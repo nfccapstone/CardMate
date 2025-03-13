@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1007147914172",
+    "project_id": "cardmate-37be3",
+    "storage_bucket": "cardmate-37be3.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1007147914172:android:a52d1dd5a39821e6cd91b9",
+        "android_client_info": {
+          "package_name": "com.example.cardmate"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA8OCYuhCDyGMR7IU5oIBJL-KVFT1moxHw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
