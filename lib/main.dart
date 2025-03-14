@@ -1,20 +1,20 @@
 import 'package:flutter/material.dart';
+import 'login.dart'; // 로그인 화면 불러오기
 
 void main() {
-  runApp(const MainApp());
+  runApp(CardMateApp());
 }
 
-class MainApp extends StatelessWidget {
-  const MainApp({super.key});
-
+class CardMateApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      home: Scaffold(
-        body: Center(
-          child: Text('Hello World!'),
-        ),
+    return MaterialApp(
+      debugShowCheckedModeBanner: false, // 디버그 배너 제거
+      title: 'CardMate',
+      theme: ThemeData(
+        brightness: Brightness.dark, // 기본 다크 모드 테마
       ),
+      home: LoginScreen(), // 앱 실행 시 로그인 화면으로 시작
     );
   }
 }
