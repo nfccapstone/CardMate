@@ -1,7 +1,13 @@
 import 'package:flutter/material.dart';
-import 'login.dart'; // 로그인 화면 불러오기
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
+import 'package:cardmate/screens/login/login_screen.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(CardMateApp());
 }
 
@@ -9,7 +15,7 @@ class CardMateApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false, // 디버그 배너 제거
+      debugShowCheckedModeBanner: false,
       title: 'CardMate',
       theme: ThemeData(
         brightness: Brightness.dark, // 기본 다크 모드 테마
