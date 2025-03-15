@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'register.dart'; // 회원가입 화면 연결을 위한 import
+import '../register/register_screen.dart'; // 회원가입 화면 연결을 위한 import
 
 class LoginScreen extends StatelessWidget {
   @override
