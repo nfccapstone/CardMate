@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:nfc_manager/nfc_manager.dart';
 
 class NfcReadService {
-  /// ✅ NFC 태그에서 명함 정보 읽기
   Future<String?> readNfcData(BuildContext context) async {
     try {
       bool isAvailable = await NfcManager.instance.isAvailable();
@@ -29,14 +28,10 @@ class NfcReadService {
             return;
           }
 
-          // ✅ 첫 번째 레코드를 가져오기
           NdefRecord record = ndef.cachedMessage!.records.first;
           List<int> payloadBytes = record.payload; // 바이너리 데이터
 
-          // ✅ 첫 바이트는 언어 코드 길이 정보 (예: 3 -> "ko")
           int langCodeLength = payloadBytes[0];
-
-          // ✅ 언어 코드 이후 데이터만 추출하여 UTF-8로 변환
           String payload =
               utf8.decode(payloadBytes.sublist(langCodeLength + 1));
 

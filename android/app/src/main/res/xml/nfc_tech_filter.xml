@@ -1,5 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- NDEF 형식의 NFC 태그 감지만 허용 -->
     <tech-list>
         <tech>android.nfc.tech.Ndef</tech>
     </tech-list>
+
+    <!-- NDEF 포맷이 가능한 태그 감지만 허용 -->
+    <tech-list>
+        <tech>android.nfc.tech.NdefFormatable</tech>
+    </tech-list>
+
 </resources>

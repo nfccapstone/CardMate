@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:cardmate/services/nfc_read_service.dart'; // ✅ NFC 서비스 추가
+import 'package:cardmate/services/nfc_read_service.dart';
 
 class NfcReadScreen extends StatefulWidget {
   const NfcReadScreen({super.key});
@@ -11,7 +11,7 @@ class NfcReadScreen extends StatefulWidget {
 class _NfcReadScreenState extends State<NfcReadScreen> {
   String _nfcData = "NFC 태그를 스캔하세요.";
 
-  final NfcReadService _nfcService = NfcReadService(); // ✅ NFC 서비스 인스턴스 생성
+  final NfcReadService _nfcService = NfcReadService();
 
   void _startNfcScan() async {
     String? result = await _nfcService.readNfcData(context);
@@ -35,9 +35,9 @@ class _NfcReadScreenState extends State<NfcReadScreen> {
           ),
         ),
         centerTitle: true,
-        backgroundColor: Colors.black, // ✅ 배경색 유지
-        elevation: 4, // ✅ 그림자 추가 (입체감)
-        shadowColor: Colors.grey.withOpacity(0.5), // ✅ 그림자 색상 조정
+        backgroundColor: Colors.black,
+        elevation: 4,
+        shadowColor: Colors.grey.withOpacity(0.5),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {

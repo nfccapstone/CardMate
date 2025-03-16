@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:cardmate/services/nfc_write_service.dart'; // ✅ NFC 서비스 추가
+import 'package:cardmate/services/nfc_write_service.dart';
 
 class NfcWriteScreen extends StatefulWidget {
   const NfcWriteScreen({super.key});
@@ -17,7 +17,7 @@ class _NfcWriteScreenState extends State<NfcWriteScreen> {
   final TextEditingController _positionController = TextEditingController();
   final TextEditingController _addressController = TextEditingController();
 
-  final NfcWriteService _nfcService = NfcWriteService(); // ✅ NFC 서비스 인스턴스 생성
+  final NfcWriteService _nfcService = NfcWriteService();
 
   @override
   Widget build(BuildContext context) {
@@ -48,7 +48,7 @@ class _NfcWriteScreenState extends State<NfcWriteScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 10), // ✅ 간격 추가 (위로 쏠림 방지)
+              const SizedBox(height: 10),
               _buildInputField(_nameController, "이름", Icons.person),
               const SizedBox(height: 12),
               _buildInputField(_phoneController, "전화번호", Icons.phone),
@@ -108,8 +108,8 @@ class _NfcWriteScreenState extends State<NfcWriteScreen> {
         filled: true,
         fillColor: Colors.black, // Background to black
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12), // ✅ 둥근 모서리
-          borderSide: BorderSide.none, // ✅ 기본 테두리 제거
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide.none,
         ),
         contentPadding:
             const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
