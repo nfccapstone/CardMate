@@ -1,7 +1,7 @@
 import 'package:cardmate/screens/home/home_screen.dart';
 import 'package:flutter/material.dart';
 import '../register/register_screen.dart'; // 회원가입 화면 import
-import 'login_service.dart'; // 로그인 서비스 import
+import '../../services/login_service.dart'; // 로그인 서비스 import
 //import '../home/home_screen.dart'; // 홈 화면 import
 
 class LoginScreen extends StatefulWidget {

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'register_service.dart'; // 회원가입 서비스 import
+import '../../services/register_service.dart'; // 회원가입 서비스 import
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});

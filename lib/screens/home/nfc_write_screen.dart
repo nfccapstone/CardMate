@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:nfc_manager/nfc_manager.dart';
+import 'package:cardmate/services/nfc_write_service.dart'; // ✅ NFC 서비스 추가
 
 class NfcWriteScreen extends StatefulWidget {
   const NfcWriteScreen({super.key});
@@ -16,77 +16,7 @@ class _NfcWriteScreenState extends State<NfcWriteScreen> {
   final TextEditingController _positionController = TextEditingController();
   final TextEditingController _addressController = TextEditingController();
 
-  /// ✅ NFC 태그에 명함 정보 저장
-  Future<void> _writeNFC() async {
-    String name = _nameController.text.trim();
-    String phone = _phoneController.text.trim();
-    String email = _emailController.text.trim();
-    String company = _companyController.text.trim();
-    String position = _positionController.text.trim();
-    String address = _addressController.text.trim();
-
-    if (name.isEmpty || phone.isEmpty || email.isEmpty || company.isEmpty || position.isEmpty || address.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("⚠️ 모든 정보를 입력해주세요.")),
-      );
-      return;
-    }
-
-    String nfcData = """
-이름: $name
-전화번호: $phone
-이메일: $email
-소속: $company
-직함: $position
-주소: $address
-""";
-
-    try {
-      await NfcManager.instance.startSession(
-        onDiscovered: (NfcTag tag) async {
-          var ndef = Ndef.from(tag);
-
-          if (ndef == null) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text("❌ NDEF 태그가 아닙니다.")),
-            );
-            await NfcManager.instance.stopSession();
-            return;
-          }
-
-          if (!ndef.isWritable) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text("❌ 쓰기 불가능한 NFC 태그입니다.")),
-            );
-            await NfcManager.instance.stopSession();
-            return;
-          }
-
-          NdefMessage message = NdefMessage([
-            NdefRecord.createText(nfcData),
-          ]);
-
-          try {
-            await ndef.write(message);
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text("✅ NFC 태그에 명함 정보 저장 완료!")),
-            );
-          } catch (e) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text("❌ NFC 저장 실패: $e")),
-            );
-          } finally {
-            await Future.delayed(Duration(milliseconds: 500)); // ✅ NFC 세션이 너무 빨리 종료되지 않도록 약간의 딜레이 추가
-            await NfcManager.instance.stopSession();
-          }
-        },
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("❌ NFC 태그 인식 실패: $e")),
-      );
-    }
-  }
+  final NfcWriteService _nfcService = NfcWriteService(); // ✅ NFC 서비스 인스턴스 생성
 
   @override
   Widget build(BuildContext context) {
@@ -109,7 +39,17 @@ class _NfcWriteScreenState extends State<NfcWriteScreen> {
               TextField(controller: _addressController, decoration: const InputDecoration(labelText: "주소")),
               const SizedBox(height: 20),
               ElevatedButton(
-                onPressed: _writeNFC,
+                onPressed: () {
+                  _nfcService.writeNfcData(
+                    context: context,
+                    name: _nameController.text.trim(),
+                    phone: _phoneController.text.trim(),
+                    email: _emailController.text.trim(),
+                    company: _companyController.text.trim(),
+                    position: _positionController.text.trim(),
+                    address: _addressController.text.trim(),
+                  );
+                },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.blueAccent,
                   padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 15),
