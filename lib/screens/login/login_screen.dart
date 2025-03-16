@@ -5,6 +5,8 @@ import 'login_service.dart'; // 로그인 서비스 import
 //import '../home/home_screen.dart'; // 홈 화면 import
 
 class LoginScreen extends StatefulWidget {
+  const LoginScreen({super.key});
+
   @override
   _LoginScreenState createState() => _LoginScreenState();
 }
@@ -22,7 +24,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     if (user != null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('로그인 성공!')),
+        const SnackBar(content: Text('로그인 성공!')),
       );
       // TODO: 로그인 성공 시 메인 화면으로 이동하는 코드 추가
       Navigator.pushReplacement(
@@ -32,7 +34,7 @@ class _LoginScreenState extends State<LoginScreen> {
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('로그인 실패! 이메일과 비밀번호를 확인하세요.')),
+        const SnackBar(content: Text('로그인 실패! 이메일과 비밀번호를 확인하세요.')),
       );
     }
   }
@@ -47,7 +49,7 @@ class _LoginScreenState extends State<LoginScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(
+              const Text(
                 "CardMate",
                 style: TextStyle(
                   fontSize: 36,
@@ -56,28 +58,30 @@ class _LoginScreenState extends State<LoginScreen> {
                   letterSpacing: 2.0,
                 ),
               ),
-              SizedBox(height: 50),
+              const SizedBox(height: 50),
               _buildTextField(emailController, "이메일", false),
+              const SizedBox(height: 12), // 이메일과 비밀번호 입력창 사이 간격 추가
               _buildTextField(passwordController, "비밀번호", true),
-              SizedBox(height: 24),
+              const SizedBox(height: 24),
               ElevatedButton(
                 onPressed: _login,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.white,
                   foregroundColor: Colors.black,
-                  minimumSize: Size(double.infinity, 50),
+                  minimumSize: const Size(double.infinity, 50),
                 ),
-                child: Text("로그인", style: TextStyle(fontSize: 18)),
+                child: const Text("로그인", style: TextStyle(fontSize: 18)),
               ),
-              SizedBox(height: 12),
+              const SizedBox(height: 12),
               TextButton(
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => RegisterScreen()),
+                    MaterialPageRoute(
+                        builder: (context) => const RegisterScreen()),
                   );
                 },
-                child: Text(
+                child: const Text(
                   "회원가입",
                   style: TextStyle(color: Colors.white, fontSize: 16),
                 ),
@@ -89,20 +93,21 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Widget _buildTextField(TextEditingController controller, String label, bool isPassword) {
+  Widget _buildTextField(
+      TextEditingController controller, String label, bool isPassword) {
     return TextField(
       controller: controller,
       obscureText: isPassword,
-      style: TextStyle(color: Colors.white),
+      style: const TextStyle(color: Colors.white),
       decoration: InputDecoration(
         labelText: label,
-        labelStyle: TextStyle(color: Colors.white),
+        labelStyle: const TextStyle(color: Colors.white),
         enabledBorder: OutlineInputBorder(
-          borderSide: BorderSide(color: Colors.white),
+          borderSide: const BorderSide(color: Colors.white),
           borderRadius: BorderRadius.circular(8),
         ),
         focusedBorder: OutlineInputBorder(
-          borderSide: BorderSide(color: Colors.blueAccent),
+          borderSide: const BorderSide(color: Colors.blueAccent),
           borderRadius: BorderRadius.circular(8),
         ),
       ),
