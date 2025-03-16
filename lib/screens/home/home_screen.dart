@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-//import 'nfc_read_screen.dart'; // NFC 읽기 화면
+import 'nfc_read_screen.dart'; // NFC 읽기 화면
 import 'nfc_write_screen.dart'; // NFC 쓰기 화면
 
 class HomeScreen extends StatefulWidget {
@@ -16,19 +16,15 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
-      appBar: AppBar(
-        title: const Text("Home", style: TextStyle(color: Colors.white)),
-        backgroundColor: Colors.black,
-        elevation: 0,
-      ),
       body: IndexedStack(
         index: _currentIndex,
         children: const [
           Center(
-              child: Text("홈 화면",
-                  style: TextStyle(color: Colors.white, fontSize: 18))),
+            child: Text("홈 화면",
+                style: TextStyle(color: Colors.white, fontSize: 18)),
+          ),
           NfcWriteScreen(), // NFC 쓰기 화면
-          //  NfcReadScreen(), // NFC 읽기 화면
+          NfcReadScreen(), // NFC 읽기 화면
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
