@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-
 import 'package:cardmate/services/nfc_write_service.dart';
+import 'package:cardmate/screens/home/home_screen.dart'; // 홈 화면 import
 
 class NfcWriteScreen extends StatefulWidget {
   const NfcWriteScreen({super.key});
@@ -38,7 +38,14 @@ class _NfcWriteScreenState extends State<NfcWriteScreen> {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
-            Navigator.pop(context); // 뒤로 가기 버튼
+            if (Navigator.canPop(context)) {
+              Navigator.pop(context); // 이전 화면이 있으면 pop 실행
+            } else {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => HomeScreen()), // 홈 화면으로 이동
+              );
+            }
           },
         ),
       ),
@@ -75,10 +82,8 @@ class _NfcWriteScreenState extends State<NfcWriteScreen> {
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor:
-                        Colors.black, // Change to black for consistency
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 50, vertical: 15),
+                    backgroundColor: Colors.black,
+                    padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 15),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30),
                     ),
@@ -111,8 +116,7 @@ class _NfcWriteScreenState extends State<NfcWriteScreen> {
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide.none,
         ),
-        contentPadding:
-            const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
+        contentPadding: const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
       ),
       style: const TextStyle(color: Colors.white), // Input text to white
       cursorColor: Colors.white, // Cursor color to white

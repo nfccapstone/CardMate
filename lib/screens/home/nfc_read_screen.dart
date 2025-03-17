@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cardmate/services/nfc_read_service.dart';
+import '../home/home_screen.dart';
 
 class NfcReadScreen extends StatefulWidget {
   const NfcReadScreen({super.key});
@@ -41,9 +42,16 @@ class _NfcReadScreenState extends State<NfcReadScreen> {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
-            Navigator.pop(context); // 뒤로 가기 기능
-          },
-        ),
+            if (Navigator.canPop(context)) {
+              Navigator.pop(context); // 뒤로 가기
+            } else {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => HomeScreen()), // 홈 화면으로 이동
+            );
+          }
+        },
+      ),
       ),
       body: Center(
         child: Padding(
