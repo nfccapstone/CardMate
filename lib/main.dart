@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'firebase_options.dart';
-import 'package:cardmate/screens/login/login_screen.dart';
+// import 'package:firebase_core/firebase_core.dart';
+import 'firebase/firebase_init.dart'; // FirebaseInit import
+import 'screens/login/login_screen.dart'; // 로그인 화면 import
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  await FirebaseInit.instance.initializeFirebase(); // ✅ Firebase 초기화 완료 후 앱 실행
+
   runApp(CardMateApp());
 }
 

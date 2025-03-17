@@ -1,11 +1,11 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cardmate/firebase/firebase_init.dart'; // FirebaseInit import
 
 class LoginService {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseAuth _auth = FirebaseInit.instance.auth; // ✅ FirebaseInit에서 FirebaseAuth 가져오기
 
   Future<User?> signIn(String email, String password) async {
     try {
-      // Firebase Authentication을 사용하여 이메일/비밀번호로 로그인
       UserCredential userCredential = await _auth.signInWithEmailAndPassword(
         email: email,
         password: password,
