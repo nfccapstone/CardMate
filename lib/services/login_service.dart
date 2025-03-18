@@ -1,5 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cardmate/firebase/firebase_init.dart'; // FirebaseInit import
+import 'package:cardmate/services/firebase/firebase_init.dart'; // FirebaseInit import
 
 class LoginService {
   final FirebaseAuth _auth = FirebaseInit.instance.auth; // ✅ FirebaseInit에서 FirebaseAuth 가져오기
