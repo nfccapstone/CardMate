@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cardmate/services/nfc_read_service.dart';
+import 'package:cardmate/services/business_card_registration_service.dart';
 import '../home/home_screen.dart';
 
 class NfcReadScreen extends StatefulWidget {
@@ -13,6 +14,8 @@ class _NfcReadScreenState extends State<NfcReadScreen> {
   String _nfcData = "NFC 태그를 스캔하세요.";
 
   final NfcReadService _nfcService = NfcReadService();
+  final BusinessCardRegistrationService _registrationService =
+      BusinessCardRegistrationService();
 
   void _startNfcScan() async {
     String? result = await _nfcService.readNfcData(context);
@@ -45,13 +48,14 @@ class _NfcReadScreenState extends State<NfcReadScreen> {
             if (Navigator.canPop(context)) {
               Navigator.pop(context); // 뒤로 가기
             } else {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (context) => HomeScreen()), // 홈 화면으로 이동
-            );
-          }
-        },
-      ),
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => HomeScreen()), // 홈 화면으로 이동
+              );
+            }
+          },
+        ),
       ),
       body: Center(
         child: Padding(
@@ -88,6 +92,23 @@ class _NfcReadScreenState extends State<NfcReadScreen> {
                 ),
                 child: const Text(
                   "📲  NFC 스캔",
+                  style: TextStyle(fontSize: 18, color: Colors.white),
+                ),
+              ),
+              ElevatedButton(
+                onPressed: () async {
+                  await _registrationService.saveNfcDataToFirebase(_nfcData);
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.black, // Black background for button
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 35, vertical: 15),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30),
+                  ),
+                ),
+                child: const Text(
+                  "📇  명함 등록",
                   style: TextStyle(fontSize: 18, color: Colors.white),
                 ),
               ),
