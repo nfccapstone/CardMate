@@ -19,6 +19,7 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
+          port: ${{ secrets.REMOTE_SSH_PORT }}
           script: |
             cd ~/backend_flask
             git pull origin main
