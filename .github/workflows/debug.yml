@@ -1,0 +1,9 @@
+name: Check GitHub Actions IP
+on: [push]
+
+jobs:
+  check-ip:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get Public IP
+        run: curl ifconfig.me
