@@ -1,33 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:cardmate/services/nfc_read_service.dart';
-import 'package:cardmate/services/business_card_registration_service.dart';
-import '../home/home_screen.dart';
+import 'package:get/get.dart';
+import 'package:cardmate/getX/controllers/nfc_read_controller.dart';
 
-class NfcReadScreen extends StatefulWidget {
+class NfcReadScreen extends StatelessWidget {
   const NfcReadScreen({super.key});
 
   @override
-  _NfcReadScreenState createState() => _NfcReadScreenState();
-}
-
-class _NfcReadScreenState extends State<NfcReadScreen> {
-  String _nfcData = "NFC 태그를 스캔하세요.";
-
-  final NfcReadService _nfcService = NfcReadService();
-  final BusinessCardRegistrationService _registrationService =
-      BusinessCardRegistrationService();
-
-  void _startNfcScan() async {
-    String? result = await _nfcService.readNfcData(context);
-    if (result != null) {
-      setState(() {
-        _nfcData = result;
-      });
-    }
-  }
-
-  @override
   Widget build(BuildContext context) {
+    final NfcReadController controller = Get.put(NfcReadController()); // 🔹 컨트롤러 주입
+
     return Scaffold(
       appBar: AppBar(
         title: const Text(
@@ -42,20 +23,6 @@ class _NfcReadScreenState extends State<NfcReadScreen> {
         backgroundColor: Colors.black,
         elevation: 4,
         shadowColor: Colors.grey.withOpacity(0.5),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () {
-            if (Navigator.canPop(context)) {
-              Navigator.pop(context); // 뒤로 가기
-            } else {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => HomeScreen()), // 홈 화면으로 이동
-              );
-            }
-          },
-        ),
       ),
       body: Center(
         child: Padding(
@@ -63,25 +30,25 @@ class _NfcReadScreenState extends State<NfcReadScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // Display NFC data in a more stylish container
-              Container(
-                padding: const EdgeInsets.all(16),
-                margin: const EdgeInsets.symmetric(horizontal: 20),
-                decoration: BoxDecoration(
-                  color: Colors.grey[800], // Darker background for contrast
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.white.withOpacity(0.2)),
-                ),
-                child: Text(
-                  _nfcData,
-                  style: const TextStyle(color: Colors.white, fontSize: 18),
-                  textAlign: TextAlign.center,
-                ),
-              ),
+              // 🔹 NFC 데이터 표시 (반응형 UI)
+              Obx(() => Container(
+                    padding: const EdgeInsets.all(16),
+                    margin: const EdgeInsets.symmetric(horizontal: 20),
+                    decoration: BoxDecoration(
+                      color: Colors.grey[800], // Darker background for contrast
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.white.withOpacity(0.2)),
+                    ),
+                    child: Text(
+                      controller.nfcData.value,
+                      style: const TextStyle(color: Colors.white, fontSize: 18),
+                      textAlign: TextAlign.center,
+                    ),
+                  )),
               const SizedBox(height: 30),
-              // Scan button styled to match the theme
+              // 🔹 NFC 스캔 버튼
               ElevatedButton(
-                onPressed: _startNfcScan,
+                onPressed: controller.startNfcScan,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.black, // Black background for button
                   padding:
@@ -95,10 +62,9 @@ class _NfcReadScreenState extends State<NfcReadScreen> {
                   style: TextStyle(fontSize: 18, color: Colors.white),
                 ),
               ),
+              // 🔹 NFC 데이터 저장 버튼
               ElevatedButton(
-                onPressed: () async {
-                  await _registrationService.saveNfcDataToFirebase(_nfcData);
-                },
+                onPressed: controller.saveNfcData,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.black, // Black background for button
                   padding:
