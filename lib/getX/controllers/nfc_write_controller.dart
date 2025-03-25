@@ -4,6 +4,22 @@ import 'package:cardmate/services/nfc_write_service.dart';
 
 class NfcWriteController extends GetxController {
   final NfcWriteService _nfcService = NfcWriteService();
+  final RxString jobCategory = ''.obs;
+
+// 선택 가능한 직종 리스트
+final List<String> jobCategories = [
+  'IT/정보통신',
+  '금융/보험',
+  '교육/연구',
+  '의료/보건',
+  '디자인/예술',
+  '건설/엔지니어링',
+  '요식업',
+  '제조/생산',
+  '공공/행정',
+  '기타',
+];
+
 
   // 🔹 TextEditingController 선언
   final TextEditingController nameController = TextEditingController();
@@ -21,6 +37,7 @@ class NfcWriteController extends GetxController {
       phone: phoneController.text.trim(),
       email: emailController.text.trim(),
       company: companyController.text.trim(),
+      jobCategory: jobCategory.value,
       position: positionController.text.trim(),
       address: addressController.text.trim(),
     );
