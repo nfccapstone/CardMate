@@ -7,7 +7,7 @@ class NfcWriteScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final NfcWriteController controller = Get.put(NfcWriteController()); // 🔹 컨트롤러 주입
+    final NfcWriteController controller = Get.put(NfcWriteController());
 
     return Scaffold(
       appBar: AppBar(
@@ -39,16 +39,52 @@ class NfcWriteScreen extends StatelessWidget {
               const SizedBox(height: 12),
               _buildInputField(controller.companyController, "소속", Icons.business),
               const SizedBox(height: 12),
+
+              // ✅ 직종 드롭다운 추가
+              Obx(() => DropdownButtonFormField<String>(
+                    value: controller.jobCategory.value.isEmpty
+                        ? null
+                        : controller.jobCategory.value,
+                    items: controller.jobCategories.map((category) {
+                      return DropdownMenuItem<String>(
+                        value: category,
+                        child: Text(category),
+                      );
+                    }).toList(),
+                    onChanged: (value) {
+                      if (value != null) {
+                        controller.jobCategory.value = value;
+                      }
+                    },
+                    decoration: InputDecoration(
+                      labelText: "직종",
+                      labelStyle: const TextStyle(color: Colors.white),
+                      filled: true,
+                      fillColor: Colors.black,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide.none,
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(
+                          vertical: 15, horizontal: 20),
+                    ),
+                    dropdownColor: Colors.black,
+                    style: const TextStyle(color: Colors.white),
+                  )),
+              const SizedBox(height: 12),
+
               _buildInputField(controller.positionController, "직함", Icons.badge),
               const SizedBox(height: 12),
               _buildInputField(controller.addressController, "주소", Icons.location_on),
               const SizedBox(height: 20),
+
               Center(
                 child: ElevatedButton(
                   onPressed: controller.writeNfcData,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.black,
-                    padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 15),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 50, vertical: 15),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30),
                     ),
@@ -66,25 +102,24 @@ class NfcWriteScreen extends StatelessWidget {
     );
   }
 
-  /// 🔹 **공통된 입력 필드 디자인 함수**
   Widget _buildInputField(
       TextEditingController controller, String label, IconData icon) {
     return TextField(
       controller: controller,
       decoration: InputDecoration(
         labelText: label,
-        labelStyle: const TextStyle(color: Colors.white), // Label text to white
-        prefixIcon: Icon(icon, color: Colors.white), // Icon color to white
+        labelStyle: const TextStyle(color: Colors.white),
+        prefixIcon: Icon(icon, color: Colors.white),
         filled: true,
-        fillColor: Colors.black, // Background to black
+        fillColor: Colors.black,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide.none,
         ),
         contentPadding: const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
       ),
-      style: const TextStyle(color: Colors.white), // Input text to white
-      cursorColor: Colors.white, // Cursor color to white
+      style: const TextStyle(color: Colors.white),
+      cursorColor: Colors.white,
     );
   }
 }
