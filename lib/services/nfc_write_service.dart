@@ -9,6 +9,7 @@ class NfcWriteService {
     required String phone,
     required String email,
     required String company,
+    required String jobCategory,
     required String position,
     required String address,
   }) async {
@@ -24,6 +25,7 @@ class NfcWriteService {
 전화번호: $phone
 이메일: $email
 소속: $company
+직종: $jobCategory
 직함: $position
 주소: $address
 """;
