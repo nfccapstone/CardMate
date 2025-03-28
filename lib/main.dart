@@ -19,7 +19,8 @@ class CardMateApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GetMaterialApp( // ✅ GetX 적용
+    return GetMaterialApp(
+      // ✅ GetX 적용
       debugShowCheckedModeBanner: false,
       title: 'CardMate',
       theme: ThemeData(
