@@ -1,11 +1,12 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+//import 'package:cloud_firestore/cloud_firestore.dart';
+//import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cardmate/services/firebase/firebase_init.dart';
 
 class EditCardService {
   final _auth = FirebaseInit.instance.auth;
   final _firestore = FirebaseInit.instance.firestore;
 
+  /// Firestore에서 명함 기본 정보 불러오기
   Future<Map<String, dynamic>?> fetchBasicInfo() async {
     final uid = _auth.currentUser?.uid;
     if (uid == null) return null;
@@ -25,22 +26,22 @@ class EditCardService {
     }
   }
 
-  Future<void> saveContact(String type, String value) async {
-  final uid = _auth.currentUser?.uid;
-  if (uid == null) return;
+  /// Firestore에 명함 기본 정보 저장
+  Future<bool> saveBasicInfo(Map<String, dynamic> data) async {
+    final uid = _auth.currentUser?.uid;
+    if (uid == null) return false;
 
-  try {
-    final docRef = _firestore
-        .collection('users')
-        .doc(uid)
-        .collection('my_namecard')
-        .doc('contacts');
-
-    await docRef.set({type: value}, SetOptions(merge: true));
-  } catch (e) {
-    print('연락처 저장 실패: $e');
-    rethrow;
+    try {
+      await _firestore
+          .collection('users')
+          .doc(uid)
+          .collection('my_namecard')
+          .doc('basic_info')
+          .set(data);
+      return true;
+    } catch (e) {
+      print('명함 정보 저장 오류: $e');
+      return false;
+    }
   }
-}
-
 }
