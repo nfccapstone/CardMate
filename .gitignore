@@ -13,6 +13,23 @@
 
 migrate_working_dir/
 
+# Android Studio / Gradle 빌드 관련
+.gradle/
+**/build/
+**/.cxx/
+**/local.properties
+android/local.properties
+
+# NDK / CMake 캐시
+**/CMakeFiles/
+**/CMakeCache.txt
+**/cmake_install.cmake
+**/*.ninja
+**/*.bin
+**/*.json
+**/*.txt
+
+
 # IntelliJ related
 *.iml
 *.ipr
