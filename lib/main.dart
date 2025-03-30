@@ -3,9 +3,11 @@ import 'package:get/get.dart';
 import 'services/firebase/firebase_init.dart';
 import 'screens/login/login_screen.dart';
 import 'screens/home/home_screen.dart';
-import 'screens/home/nfc_write_screen.dart';
-import 'screens/home/nfc_read_screen.dart';
 import 'screens/register/register_screen.dart';
+import 'screens/namecard/edit_card_screen.dart';
+import 'screens/namecard/namecard_info_screen.dart';
+import 'getX/bindings/namecard_bindings.dart';
+import 'screens/namecard/edit_contact_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -30,8 +32,15 @@ class CardMateApp extends StatelessWidget {
         GetPage(name: '/', page: () => const LoginScreen()),
         GetPage(name: '/home', page: () => const HomeScreen()),
         GetPage(name: '/register', page: () => const RegisterScreen()),
-        GetPage(name: '/nfcWrite', page: () => const NfcWriteScreen()),
-        GetPage(name: '/nfcRead', page: () => const NfcReadScreen()),
+        GetPage(name: '/editCard', page: () => const EditCardScreen()),
+        GetPage( // ✅ 바인딩 포함된 단 하나의 등록만 유지
+          name: '/namecardInfo',
+          page: () => const NameCardInfoScreen(),
+          binding: NameCardBindings(),
+          ),
+          GetPage(name: '/editContact',
+          page: () => EditContactScreen(),
+          ),
       ],
     );
   }
