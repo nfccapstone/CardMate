@@ -1,3 +1,4 @@
+//import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:cardmate/getX/controllers/namecard_info_controller.dart';
@@ -27,11 +28,24 @@ class NameCardInfoScreen extends StatelessWidget {
           child: Column(
             children: [
               const SizedBox(height: 20),
-              CircleAvatar(
-                radius: 40,
-                backgroundColor: Colors.grey[300],
-                child: const Icon(Icons.person, size: 40, color: Colors.white),
-              ),
+              Obx(() => GestureDetector(
+                onTap: controller.pickImage,
+                child: CircleAvatar(
+                  radius: 40,
+                  backgroundColor: Colors.grey[300],
+                  backgroundImage: controller.profileImage.value != null &&
+                  controller.profileImage.value!.path.isNotEmpty
+                  ? FileImage(controller.profileImage.value!)
+                  : (controller.profileImageUrl.value.isNotEmpty
+                  ? NetworkImage(controller.profileImageUrl.value)
+                  : null),
+                  child: (controller.profileImage.value == null ||
+                  controller.profileImage.value!.path.isEmpty) &&
+                  controller.profileImageUrl.value.isEmpty
+                  ? const Icon(Icons.person, size: 40, color: Colors.white)
+                  : null,
+                  ),
+              )),
               const SizedBox(height: 30),
               _buildTextField(controller.nameController, '이름'),
               _buildTextField(controller.positionController, '직책'),
@@ -69,9 +83,20 @@ class NameCardInfoScreen extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: TextField(
         controller: controller,
+        style: const TextStyle(
+          color: Colors.black,
+          fontWeight: FontWeight.bold,
+          fontSize: 16,
+        ),
         decoration: InputDecoration(
           labelText: label,
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+          labelStyle: const TextStyle(
+            color:Colors.black,
+            fontWeight: FontWeight.w600,
+          ),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8)
+            ),
         ),
       ),
     );
