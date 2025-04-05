@@ -98,24 +98,55 @@ Widget _buildHomeBody(HomeController controller) {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // 이름, 직책
-              Text(
-                data['name'] ?? '',
-                style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.white),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                '${data['department'] ?? ''} / ${data['position'] ?? ''}',
-                style: const TextStyle(fontSize: 14, color: Colors.white70),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                data['company'] ?? '',
-                style: const TextStyle(fontSize: 14, color: Colors.white70),
+              // 상단 Row: 프로필 사진, 기본 정보, QR 버튼
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // 프로필 사진 (왼쪽)
+                  if (data['photoUrl'] != null && data['photoUrl'].toString().isNotEmpty)
+                    CircleAvatar(
+                      radius: 40,
+                      backgroundImage: NetworkImage(data['photoUrl']),
+                    ),
+                  const SizedBox(width: 12),
+                  // 기본 정보 (이름, 부서/직책, 회사)
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          data['name'] ?? '',
+                          style: const TextStyle(
+                              fontSize: 22, fontWeight: FontWeight.bold, color: Colors.white),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          '${data['department'] ?? ''} / ${data['position'] ?? ''}',
+                          style: const TextStyle(fontSize: 14, color: Colors.white70),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          data['company'] ?? '',
+                          style: const TextStyle(fontSize: 14, color: Colors.white70),
+                        ),
+                      ],
+                    ),
+                  ),
+                  // QR 버튼 (오른쪽 상단)
+                  Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: Colors.white24,
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    alignment: Alignment.center,
+                    child: const Text('QR', style: TextStyle(color: Colors.white)),
+                  ),
+                ],
               ),
               const SizedBox(height: 16),
-
-              // 링크 + 공유 + QR
+              // 링크, 복사, 공유 버튼 Row
               Row(
                 children: [
                   Expanded(
@@ -146,26 +177,23 @@ Widget _buildHomeBody(HomeController controller) {
                       textStyle: const TextStyle(fontSize: 14),
                     ),
                   ),
-                  const SizedBox(width: 12),
-                  Container(
-                    width: 40,
-                    height: 40,
-                    color: Colors.white24,
-                    alignment: Alignment.center,
-                    child: const Text('QR', style: TextStyle(color: Colors.white)),
-                  )
                 ],
               ),
-
               const SizedBox(height: 20),
-
-              // 연락처 (휴대전화 + 이메일만 표시)
-              if (contact['mobile'] != null) ...[
-                Text('연락처: ${contact['mobile']}', style: const TextStyle(color: Colors.white)),
-              ],
-              if (contact['email'] != null) ...[
+              // 연락처 정보 전체 출력
+              if (contact.isNotEmpty) ...[
+                const Text(
+                  "연락처:",
+                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                ),
                 const SizedBox(height: 6),
-                Text('Email: ${contact['email']}', style: const TextStyle(color: Colors.white)),
+                ...contact.entries.map((entry) => Padding(
+                      padding: const EdgeInsets.only(bottom: 6),
+                      child: Text(
+                        '${entry.key}: ${entry.value}',
+                        style: const TextStyle(color: Colors.white),
+                      ),
+                    )),
               ],
             ],
           ),
@@ -174,5 +202,4 @@ Widget _buildHomeBody(HomeController controller) {
     );
   });
 }
-
-}
+      }
