@@ -12,7 +12,12 @@ class HomeService {
     if (user == null) return null;
 
     try {
-      final doc = await _firestore.collection('users').doc(user.uid).get();
+      final doc = await _firestore
+      .collection('users')
+      .doc(user.uid)
+      .collection('my_namecard')
+      .doc('basic_info')
+      .get();
       return doc.data();
     } catch (e) {
       print('명함 정보 가져오기 오류: $e');
