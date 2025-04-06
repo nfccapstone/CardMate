@@ -19,6 +19,7 @@ class HomeController extends GetxController {
   void onInit() {
     super.onInit();
     fetchCardInfo(); // ✅ 앱 실행 시 명함 정보 로드
+    
   }
 
   void changeIndex(int index) {
