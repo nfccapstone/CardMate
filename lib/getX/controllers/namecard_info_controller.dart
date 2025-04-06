@@ -15,7 +15,7 @@ class NameCardInfoController extends GetxController {
   final NameCardService _service = NameCardService();
 
   Rx<File?> profileImage = Rx<File?>(null); // ✅ 선택한 이미지 파일
-  RxString profileImageUrl = ''.obs;        // ✅ 저장된 이미지 URL
+  RxString profileImageUrl = ''.obs; // ✅ 저장된 이미지 URL
   final ImagePicker _picker = ImagePicker();
 
   @override
@@ -32,21 +32,21 @@ class NameCardInfoController extends GetxController {
   }
 
   Future<void> loadBasicInfo() async {
-  final data = await _service.fetchBasicInfo(); // Firestore에서 불러오기
-  if (data != null) {
-    nameController.text = data['name'] ?? '';
-    positionController.text = data['position'] ?? '';
-    departmentController.text = data['department'] ?? '';
-    companyController.text = data['company'] ?? '';
-    nameCardIdController.text = data['nameCardId'] ?? '';
+    final data = await _service.fetchBasicInfo(); // Firestore에서 불러오기
+    if (data != null) {
+      nameController.text = data['name'] ?? '';
+      positionController.text = data['position'] ?? '';
+      departmentController.text = data['department'] ?? '';
+      companyController.text = data['company'] ?? '';
+      nameCardIdController.text = data['nameCardId'] ?? '';
 
-    final url = data['photoUrl'] ?? '';
-    if (url.isNotEmpty) {
-      //profileImage.value = File(''); // 초기화용 더미
-      profileImageUrl.value = url;   // ✅ 새 변수로 URL 보관
+      final url = data['photoUrl'] ?? '';
+      if (url.isNotEmpty) {
+        //profileImage.value = File(''); // 초기화용 더미
+        profileImageUrl.value = url; // ✅ 새 변수로 URL 보관
+      }
     }
   }
-}
 
   Future<void> saveToFirebase() async {
     isSaving.value = true;

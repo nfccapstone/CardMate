@@ -59,7 +59,10 @@ class EditCardScreen extends StatelessWidget {
           children: [
             Text(
               data['name'] ?? '이름 없음',
-              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
+              style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white),
             ),
             const SizedBox(height: 8),
             Text(
@@ -117,7 +120,8 @@ class EditCardScreen extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(contactTitles[type] ?? '연락처',
-                          style: const TextStyle(fontSize: 14, color: Colors.grey)),
+                          style: const TextStyle(
+                              fontSize: 14, color: Colors.grey)),
                       const SizedBox(height: 4),
                       Text(
                         value,
@@ -148,7 +152,8 @@ class EditCardScreen extends StatelessWidget {
     });
   }
 
-  Widget _buildContactAddButton(BuildContext context, ContactController controller) {
+  Widget _buildContactAddButton(
+      BuildContext context, ContactController controller) {
     return GestureDetector(
       onTap: () => controller.showContactTypeSelector(context),
       child: Container(
@@ -160,7 +165,8 @@ class EditCardScreen extends StatelessWidget {
         ),
         child: const Text(
           '+ 연락처 추가',
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: Colors.black),
+          style: TextStyle(
+              fontSize: 16, fontWeight: FontWeight.w500, color: Colors.black),
         ),
       ),
     );
