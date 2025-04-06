@@ -1,3 +1,4 @@
+import 'package:cardmate/screens/namecardbooks/add_card_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -92,7 +93,8 @@ class NamecardbooksScreen extends StatelessWidget {
                 }),
                 const SizedBox(height: 12),
                 _buildOptionButton(context, Icons.edit, '직접 입력', () {
-                  // 직접 입력 기능
+                  Get.to(() => AddCardScreen());
+                  //Get.toNamed('/addNamecard');
                 }),
               ],
             ),

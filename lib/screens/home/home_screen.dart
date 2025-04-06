@@ -1,3 +1,4 @@
+import 'package:cardmate/screens/namecardbooks/namecard_list_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:cardmate/getX/controllers/home_controller.dart';
@@ -17,10 +18,7 @@ class HomeScreen extends StatelessWidget {
           NamecardbooksScreen(),
           Expanded(
             child: Center(
-              child: Text(
-                '명함 리스트',
-                style: TextStyle(color: Colors.white),
-              ),
+              child: NameCardListScreen(),
             ),
           ),
         ],

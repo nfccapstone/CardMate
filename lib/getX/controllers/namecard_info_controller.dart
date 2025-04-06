@@ -26,9 +26,8 @@ class NameCardInfoController extends GetxController {
     final success = await _service.saveBasicInfo(data);
     if (success) {
       Get.snackbar('저장 완료', '기본 정보가 저장되었습니다.');
-      }
+    }
   }
-
 
   @override
   void onClose() {

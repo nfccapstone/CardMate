@@ -1,3 +1,4 @@
+import 'package:cardmate/getX/controllers/namecard_info_controller.dart';
 import 'package:get/get.dart';
 import 'package:cardmate/services/firebase/firebase_init.dart';
 import 'package:cardmate/services/home_service.dart';
@@ -35,7 +36,8 @@ class HomeController extends GetxController {
   /// 🔄 명함 정보 및 연락처 정보를 함께 불러옴
   Future<void> fetchCardInfo() async {
     final basicInfo = await _homeService.fetchCardData(); // 기존 문서 (users/{uid})
-    final contactInfo = await _homeService.fetchContactInfo(); // 🔹 연락처 문서 (my_namecard/contact)
+    final contactInfo = await _homeService
+        .fetchContactInfo(); // 🔹 연락처 문서 (my_namecard/contact)
 
     if (basicInfo != null) {
       final combined = {...basicInfo};

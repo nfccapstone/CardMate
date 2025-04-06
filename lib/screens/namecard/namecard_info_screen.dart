@@ -18,7 +18,8 @@ class NameCardInfoScreen extends StatelessWidget {
         appBar: AppBar(
           backgroundColor: Colors.white,
           iconTheme: const IconThemeData(color: Colors.black),
-          title: const Text('이름 / 재직 정보', style: TextStyle(color: Colors.black)),
+          title:
+              const Text('이름 / 재직 정보', style: TextStyle(color: Colors.black)),
           centerTitle: true,
         ),
         backgroundColor: Colors.white,
@@ -40,7 +41,9 @@ class NameCardInfoScreen extends StatelessWidget {
               _buildTextField(controller.nameCardIdController, 'NameCard ID'),
               const SizedBox(height: 20),
               Obx(() => ElevatedButton(
-                    onPressed: controller.isSaving.value ? null : controller.saveToFirebase,
+                    onPressed: controller.isSaving.value
+                        ? null
+                        : controller.saveToFirebase,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.grey[300],
                       foregroundColor: Colors.black,

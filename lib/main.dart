@@ -1,3 +1,5 @@
+import 'package:cardmate/screens/namecardbooks/add_card_screen.dart';
+import 'package:cardmate/screens/namecardbooks/edit_othercard_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'services/firebase/firebase_init.dart';
@@ -21,7 +23,8 @@ class CardMateApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GetMaterialApp( // ✅ GetX 적용
+    return GetMaterialApp(
+      // ✅ GetX 적용
       debugShowCheckedModeBanner: false,
       title: 'CardMate',
       theme: ThemeData(
@@ -33,14 +36,17 @@ class CardMateApp extends StatelessWidget {
         GetPage(name: '/home', page: () => const HomeScreen()),
         GetPage(name: '/register', page: () => const RegisterScreen()),
         GetPage(name: '/editCard', page: () => const EditCardScreen()),
-        GetPage( // ✅ 바인딩 포함된 단 하나의 등록만 유지
+        GetPage(
+          // ✅ 바인딩 포함된 단 하나의 등록만 유지
           name: '/namecardInfo',
           page: () => const NameCardInfoScreen(),
           binding: NameCardBindings(),
-          ),
-          GetPage(name: '/editContact',
+        ),
+        GetPage(
+          name: '/editContact',
           page: () => EditContactScreen(),
-          ),
+        ),
+        GetPage(name: '/addNamecard', page: () => AddCardScreen()),
       ],
     );
   }
