@@ -7,7 +7,6 @@ class FirebaseInit {
   late FirebaseFirestore firestore;
   late FirebaseAuth auth;
 
-  // Singleton 패턴으로 인스턴스 관리
   static FirebaseInit get instance => _instance;
 
   factory FirebaseInit() {
@@ -17,8 +16,13 @@ class FirebaseInit {
   FirebaseInit._internal();
 
   Future<void> initializeFirebase() async {
+    // 1) Firebase 초기화
     await Firebase.initializeApp();
-    firestore = FirebaseFirestore.instance;
+    
+    // 2) Cloud Firestore 인스턴스
+    firestore = FirebaseFirestore.instance; // 또는 instanceFor(app: Firebase.app())
+    
+    // 3) Firebase Auth 인스턴스
     auth = FirebaseAuth.instance;
   }
 }
