@@ -1,4 +1,5 @@
 import 'package:cardmate/screens/namecardbooks/add_card_screen.dart';
+import 'package:cardmate/screens/namecard/block_create_screen.dart';
 import 'package:cardmate/screens/namecardbooks/edit_othercard_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -47,6 +48,10 @@ class CardMateApp extends StatelessWidget {
           page: () => EditContactScreen(),
         ),
         GetPage(name: '/addNamecard', page: () => AddCardScreen()),
+        GetPage(
+          name: '/blockCreate',
+          page: () => BlockCreateScreen(),
+        ),
       ],
     );
   }

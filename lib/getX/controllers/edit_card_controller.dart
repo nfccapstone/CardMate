@@ -5,6 +5,9 @@ class EditCardController extends GetxController {
   final isLoading = true.obs;
   final basicInfo = <String, dynamic>{}.obs;
 
+  // 추가: 블록들을 저장할 RxList
+  final blocks = <Map<String, dynamic>>[].obs;
+
   final EditCardService _service = EditCardService();
 
   @override
@@ -40,5 +43,12 @@ class EditCardController extends GetxController {
     }
 
     isLoading.value = false;
+  }
+
+  /// 블록을 추가하는 메서드  
+  /// type: 'text', 'photo', 'link' 중 하나를 전달
+  void addBlock(String type) {
+    // 초기 content는 빈 문자열 또는 기본값
+    blocks.add({'type': type, 'content': ''});
   }
 }
