@@ -1,15 +1,20 @@
-import 'package:cardmate/screens/namecardbooks/add_card_screen.dart';
-import 'package:cardmate/screens/namecardbooks/edit_othercard_screen.dart';
+import 'package:cardmate/features/home/home_binding.dart';
+import 'package:cardmate/features/namecardbooks/add_card_screen.dart';
+import 'package:cardmate/features/namecard/screens/block_create_screen.dart';
+import 'package:cardmate/features/namecardbooks/edit_othercard_screen.dart';
+import 'package:cardmate/features/register/register_binding.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'services/firebase/firebase_init.dart';
-import 'screens/login/login_screen.dart';
-import 'screens/home/home_screen.dart';
-import 'screens/register/register_screen.dart';
-import 'screens/namecard/edit_card_screen.dart';
-import 'screens/namecard/namecard_info_screen.dart';
-import 'getX/bindings/namecard_bindings.dart';
-import 'screens/namecard/edit_contact_screen.dart';
+import 'firebase/firebase_init.dart';
+import 'features/login/login_screen.dart';
+import 'features/home/home_screen.dart';
+import 'features/register/register_screen.dart';
+import 'features/namecard/screens/edit_card_screen.dart';
+import 'features/namecard/screens/namecard_info_screen.dart';
+import 'features/namecard/screens/edit_contact_screen.dart';
+import 'features/namecard/namecard_bindings.dart';
+import 'features/login/login_bindings.dart';
+//import 'features/register/register_binding.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -32,10 +37,22 @@ class CardMateApp extends StatelessWidget {
       ),
       initialRoute: '/', // 기본 시작 화면 (로그인 화면)
       getPages: [
-        GetPage(name: '/', page: () => const LoginScreen()),
-        GetPage(name: '/home', page: () => const HomeScreen()),
-        GetPage(name: '/register', page: () => const RegisterScreen()),
-        GetPage(name: '/editCard', page: () => const EditCardScreen()),
+        GetPage(
+          name: '/',
+          page: () => const LoginScreen(),
+          binding: LoginBinding()),
+        GetPage(
+          name: '/home', 
+          page: () => const HomeScreen(),
+          binding: HomeBinding()),
+        GetPage(
+          name: '/register', 
+          page: () => const RegisterScreen(),
+          binding: RegisterBinding()),
+        GetPage(
+          name: '/editCard', 
+          page: () => const EditCardScreen(), 
+          binding: NameCardBindings()),
         GetPage(
           // ✅ 바인딩 포함된 단 하나의 등록만 유지
           name: '/namecardInfo',
@@ -47,6 +64,10 @@ class CardMateApp extends StatelessWidget {
           page: () => EditContactScreen(),
         ),
         GetPage(name: '/addNamecard', page: () => AddCardScreen()),
+        GetPage(
+          name: '/blockCreate',
+          page: () => BlockCreateScreen(),
+        ),
       ],
     );
   }
