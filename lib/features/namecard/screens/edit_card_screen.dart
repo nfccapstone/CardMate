@@ -5,15 +5,17 @@ import 'package:cardmate/features/namecard/controllers/contact_controller.dart';
 import 'package:cardmate/features/namecard/widgets/profile_section.dart';
 import 'package:cardmate/features/namecard/widgets/contact_section.dart';
 import 'package:cardmate/features/namecard/widgets/block_section.dart';
+import 'package:cardmate/features/namecard/widgets/sns_bottom_sheet.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class EditCardScreen extends StatelessWidget {
   const EditCardScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final EditCardController editController = Get.find<EditCardController>();
-    final ContactController contactController = Get.find<ContactController>();
-
+    // 이미 바인딩을 통해 등록된 컨트롤러를 Get.find()로 호출합니다.
+    final editController = Get.find<EditCardController>();
+    final contactController = Get.find<ContactController>();
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -31,8 +33,7 @@ class EditCardScreen extends StatelessWidget {
           return const Center(child: CircularProgressIndicator());
         }
         return SingleChildScrollView(
-          padding:
-              const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -50,6 +51,23 @@ class EditCardScreen extends StatelessWidget {
           ),
         );
       }),
+      // 우측 하단에 SNS 버튼 고정 (floatingActionButton)
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: Colors.deepPurple,
+        onPressed: () {
+          // SNS 목록 및 추가 기능 BottomSheet 표시
+          showModalBottomSheet(
+            context: context,
+            backgroundColor: Colors.white,
+            shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+            ),
+            builder: (_) => const SNSBottomSheetUI(),
+          );
+        },
+        child: const Icon(Icons.public),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }
 
