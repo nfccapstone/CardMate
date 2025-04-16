@@ -5,6 +5,7 @@ class CardModel {
   String position;
   String department;
   String? profileUrl;
+  Map<String, String>? contacts;
 
   CardModel({
     required this.id,
@@ -13,6 +14,7 @@ class CardModel {
     required this.position,
     required this.department,
     this.profileUrl,
+    this.contacts,
   });
 
   factory CardModel.fromMap(Map<String, dynamic> map, String id) {
@@ -22,7 +24,8 @@ class CardModel {
         department: map['department'],
         company: map['company'],
         id: id,
-        profileUrl: map['profileUrl']);
+        profileUrl: map['profileUrl'],
+        contacts: map['contacts']);
   }
 
   Map<String, dynamic> toMap() {
@@ -33,6 +36,7 @@ class CardModel {
       'company': company,
       'id': id,
       'profileUrl': profileUrl,
+      if (contacts != null) 'contacts': contacts,
     };
   }
 }

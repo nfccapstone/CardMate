@@ -1,9 +1,12 @@
-import 'package:cardmate/features/namecardbooks/card_controller.dart';
-import 'package:cardmate/features/namecardbooks/edit_card_screen.dart';
+import 'package:cardmate/features/namecardbooks/i_other_contact_service.dart';
+import 'package:cardmate/features/namecardbooks/other_contact_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-// CardController
-import 'package:cardmate/features/namecardbooks/card_model.dart'; // CardModel
+import 'package:cardmate/features/namecardbooks/other_contact_controller.dart';
+import 'package:cardmate/features/namecardbooks/card_controller.dart';
+import 'package:cardmate/features/namecardbooks/edit_card_info_screen.dart';
+import 'package:cardmate/features/namecardbooks/card_model.dart';
+import 'package:cardmate/features/namecard/services/i_contact_service.dart';
 
 class EditOtherCardScreen extends StatelessWidget {
   final CardModel card;
@@ -12,6 +15,11 @@ class EditOtherCardScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cardController = Get.put(CardController());
+    final contactController = Get.put(
+        OtherContactController(contactService: Get.put(OtherContactService())));
+
+    // 이 카드의 연락처 불러오기
+    contactController.loadContacts(card.id);
 
     return Scaffold(
       backgroundColor: Colors.black,
@@ -22,10 +30,6 @@ class EditOtherCardScreen extends StatelessWidget {
         centerTitle: true,
       ),
       body: Obx(() {
-        if (cardController.cards.isEmpty) {
-          return const Center(child: CircularProgressIndicator());
-        }
-
         final currentCard = cardController.cards.firstWhere(
           (c) => c.id == card.id,
           orElse: () => card,
@@ -38,6 +42,10 @@ class EditOtherCardScreen extends StatelessWidget {
             children: [
               _buildNameCardPreview(currentCard),
               const SizedBox(height: 20),
+              _buildContactList(contactController, card.id),
+              const SizedBox(height: 20),
+              _buildContactAddButton(context, contactController, card.id),
+              const Divider(height: 40, color: Colors.white24),
               _buildAddButton('+ 연락처 추가'),
               const Divider(height: 40, color: Colors.white24),
               _buildAddButton('+ 블록 추가'),
@@ -93,6 +101,88 @@ class EditOtherCardScreen extends StatelessWidget {
               child: const Text('+ 태그 추가'),
             )
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildContactList(OtherContactController controller, String cardId) {
+    final contactTitles = {
+      'mobile': '휴대전화',
+      'phone': '유선전화',
+      'email': '이메일',
+      'website': '홈페이지',
+      'address': '주소',
+      'fax': '팩스',
+    };
+
+    final contacts = controller.getContactsForCard(cardId);
+
+    if (contacts.isEmpty) return const SizedBox();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: contacts.entries.map((entry) {
+        final type = entry.key;
+        final value = entry.value;
+
+        return Container(
+          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+          margin: const EdgeInsets.only(bottom: 1),
+          color: Colors.white,
+          child: Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(contactTitles[type] ?? '연락처',
+                        style:
+                            const TextStyle(fontSize: 14, color: Colors.grey)),
+                    const SizedBox(height: 4),
+                    Text(
+                      value,
+                      style: const TextStyle(
+                        fontSize: 18,
+                        color: Colors.black,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              if (type == 'mobile' || type == 'phone') ...[
+                IconButton(
+                  icon: const Icon(Icons.call, color: Colors.black87),
+                  onPressed: () {},
+                ),
+                IconButton(
+                  icon: const Icon(Icons.message, color: Colors.black87),
+                  onPressed: () {},
+                ),
+              ]
+            ],
+          ),
+        );
+      }).toList(),
+    );
+  }
+
+  Widget _buildContactAddButton(
+      BuildContext context, OtherContactController controller, String cardId) {
+    return GestureDetector(
+      onTap: () => controller.showContactTypeSelector(context, cardId),
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 16),
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: const Text(
+          '+ 연락처 추가',
+          style: TextStyle(
+              fontSize: 16, fontWeight: FontWeight.w500, color: Colors.black),
         ),
       ),
     );
