@@ -30,7 +30,8 @@ class NameCardService implements INameCardService {
     if (uid == null) return false;
 
     try {
-      await _firestore.collection('users')
+      await _firestore
+          .collection('users')
           .doc(uid)
           .collection('my_namecard')
           .doc('basic_info')
@@ -38,6 +39,17 @@ class NameCardService implements INameCardService {
         ...data,
         'updatedAt': FieldValue.serverTimestamp(),
       });
+
+      await _firestore
+          .collection('shared_namecards')
+          .doc(data['nameCardId'])
+          .collection('namecard')
+          .doc('basic_info')
+          .set({
+        ...data,
+        'updatedAt': FieldValue.serverTimestamp(),
+      });
+
       return true;
     } catch (e) {
       print('기본 정보 저장 오류: $e');
@@ -51,7 +63,8 @@ class NameCardService implements INameCardService {
     if (uid == null) return null;
 
     try {
-      final doc = await _firestore.collection('users')
+      final doc = await _firestore
+          .collection('users')
           .doc(uid)
           .collection('my_namecard')
           .doc('basic_info')

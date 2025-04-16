@@ -17,6 +17,7 @@ class EditCardScreen extends StatelessWidget {
     final editController = Get.find<EditCardController>();
     final contactController = Get.find<ContactController>();
 
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -71,7 +72,8 @@ class EditCardScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildContactAddButton(BuildContext context, ContactController controller) {
+  Widget _buildContactAddButton(
+      BuildContext context, ContactController controller) {
     return GestureDetector(
       onTap: () => controller.showContactTypeSelector(context),
       child: Container(
@@ -93,7 +95,8 @@ class EditCardScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildBlockAddButton(BuildContext context, EditCardController controller) {
+  Widget _buildBlockAddButton(
+      BuildContext context, EditCardController controller) {
     return GestureDetector(
       onTap: () => _showBlockTypeBottomSheet(controller),
       child: Container(
@@ -150,7 +153,8 @@ class EditCardScreen extends StatelessWidget {
     );
   }
 
-  void _navigateToBlockCreateScreen(String blockType, EditCardController controller) async {
+  void _navigateToBlockCreateScreen(
+      String blockType, EditCardController controller) async {
     Get.back(); // BottomSheet 닫기
     final result = await Get.toNamed(
       '/blockCreate',

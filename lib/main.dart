@@ -51,7 +51,7 @@ class CardMateApp extends StatelessWidget {
           binding: RegisterBinding()),
         GetPage(
           name: '/editCard', 
-          page: () => const EditCardScreen(),
+          page: () => const EditCardScreen(), 
           binding: NameCardBindings()),
         GetPage(
           // ✅ 바인딩 포함된 단 하나의 등록만 유지

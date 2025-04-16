@@ -18,9 +18,37 @@ class ContactService implements IContactService {
           .collection('my_namecard')
           .doc('contacts');
       await docRef.set({type: value}, SetOptions(merge: true));
+
+      final nameCardId = await getNameCardId(uid); // await로 값을 가져와야 함
+
+      if (nameCardId != null) {
+        final ref = _firestore
+            .collection('shared_namecards')
+            .doc(nameCardId)
+            .collection('namecard')
+            .doc('contacts');
+
+        await ref.set({type: value}, SetOptions(merge: true));
+      }
     } catch (e) {
       print('연락처 저장 오류: $e');
       rethrow;
+    }
+  }
+
+  Future<String?> getNameCardId(uid) async {
+    try {
+      final data = await _firestore
+          .collection('users')
+          .doc(uid)
+          .collection('my_namecard')
+          .doc('basic_info')
+          .get();
+
+      String nameCardId = data['nameCardId'];
+      return nameCardId;
+    } catch (e) {
+      print('데이터 접근 불가');
     }
   }
 

@@ -1,6 +1,4 @@
-import 'package:cardmate/features/namecard/screens/edit_card_screen.dart';
 import 'package:cardmate/features/namecardbooks/card_controller.dart';
-import 'package:cardmate/features/namecardbooks/edit_card_screen.dart';
 import 'package:cardmate/features/namecardbooks/edit_othercard_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
