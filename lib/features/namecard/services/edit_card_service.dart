@@ -14,8 +14,6 @@ class EditCardService implements IEditCardService {
       final doc = await _firestore
           .collection('users')
           .doc(uid)
-          .collection('my_namecard')
-          .doc('basic_info')
           .get();
       return doc.exists ? doc.data() : null;
     } catch (e) {
@@ -31,8 +29,6 @@ class EditCardService implements IEditCardService {
     try {
       await _firestore.collection('users')
           .doc(uid)
-          .collection('my_namecard')
-          .doc('basic_info')
           .set(data);
       return true;
     } catch (e) {

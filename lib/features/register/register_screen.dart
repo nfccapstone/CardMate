@@ -36,6 +36,8 @@ class RegisterScreen extends StatelessWidget {
               const SizedBox(height: 12),
               _buildTextField(controller.phoneController, "전화번호", false, TextInputType.phone),
               const SizedBox(height: 12),
+              _buildTextField(controller.departmentController, "부서 (선택)", false),
+              const SizedBox(height: 12),
               _buildTextField(controller.positionController, "직책/직위 (선택)", false),
               const SizedBox(height: 12),
               _buildTextField(controller.companyController, "회사명 (선택)", false),

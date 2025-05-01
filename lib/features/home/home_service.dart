@@ -7,6 +7,15 @@ class HomeService implements IHomeService {
   final FirebaseFirestore _firestore = FirebaseInit.instance.firestore;
   final FirebaseAuth _auth = FirebaseInit.instance.auth;
 
+  User? getUserByUid(String uid) {
+    try {
+      return _auth.currentUser?.uid == uid ? _auth.currentUser : null;
+    } catch (e) {
+      print('UID로 사용자 가져오기 오류: $e');
+      return null;
+    }
+  }
+
   @override
   Future<Map<String, dynamic>?> fetchCardData() async {
     final user = _auth.currentUser;
@@ -16,8 +25,6 @@ class HomeService implements IHomeService {
       final doc = await _firestore
           .collection('users')
           .doc(user.uid)
-          .collection('my_namecard')
-          .doc('basic_info')
           .get();
       return doc.data();
     } catch (e) {
@@ -35,8 +42,6 @@ class HomeService implements IHomeService {
       final doc = await _firestore
           .collection('users')
           .doc(user.uid)
-          .collection('my_namecard')
-          .doc('contact')
           .get();
 
       if (doc.exists && doc.data() != null) {
@@ -71,8 +76,6 @@ class HomeService implements IHomeService {
       final doc = await _firestore
           .collection('users')
           .doc(user.uid)
-          .collection('my_namecard')
-          .doc('basic_info')
           .get();
       return doc.exists;
     } catch (e) {

@@ -7,8 +7,10 @@ abstract class IRegisterService {
     required String name,
     required String email,
     required String password,
-    required String phone,
+    required String phoneNumber,
+    String? department,
     String? position,
     String? company,
+    String? profileImageUrl,
   });
 }
