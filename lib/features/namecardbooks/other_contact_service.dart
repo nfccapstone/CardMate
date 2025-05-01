@@ -14,10 +14,8 @@ class OtherContactService implements IOtherContactService {
       final docRef = _firestore
           .collection('users')
           .doc(uid)
-          .collection('saved_cards')
-          .doc(cardId)
-          .collection('contacts')
-          .doc('data'); // 연락처를 한 문서에 저장
+          .collection('card_concatct')
+          .doc(cardId); // 연락처를 한 문서에 저장
       await docRef.set({type: value}, SetOptions(merge: true));
     } catch (e) {
       print('연락처 저장 오류: $e');
@@ -33,10 +31,8 @@ class OtherContactService implements IOtherContactService {
       final doc = await _firestore
           .collection('users')
           .doc(uid)
-          .collection('saved_cards')
+          .collection('card_contact')
           .doc(cardId)
-          .collection('contacts')
-          .doc('data')
           .get();
       if (doc.exists && doc.data() != null) {
         return Map<String, String>.from(doc.data()!);

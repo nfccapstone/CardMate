@@ -52,7 +52,7 @@ class NameCardInfoScreen extends StatelessWidget {
               _buildTextField(controller.positionController, '직책'),
               _buildTextField(controller.departmentController, '부서'),
               _buildTextField(controller.companyController, '회사'),
-              _buildTextField(controller.nameCardIdController, 'NameCard ID'),
+              //_buildTextField(controller.nameCardIdController, 'NameCard ID'),
               const SizedBox(height: 20),
               Obx(() => ElevatedButton(
                     onPressed: controller.isSaving.value

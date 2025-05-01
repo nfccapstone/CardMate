@@ -14,6 +14,8 @@ class RegisterController extends GetxController {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   final confirmPasswordController = TextEditingController();
+  final departmentController = TextEditingController();
+
   final phoneController = TextEditingController();
   final positionController = TextEditingController();
   final companyController = TextEditingController();
@@ -34,7 +36,10 @@ class RegisterController extends GetxController {
         name: nameController.text.trim(),
         email: emailController.text.trim(),
         password: passwordController.text.trim(),
-        phone: phoneController.text.trim(),
+        phoneNumber: phoneController.text.trim(),
+        department: positionController.text.trim().isEmpty
+            ? null
+            : positionController.text.trim(),
         position: positionController.text.trim().isEmpty
             ? null
             : positionController.text.trim(),
@@ -67,7 +72,6 @@ class RegisterController extends GetxController {
       );
     }
   }
-
   @override
   void onClose() {
     nameController.dispose();

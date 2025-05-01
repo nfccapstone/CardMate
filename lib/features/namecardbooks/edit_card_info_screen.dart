@@ -41,10 +41,11 @@ class EditCardScreen2 extends StatelessWidget {
             TextField(
                 controller: companyCtrl,
                 decoration: InputDecoration(labelText: '회사')),
-            // TextField(
-            //     controller: idCtrl,
-            //     decoration: InputDecoration(labelText: 'CardMateID')),
-            // SizedBox(height: 20),
+            TextField(
+                controller: idCtrl,
+                decoration: InputDecoration(labelText: '카드ID')),
+                //고유성 체크 필요
+            SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
                 final updatedCard = CardModel(

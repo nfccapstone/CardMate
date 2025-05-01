@@ -33,18 +33,6 @@ class NameCardService implements INameCardService {
       await _firestore
           .collection('users')
           .doc(uid)
-          .collection('my_namecard')
-          .doc('basic_info')
-          .set({
-        ...data,
-        'updatedAt': FieldValue.serverTimestamp(),
-      });
-
-      await _firestore
-          .collection('shared_namecards')
-          .doc(data['nameCardId'])
-          .collection('namecard')
-          .doc('basic_info')
           .set({
         ...data,
         'updatedAt': FieldValue.serverTimestamp(),
@@ -66,8 +54,6 @@ class NameCardService implements INameCardService {
       final doc = await _firestore
           .collection('users')
           .doc(uid)
-          .collection('my_namecard')
-          .doc('basic_info')
           .get();
       return doc.data();
     } catch (e) {

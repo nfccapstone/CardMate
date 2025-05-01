@@ -15,7 +15,7 @@ class ContactService implements IContactService {
       final docRef = _firestore
           .collection('users')
           .doc(uid)
-          .collection('my_namecard')
+          .collection('card_contact')
           .doc('contacts');
       await docRef.set({type: value}, SetOptions(merge: true));
 
