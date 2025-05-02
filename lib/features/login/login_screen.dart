@@ -1,57 +1,142 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'login_controller.dart';
-import '../register/register_controller.dart';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    // 로그인 화면 진입 시 RegisterController가 남아있으면 삭제
-    if (Get.isRegistered<RegisterController>()) {
-      Get.delete<RegisterController>();
-    }
-    // GetX 바인딩을 통해 주입된 LoginController를 가져옵니다.
     final LoginController controller = Get.find<LoginController>();
 
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: Colors.white,
       body: Center(
-        child: Padding(
+        child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 32.0),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
             children: [
               const Text(
                 "CardMate",
                 style: TextStyle(
-                  fontSize: 36,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                  letterSpacing: 2.0,
+                  fontSize: 44,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 2.5,
+                  color: Colors.black,
                 ),
               ),
-              const SizedBox(height: 50),
-              _buildTextField(controller.emailController, "이메일", false),
-              const SizedBox(height: 12),
-              _buildTextField(controller.passwordController, "비밀번호", true),
-              const SizedBox(height: 24),
+              const SizedBox(height: 40),
+              Column(
+                children: [
+                  _buildClippedField(
+                    controller.emailController,
+                    "Email",
+                    Icons.person,
+                    false,
+                    clipper: TopDiagonalClipper(),
+                    isTop: true,
+                  ),
+                  _buildClippedField(
+                    controller.passwordController,
+                    "Password",
+                    Icons.lock,
+                    true,
+                    clipper: BottomDiagonalClipper(),
+                    isTop: false,
+                  ),
+                ],
+              ),
+              const SizedBox(height: 30),
               ElevatedButton(
                 onPressed: controller.login,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.white,
-                  foregroundColor: Colors.black,
+                  backgroundColor: Colors.black,
+                  foregroundColor: Colors.white,
                   minimumSize: const Size(double.infinity, 50),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(6),
+                  ),
                 ),
-                child: const Text("로그인", style: TextStyle(fontSize: 18)),
-              ),
-              const SizedBox(height: 12),
-              TextButton(
-                onPressed: () => Get.toNamed('/register'),
                 child: const Text(
-                  "회원가입",
-                  style: TextStyle(color: Colors.white, fontSize: 16),
+                  "LOGIN",
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+              ),
+              const SizedBox(height: 7),
+              Column(
+                children: [
+                  TextButton(
+                    onPressed: () => Get.toNamed('/register'),
+                    child: const Text(
+                      "CREATE ACCOUNT",
+                      style: TextStyle(
+                        color: Colors.black54,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                        letterSpacing: 1.2,
+                      ),
+                    ),
+                  ),
+                  Container(
+                    width: 100,
+                    height: 1,
+                    color: Colors.black26,
+                  ),
+                ],
+              ),
+              const SizedBox(height: 30),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildClippedField(
+    TextEditingController controller,
+    String hint,
+    IconData icon,
+    bool isPassword, {
+    required CustomClipper<Path> clipper,
+    required bool isTop,
+  }) {
+    return CustomPaint(
+      painter: DiagonalBorderPainter(isTop: isTop),
+      child: ClipPath(
+        clipper: clipper,
+        child: Container(
+          height: 65,
+          color: const Color(0xFFF9F9F9),
+          child: Stack(
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(left: 48.0, right: 16.0),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: TextField(
+                    controller: controller,
+                    obscureText: isPassword,
+                    style: const TextStyle(color: Colors.black87),
+                    cursorColor: const Color.fromARGB(255, 106, 105, 105),
+                    decoration: const InputDecoration(
+                      hintText: '',
+                      border: InputBorder.none,
+                      isDense: true,
+                    ).copyWith(
+                      hintText: hint,
+                      hintStyle: const TextStyle(color: Colors.grey),
+                      contentPadding: const EdgeInsets.only(top: 7),
+                    ),
+                  ),
+                ),
+              ),
+              Positioned(
+                left: 12,
+                top: 23,
+                child: Icon(
+                  icon,
+                  color: Colors.black87,
                 ),
               ),
             ],
@@ -60,25 +145,70 @@ class LoginScreen extends StatelessWidget {
       ),
     );
   }
+}
 
-  Widget _buildTextField(
-      TextEditingController controller, String label, bool isPassword) {
-    return TextField(
-      controller: controller,
-      obscureText: isPassword,
-      style: const TextStyle(color: Colors.white),
-      decoration: InputDecoration(
-        labelText: label,
-        labelStyle: const TextStyle(color: Colors.white),
-        enabledBorder: OutlineInputBorder(
-          borderSide: const BorderSide(color: Colors.white),
-          borderRadius: BorderRadius.circular(8),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderSide: const BorderSide(color: Colors.blueAccent),
-          borderRadius: BorderRadius.circular(8),
-        ),
-      ),
-    );
+// ───────── Clipper / Painter ─────────
+
+class DiagonalBorderPainter extends CustomPainter {
+  final bool isTop;
+
+  DiagonalBorderPainter({required this.isTop});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = const Color(0xFF333333)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 4;
+
+    final path = Path();
+    if (isTop) {
+      path.moveTo(0, 0);
+      path.lineTo(size.width, 0);
+      path.lineTo(size.width, size.height - 20);
+      path.lineTo(0, size.height);
+      path.close();
+    } else {
+      path.moveTo(0, 20);
+      path.lineTo(size.width, 0);
+      path.lineTo(size.width, size.height);
+      path.lineTo(0, size.height);
+      path.close();
+    }
+
+    canvas.drawPath(path, paint);
   }
+
+  @override
+  bool shouldRepaint(CustomPainter oldDelegate) => false;
+}
+
+class TopDiagonalClipper extends CustomClipper<Path> {
+  @override
+  Path getClip(Size size) {
+    return Path()
+      ..moveTo(0, 0)
+      ..lineTo(size.width, 0)
+      ..lineTo(size.width, size.height - 20)
+      ..lineTo(0, size.height)
+      ..close();
+  }
+
+  @override
+  bool shouldReclip(CustomClipper<Path> oldClipper) => false;
+}
+
+class BottomDiagonalClipper extends CustomClipper<Path> {
+  @override
+  Path getClip(Size size) {
+    return Path()
+      ..moveTo(0, 20)
+      ..lineTo(size.width, 0)
+      ..lineTo(size.width, size.height)
+      ..lineTo(0, size.height)
+      ..close();
+  }
+
+  @override
+  bool shouldReclip(CustomClipper<Path> oldClipper) => false;
 }
