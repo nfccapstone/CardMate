@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:cardmate/features/namecard/controllers/contact_controller.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ContactSection extends StatelessWidget {
   final ContactController controller;
@@ -25,6 +26,47 @@ class ContactSection extends StatelessWidget {
         children: controller.contacts.entries.map((entry) {
           final type = entry.key;
           final value = entry.value;
+          IconData icon;
+          List<Widget> actions = [];
+          if (type == 'mobile' || type == 'phone' || type == 'phoneNumber') {
+            icon = Icons.phone;
+            actions = [
+              IconButton(
+                icon: const Icon(Icons.call, color: Colors.black87),
+                onPressed: () {
+                  launchUrl(Uri.parse('tel:$value'));
+                },
+              ),
+              IconButton(
+                icon: const Icon(Icons.message, color: Colors.black87),
+                onPressed: () {
+                  launchUrl(Uri.parse('sms:$value'));
+                },
+              ),
+            ];
+          } else if (type == 'email') {
+            icon = Icons.email;
+            actions = [
+              IconButton(
+                icon: const Icon(Icons.email, color: Colors.black87),
+                onPressed: () {
+                  launchUrl(Uri.parse('mailto:$value'));
+                },
+              ),
+            ];
+          } else if (type == 'website') {
+            icon = Icons.language;
+            actions = [
+              IconButton(
+                icon: const Icon(Icons.open_in_browser, color: Colors.black87),
+                onPressed: () {
+                  launchUrl(Uri.parse(value));
+                },
+              ),
+            ];
+          } else {
+            icon = Icons.contact_phone;
+          }
           return Container(
             padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
             margin: const EdgeInsets.only(bottom: 8),
@@ -41,12 +83,14 @@ class ContactSection extends StatelessWidget {
             ),
             child: Row(
               children: [
+                Icon(icon, color: Colors.deepPurple),
+                const SizedBox(width: 12),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        contactTitles[type] ?? '연락처',
+                        contactTitles[type] ?? type,
                         style: TextStyle(fontSize: 14, color: Colors.grey[600]),
                       ),
                       const SizedBox(height: 4),
@@ -61,16 +105,7 @@ class ContactSection extends StatelessWidget {
                     ],
                   ),
                 ),
-                if (type == 'mobile' || type == 'phone') ...[
-                  IconButton(
-                    icon: const Icon(Icons.call, color: Colors.black87),
-                    onPressed: () {},
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.message, color: Colors.black87),
-                    onPressed: () {},
-                  ),
-                ],
+                ...actions,
               ],
             ),
           );

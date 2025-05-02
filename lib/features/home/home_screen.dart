@@ -98,7 +98,12 @@ class HomeScreen extends StatelessWidget {
       final profileLink = 'https://cardmate.link/@$cardMateId';
 
       return GestureDetector(
-        onTap: () => Get.toNamed('/editCard'),
+        onTap: () async {
+          final result = await Get.toNamed('/editCard');
+          if (result == true) {
+            controller.fetchCardInfo();
+          }
+        },
         child: Padding(
           padding: const EdgeInsets.all(20),
           child: Container(
