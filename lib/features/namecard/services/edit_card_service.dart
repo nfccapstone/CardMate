@@ -38,15 +38,13 @@ class EditCardService implements IEditCardService {
       // users/{uid}에 저장
       await _firestore.collection('users').doc(uid).set(saveData, SetOptions(merge: true));
 
-      // card_data/{uid}에 createdAt, updatedAt 저장
-      final cardDataRef = _firestore.collection('card_data').doc(uid);
+      // users/{uid}/card_data/data 문서에 createdAt, updatedAt 저장
+      final cardDataRef = _firestore.collection('users').doc(uid).collection('card_data').doc('data');
       final cardDataDoc = await cardDataRef.get();
       if (!cardDataDoc.exists) {
         await cardDataRef.set({
           'createdAt': FieldValue.serverTimestamp(),
           'updatedAt': FieldValue.serverTimestamp(),
-          'registeredCount': 0,
-          'viewedCount': 0,
         });
       } else {
         await cardDataRef.update({
