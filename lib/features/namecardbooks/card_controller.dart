@@ -84,13 +84,13 @@ class CardController extends GetxController {
     }
   }
 
-  Future<Map<String, dynamic>?> getUserNamecardData(
-      DocumentSnapshot userId) async {
-    final snapshot = await userId.reference
-        .collection('my_namecard')
-        .doc('basic_info')
-        .get();
-    return snapshot.data();
+  Future<Map<String, dynamic>?> getUserNamecardData(DocumentSnapshot userId) async {
+    final snapshot = await userId.reference.get();
+    final data = snapshot.data();
+    if (data is Map<String, dynamic>) {
+      return data;
+    }
+    return null;
   }
 
   // void addCard(CardModel card) async {

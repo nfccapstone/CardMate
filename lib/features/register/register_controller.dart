@@ -37,9 +37,9 @@ class RegisterController extends GetxController {
         email: emailController.text.trim(),
         password: passwordController.text.trim(),
         phoneNumber: phoneController.text.trim(),
-        department: positionController.text.trim().isEmpty
+        department: departmentController.text.trim().isEmpty
             ? null
-            : positionController.text.trim(),
+            : departmentController.text.trim(),
         position: positionController.text.trim().isEmpty
             ? null
             : positionController.text.trim(),
@@ -51,10 +51,10 @@ class RegisterController extends GetxController {
       if (user != null) {
         Get.snackbar(
           "회원가입 성공",
-          "로그인 화면으로 이동합니다.",
+          "홈 화면으로 이동합니다.",
           snackPosition: SnackPosition.BOTTOM,
         );
-        Get.back(); // 로그인 화면으로 이동
+        Get.offAllNamed('/home'); // 홈 화면으로 이동
       } else {
         Get.snackbar(
           "회원가입 실패",

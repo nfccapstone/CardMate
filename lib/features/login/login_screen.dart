@@ -1,12 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'login_controller.dart';
+import '../register/register_controller.dart';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    // 로그인 화면 진입 시 RegisterController가 남아있으면 삭제
+    if (Get.isRegistered<RegisterController>()) {
+      Get.delete<RegisterController>();
+    }
     // GetX 바인딩을 통해 주입된 LoginController를 가져옵니다.
     final LoginController controller = Get.find<LoginController>();
 
