@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'services/i_register_service.dart';
@@ -64,14 +65,40 @@ class RegisterController extends GetxController {
         );
       }
     } catch (e) {
-      Get.snackbar(
-        "오류",
-        "회원가입 중 예기치 못한 오류가 발생했습니다.",
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red,
-      );
+      if (e is FirebaseAuthException) {
+        if (e.code == 'email-already-in-use') {
+          Get.snackbar(
+            "회원가입 실패",
+            "이미 사용 중인 이메일입니다.",
+            snackPosition: SnackPosition.BOTTOM,
+            backgroundColor: Colors.red,
+          );
+        } else if (e.code == 'weak-password') {
+          Get.snackbar(
+            "회원가입 실패",
+            "비밀번호는 6자 이상이어야 합니다.",
+            snackPosition: SnackPosition.BOTTOM,
+            backgroundColor: Colors.red,
+          );
+        } else {
+          Get.snackbar(
+            "오류",
+            "회원가입 중 예기치 못한 오류가 발생했습니다.",
+            snackPosition: SnackPosition.BOTTOM,
+            backgroundColor: Colors.red,
+          );
+        }
+      } else {
+        Get.snackbar(
+          "오류",
+          "회원가입 중 예기치 못한 오류가 발생했습니다.",
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.red,
+        );
+      }
     }
   }
+
   @override
   void onClose() {
     nameController.dispose();
