@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'services/i_login_service.dart';
@@ -31,12 +32,30 @@ class LoginController extends GetxController {
         );
       }
     } catch (e) {
-      Get.snackbar(
-        "오류",
-        "로그인 중 예기치 못한 오류가 발생했습니다.",
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red,
-      );
+      if (e is FirebaseAuthException) {
+        if (e.code == 'invalid-credential') {
+          Get.snackbar(
+            "이메일 또는 비밀번호가 올바르지 않습니다.",
+            "다시 확인해주세요.",
+            snackPosition: SnackPosition.BOTTOM,
+            backgroundColor: Colors.red,
+          );
+        } else {
+          Get.snackbar(
+            "오류",
+            "로그인 중 예기치 못한 오류가 발생했습니다.",
+            snackPosition: SnackPosition.BOTTOM,
+            backgroundColor: Colors.red,
+          );
+        }
+      } else {
+        Get.snackbar(
+          "오류",
+          "로그인 중 예기치 못한 오류가 발생했습니다.",
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.red,
+        );
+      }
     }
   }
 
