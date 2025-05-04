@@ -41,10 +41,7 @@ class ContactService implements IContactService {
       final data = await _firestore
           .collection('users')
           .doc(uid)
-          .collection('my_namecard')
-          .doc('basic_info')
           .get();
-
       String nameCardId = data['nameCardId'];
       return nameCardId;
     } catch (e) {
@@ -57,15 +54,18 @@ class ContactService implements IContactService {
     final uid = _auth.currentUser?.uid;
     if (uid == null) return null;
     try {
-      final doc = await _firestore
+      final snapshot = await _firestore
           .collection('users')
           .doc(uid)
-          .collection('my_namecard')
-          .doc('contacts')
+          .collection('card_contact')
           .get();
-      if (doc.exists && doc.data() != null) {
-        return Map<String, String>.from(doc.data()!);
+      final Map<String, String> contacts = {};
+      for (var doc in snapshot.docs) {
+        doc.data().forEach((key, value) {
+          contacts[key] = value;
+        });
       }
+      return contacts;
     } catch (e) {
       print('연락처 불러오기 오류: $e');
     }

@@ -27,9 +27,30 @@ class EditCardService implements IEditCardService {
     final uid = _auth.currentUser?.uid;
     if (uid == null) return false;
     try {
-      await _firestore.collection('users')
-          .doc(uid)
-          .set(data);
+      // 기존 name 값 불러오기
+      final userDoc = await _firestore.collection('users').doc(uid).get();
+      String? originalName = userDoc.data()?['name'];
+      // name 필드는 기존 값으로 고정
+      final saveData = Map<String, dynamic>.from(data);
+      if (originalName != null) {
+        saveData['name'] = originalName;
+      }
+      // users/{uid}에 저장
+      await _firestore.collection('users').doc(uid).set(saveData, SetOptions(merge: true));
+
+      // users/{uid}/card_data/data 문서에 createdAt, updatedAt 저장
+      final cardDataRef = _firestore.collection('users').doc(uid).collection('card_data').doc('data');
+      final cardDataDoc = await cardDataRef.get();
+      if (!cardDataDoc.exists) {
+        await cardDataRef.set({
+          'createdAt': FieldValue.serverTimestamp(),
+          'updatedAt': FieldValue.serverTimestamp(),
+        });
+      } else {
+        await cardDataRef.update({
+          'updatedAt': FieldValue.serverTimestamp(),
+        });
+      }
       return true;
     } catch (e) {
       print('명함 정보 저장 오류: $e');

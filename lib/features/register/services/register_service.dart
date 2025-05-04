@@ -37,10 +37,10 @@ class RegisterService implements IRegisterService {
           'department': department ?? '', //회사내 부서 또는 학교내 부서
           'profileImageUrl': profileImageUrl ?? '', // 프로필 이미지 URL
         });
-        await _firestore.collection("users").doc(user.uid).collection("card_contact").add({
+        await _firestore.collection("users").doc(user.uid).collection("card_contact").doc("contacts").set({
           'email': email,
           'phoneNumber': phoneNumber,
-        });
+        }, SetOptions(merge: true));
       }
 
       return user;
