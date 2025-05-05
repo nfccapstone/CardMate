@@ -94,8 +94,8 @@ class HomeScreen extends StatelessWidget {
 
       final data = controller.cardData;
       final contact = data['contact'] ?? {};
-      final cardMateId = data['cardMateId'] ?? 'yourID';
-      final profileLink = 'https://cardmate.link/@$cardMateId';
+      final nameCardId = data['nameCardId'] ?? '';
+      final profileLink = nameCardId.isEmpty ? 'cardmate.link' : 'cardmate.link/@$nameCardId';
 
       return GestureDetector(
         onTap: () async {
@@ -227,6 +227,25 @@ class HomeScreen extends StatelessWidget {
                         ),
                       )),
                 ],
+                // 공유 명함 확인 버튼 추가
+                const SizedBox(height: 16),
+                ElevatedButton(
+                  onPressed: () {
+                    final cardId = nameCardId;
+                    if (cardId.isNotEmpty) {
+                      Get.toNamed('/sharedNameCard/$cardId');
+                    } else {
+                      Get.snackbar('오류', 'CardId가 없습니다.');
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.deepPurple,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                    textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                  child: const Text('내 공유 명함 보기'),
+                ),
               ],
             ),
           ),

@@ -14,6 +14,8 @@ import 'features/namecard/screens/namecard_info_screen.dart';
 import 'features/namecard/screens/edit_contact_screen.dart';
 import 'features/namecard/namecard_bindings.dart';
 import 'features/login/login_bindings.dart';
+import 'features/namecard/screens/shared_card_check_screen.dart';
+import 'features/namecard/screens/shared_namecard_screen.dart';
 //import 'features/register/register_binding.dart';
 
 void main() async {
@@ -51,7 +53,11 @@ class CardMateApp extends StatelessWidget {
           binding: RegisterBinding()),
         GetPage(
           name: '/editCard', 
-          page: () => const EditCardScreen(), 
+          page: () {
+            final args = Get.arguments as Map<String, dynamic>?;
+            final cardId = args?['cardId'] ?? '';
+            return EditCardScreen(cardId: cardId);
+          },
           binding: NameCardBindings()),
         GetPage(
           // ✅ 바인딩 포함된 단 하나의 등록만 유지
@@ -67,6 +73,17 @@ class CardMateApp extends StatelessWidget {
         GetPage(
           name: '/blockCreate',
           page: () => BlockCreateScreen(),
+        ),
+        GetPage(
+          name: '/sharedCardCheck',
+          page: () => const SharedCardCheckScreen(),
+        ),
+        GetPage(
+          name: '/sharedNameCard/:cardId',
+          page: () {
+            final cardId = Get.parameters['cardId'] ?? '';
+            return SharedNameCardScreen(nameCardId: cardId);
+          },
         ),
       ],
     );

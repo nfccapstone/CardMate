@@ -7,16 +7,21 @@ import 'package:cardmate/features/namecard/widgets/contact_section.dart';
 import 'package:cardmate/features/namecard/widgets/block_section.dart';
 import 'package:cardmate/features/namecard/widgets/sns_bottom_sheet.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:cardmate/features/namecard/services/i_contact_service.dart';
 
 class EditCardScreen extends StatelessWidget {
-  const EditCardScreen({Key? key}) : super(key: key);
+  final String cardId;
+  const EditCardScreen({Key? key, required this.cardId}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    // 이미 바인딩을 통해 등록된 컨트롤러를 Get.find()로 호출합니다.
     final editController = Get.find<EditCardController>();
-    final contactController = Get.find<ContactController>();
-
+    final contactController = Get.put(
+      ContactController(
+        contactService: Get.find<IContactService>(),
+        cardId: cardId,
+      ),
+    );
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -161,7 +166,7 @@ class EditCardScreen extends StatelessWidget {
       arguments: {'type': blockType},
     );
     if (result != null && result is Map<String, dynamic>) {
-      controller.blocks.add(result);
+      controller.addBlock(result);
     }
   }
 }

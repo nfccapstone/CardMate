@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
 import 'package:cardmate/features/namecard/services/i_edit_card_service.dart';
+import 'dart:typed_data';
 
 class EditCardController extends GetxController {
   final isLoading = true.obs;
@@ -25,6 +26,11 @@ class EditCardController extends GetxController {
     } else {
       Get.snackbar('오류', '명함 정보를 불러오지 못했습니다.');
     }
+
+    // 블록 데이터 불러오기
+    final blocksData = await _service.fetchBlocks();
+    blocks.assignAll(blocksData);
+
     isLoading.value = false;
   }
 
@@ -40,7 +46,21 @@ class EditCardController extends GetxController {
     isLoading.value = false;
   }
 
-  void addBlock(String type) {
-    blocks.add({'type': type, 'content': ''});
+  void addBlock(Map<String, dynamic> blockData) {
+    blocks.add(blockData);
+    _service.addBlock(blockData); // Firebase에 저장
+  }
+
+  Future<void> deleteBlock(String blockId) async {
+    try {
+      await _service.deleteBlock(blockId);
+      blocks.removeWhere((block) => block['id'] == blockId);
+    } catch (e) {
+      Get.snackbar('오류', '블록 삭제에 실패했습니다.');
+    }
+  }
+
+  Future<String?> uploadImage(Uint8List imageBytes, String fileName) async {
+    return await _service.uploadImage(imageBytes, fileName);
   }
 }

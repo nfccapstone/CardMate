@@ -4,11 +4,11 @@ import 'package:cardmate/features/namecard/services/i_contact_service.dart';
 
 class ContactController extends GetxController {
   final contacts = <String, String>{}.obs;
-  final IContactService _service;
+  final IContactService _contactService;
+  final String? cardId;
 
-  // DI: IContactService 구현체를 생성자 주입
-  ContactController({required IContactService contactService})
-      : _service = contactService;
+  ContactController({required IContactService contactService, this.cardId})
+      : _contactService = contactService;
 
   @override
   void onInit() {
@@ -17,19 +17,41 @@ class ContactController extends GetxController {
   }
 
   Future<void> loadContacts() async {
-    final data = await _service.fetchContacts();
-    if (data != null) {
-      contacts.assignAll(data);
+    try {
+      final data = await _contactService.fetchContacts(cardId);
+      if (data != null) {
+        contacts.assignAll(data);
+      }
+    } catch (e) {
+      print('연락처 불러오기 오류: $e');
+      Get.snackbar('오류', '연락처를 불러오는데 실패했습니다.');
     }
   }
 
   Future<void> addContact(String type, String value) async {
     try {
-      await _service.saveContact(type, value);
-      await loadContacts();
-    } catch (_) {
-      Get.snackbar('오류', '연락처 저장에 실패했어요.');
+      await _contactService.saveContact(type, value);
+      await loadContacts(); // 연락처 목록 새로고침
+      Get.snackbar('성공', '연락처가 저장되었습니다.');
+    } catch (e) {
+      print('연락처 저장 오류: $e');
+      Get.snackbar('오류', '연락처 저장에 실패했습니다.');
     }
+  }
+
+  Future<void> deleteContact(String type) async {
+    try {
+      await _contactService.deleteContact(type);
+      await loadContacts(); // 연락처 목록 새로고침
+      Get.snackbar('성공', '연락처가 삭제되었습니다.');
+    } catch (e) {
+      print('연락처 삭제 오류: $e');
+      Get.snackbar('오류', '연락처 삭제에 실패했습니다.');
+    }
+  }
+
+  void clearContacts() {
+    contacts.clear();
   }
 
   void showContactTypeSelector(BuildContext context) {

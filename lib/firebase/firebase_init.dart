@@ -1,11 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
 class FirebaseInit {
   static final FirebaseInit _instance = FirebaseInit._internal();
   late FirebaseFirestore firestore;
   late FirebaseAuth auth;
+  late FirebaseStorage storage;
 
   static FirebaseInit get instance => _instance;
 
@@ -24,5 +26,8 @@ class FirebaseInit {
     
     // 3) Firebase Auth 인스턴스
     auth = FirebaseAuth.instance;
+    
+    // 4) Firebase Storage 인스턴스
+    storage = FirebaseStorage.instance;
   }
 }

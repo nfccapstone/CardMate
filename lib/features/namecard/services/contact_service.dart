@@ -11,64 +11,90 @@ class ContactService implements IContactService {
   Future<void> saveContact(String type, String value) async {
     final uid = _auth.currentUser?.uid;
     if (uid == null) return;
+
     try {
-      final docRef = _firestore
-          .collection('users')
-          .doc(uid)
-          .collection('card_contact')
-          .doc('contacts');
-      await docRef.set({type: value}, SetOptions(merge: true));
+      // 트랜잭션을 사용하여 데이터 일관성 보장
+      await _firestore.runTransaction((transaction) async {
+        // 사용자 문서의 연락처 정보 업데이트
+        transaction.set(
+          _firestore.collection('users').doc(uid),
+          {'contact.$type': value},
+          SetOptions(merge: true),
+        );
 
-      final nameCardId = await getNameCardId(uid); // await로 값을 가져와야 함
-
-      if (nameCardId != null) {
-        final ref = _firestore
-            .collection('shared_namecards')
-            .doc(nameCardId)
-            .collection('namecard')
-            .doc('contacts');
-
-        await ref.set({type: value}, SetOptions(merge: true));
-      }
+        // 공유 명함의 연락처 정보 업데이트
+        final nameCardId = await getNameCardId(uid);
+        if (nameCardId != null) {
+          transaction.set(
+            _firestore.collection('shared_namecards').doc(nameCardId),
+            {'contact.$type': value},
+            SetOptions(merge: true),
+          );
+        }
+      });
     } catch (e) {
       print('연락처 저장 오류: $e');
       rethrow;
     }
   }
 
-  Future<String?> getNameCardId(uid) async {
-    try {
-      final data = await _firestore
-          .collection('users')
-          .doc(uid)
-          .get();
-      String nameCardId = data['nameCardId'];
-      return nameCardId;
-    } catch (e) {
-      print('데이터 접근 불가');
+  @override
+  Future<Map<String, String>?> fetchContacts([String? _]) async {
+    final uid = _auth.currentUser?.uid;
+    if (uid == null) return null;
+
+    // card_contact/contacts 문서에서 읽기
+    final doc = await _firestore
+        .collection('users')
+        .doc(uid)
+        .collection('card_contact')
+        .doc('contacts')
+        .get();
+
+    if (doc.exists && doc.data() != null) {
+      return Map<String, String>.from(doc.data()!);
     }
+    return null;
   }
 
   @override
-  Future<Map<String, String>?> fetchContacts() async {
+  Future<void> deleteContact(String type) async {
     final uid = _auth.currentUser?.uid;
-    if (uid == null) return null;
+    if (uid == null) return;
+
     try {
-      final snapshot = await _firestore
+      await _firestore.runTransaction((transaction) async {
+        // 사용자 문서에서 연락처 정보 삭제
+        transaction.update(
+          _firestore.collection('users').doc(uid),
+          {'contact.$type': FieldValue.delete()},
+        );
+
+        // 공유 명함에서 연락처 정보 삭제
+        final nameCardId = await getNameCardId(uid);
+        if (nameCardId != null) {
+          transaction.update(
+            _firestore.collection('shared_namecards').doc(nameCardId),
+            {'contact.$type': FieldValue.delete()},
+          );
+        }
+      });
+    } catch (e) {
+      print('연락처 삭제 오류: $e');
+      rethrow;
+    }
+  }
+
+  Future<String?> getNameCardId(String uid) async {
+    try {
+      final doc = await _firestore
           .collection('users')
           .doc(uid)
-          .collection('card_contact')
           .get();
-      final Map<String, String> contacts = {};
-      for (var doc in snapshot.docs) {
-        doc.data().forEach((key, value) {
-          contacts[key] = value;
-        });
-      }
-      return contacts;
+      return doc.data()?['nameCardId'] as String?;
     } catch (e) {
-      print('연락처 불러오기 오류: $e');
+      print('nameCardId 조회 오류: $e');
+      return null;
     }
-    return null;
   }
 }

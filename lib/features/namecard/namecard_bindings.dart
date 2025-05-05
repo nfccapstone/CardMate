@@ -8,6 +8,8 @@ import 'services/i_edit_card_service.dart';
 import 'services/edit_card_service.dart';
 import 'services/i_contact_service.dart';
 import 'services/contact_service.dart';
+import 'services/i_profile_image_service.dart';
+import 'services/profile_image_service.dart';
 
 class NameCardBindings extends Bindings {
   @override
@@ -16,10 +18,14 @@ class NameCardBindings extends Bindings {
     Get.lazyPut<INameCardService>(() => NameCardService());
     Get.lazyPut<IEditCardService>(() => EditCardService());
     Get.lazyPut<IContactService>(() => ContactService());
+    Get.lazyPut<IProfileImageService>(() => ProfileImageService());
 
     // 컨트롤러에 DI로 주입 (생성자 주입)
     Get.lazyPut<NameCardInfoController>(
-      () => NameCardInfoController(nameCardService: Get.find<INameCardService>()),
+      () => NameCardInfoController(
+        nameCardService: Get.find<INameCardService>(),
+        profileImageService: Get.find<IProfileImageService>(),
+      ),
     );
     Get.lazyPut<EditCardController>(
       () => EditCardController(editCardService: Get.find<IEditCardService>()),
