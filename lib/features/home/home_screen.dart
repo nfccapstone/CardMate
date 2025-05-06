@@ -231,12 +231,7 @@ class HomeScreen extends StatelessWidget {
                 const SizedBox(height: 16),
                 ElevatedButton(
                   onPressed: () {
-                    final cardId = nameCardId;
-                    if (cardId.isNotEmpty) {
-                      Get.toNamed('/sharedNameCard/$cardId');
-                    } else {
-                      Get.snackbar('오류', 'CardId가 없습니다.');
-                    }
+                    Get.toNamed('/myNameCard');
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.deepPurple,

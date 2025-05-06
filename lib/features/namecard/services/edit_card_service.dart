@@ -134,4 +134,25 @@ class EditCardService implements IEditCardService {
       rethrow;
     }
   }
+
+  @override
+  Future<Map<String, String>?> fetchContactsFromSubcollection() async {
+    final uid = _auth.currentUser?.uid;
+    if (uid == null) return null;
+    try {
+      final doc = await _firestore
+          .collection('users')
+          .doc(uid)
+          .collection('card_contact')
+          .doc('contacts')
+          .get();
+      if (doc.exists && doc.data() != null) {
+        return Map<String, String>.from(doc.data()!);
+      }
+      return null;
+    } catch (e) {
+      print('연락처 서브컬렉션 불러오기 오류: $e');
+      return null;
+    }
+  }
 }

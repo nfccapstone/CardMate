@@ -16,11 +16,20 @@ import 'features/namecard/namecard_bindings.dart';
 import 'features/login/login_bindings.dart';
 import 'features/namecard/screens/shared_card_check_screen.dart';
 import 'features/namecard/screens/shared_namecard_screen.dart';
+import 'features/namecard/services/namecard_service.dart';
+import 'features/namecard/services/i_namecard_service.dart';
+import 'features/namecard/screens/my_namecard_screen.dart';
+import 'features/namecard/controllers/my_namecard_controller.dart';
+import 'features/namecard/services/edit_card_service.dart';
+import 'features/namecard/services/i_edit_card_service.dart';
 //import 'features/register/register_binding.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await FirebaseInit.instance.initializeFirebase(); // ✅ Firebase 초기화 완료 후 앱 실행
+
+  // INameCardService를 GetX에 등록
+  Get.put<INameCardService>(NameCardService());
 
   runApp(const CardMateApp());
 }
@@ -84,6 +93,14 @@ class CardMateApp extends StatelessWidget {
             final cardId = Get.parameters['cardId'] ?? '';
             return SharedNameCardScreen(nameCardId: cardId);
           },
+        ),
+        GetPage(
+          name: '/myNameCard',
+          page: () => const MyNameCardScreen(),
+          binding: BindingsBuilder(() {
+            Get.put<IEditCardService>(EditCardService());
+            Get.put(MyNameCardController(editCardService: Get.find<IEditCardService>()));
+          }),
         ),
       ],
     );
