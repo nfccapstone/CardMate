@@ -75,28 +75,6 @@ class NameCardInfoScreen extends StatelessWidget {
               _buildTextField(controller.departmentController, '부서'),
               _buildTextField(controller.companyController, '회사'),
               const SizedBox(height: 24),
-              const Text(
-                '명함 ID',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 8),
-              const Text(
-                '다른 사람이 당신의 명함을 찾을 때 사용할 수 있는 고유 ID입니다.',
-                style: TextStyle(
-                  color: Colors.grey,
-                  fontSize: 12,
-                ),
-              ),
-              const SizedBox(height: 8),
-              _buildTextField(
-                controller.nameCardIdController,
-                '명함 ID',
-                prefixIcon: const Icon(Icons.badge, color: Colors.grey),
-              ),
-              const SizedBox(height: 20),
               Obx(() => ElevatedButton(
                     onPressed: controller.isSaving.value
                         ? null

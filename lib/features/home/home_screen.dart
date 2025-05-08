@@ -166,12 +166,12 @@ class HomeScreen extends StatelessWidget {
                     CircleAvatar(
                       radius: 40,
                       backgroundColor: Colors.grey[300],
-                      backgroundImage: data['photoUrl'] != null &&
-                              data['photoUrl'].toString().isNotEmpty
-                          ? NetworkImage(data['photoUrl'])
+                      backgroundImage: data['profileImageUrl'] != null &&
+                              data['profileImageUrl'].toString().isNotEmpty
+                          ? NetworkImage(data['profileImageUrl'])
                           : null,
-                      child: (data['photoUrl'] == null ||
-                              data['photoUrl'].toString().isEmpty)
+                      child: (data['profileImageUrl'] == null ||
+                              data['profileImageUrl'].toString().isEmpty)
                           ? const Icon(Icons.person,
                               size: 40, color: Colors.white)
                           : null,

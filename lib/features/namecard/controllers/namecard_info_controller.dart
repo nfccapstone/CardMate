@@ -10,17 +10,14 @@ class NameCardInfoController extends GetxController {
   final positionController = TextEditingController();
   final departmentController = TextEditingController();
   final companyController = TextEditingController();
-  final nameCardIdController = TextEditingController();
 
   final isSaving = false.obs;
   final INameCardService _nameCardService;
   final IProfileImageService _profileImageService;
   Rx<File?> profileImage = Rx<File?>(null);
   RxString profileImageUrl = ''.obs;
-  RxString nameCardId = ''.obs;
   final ImagePicker _picker = ImagePicker();
 
-  // 의존성 주입: INameCardService와 IProfileImageService 구현체를 전달 받습니다.
   NameCardInfoController({
     required INameCardService nameCardService,
     required IProfileImageService profileImageService,
@@ -47,9 +44,7 @@ class NameCardInfoController extends GetxController {
       positionController.text = data['position'] ?? '';
       departmentController.text = data['department'] ?? '';
       companyController.text = data['company'] ?? '';
-      nameCardIdController.text = data['nameCardId'] ?? '';
-      nameCardId.value = data['nameCardId'] ?? '';
-      final url = data['photoUrl'] ?? '';
+      final url = data['profileImageUrl'] ?? '';
       if (url.isNotEmpty) {
         profileImageUrl.value = url;
       }
@@ -64,9 +59,10 @@ class NameCardInfoController extends GetxController {
 
     isSaving.value = true;
     try {
-      String? photoUrl = profileImageUrl.value;
+      String? imageUrl = profileImageUrl.value;
       if (profileImage.value != null) {
-        photoUrl = await _profileImageService.uploadProfileImage(profileImage.value!);
+        imageUrl = await _profileImageService.uploadProfileImage(profileImage.value!);
+        profileImageUrl.value = imageUrl ?? '';
       }
 
       final data = {
@@ -74,8 +70,7 @@ class NameCardInfoController extends GetxController {
         'position': positionController.text,
         'department': departmentController.text,
         'company': companyController.text,
-        'nameCardId': nameCardIdController.text,
-        'photoUrl': photoUrl,
+        'profileImageUrl': imageUrl,
       };
 
       await _nameCardService.saveBasicInfo(data);
@@ -87,20 +82,12 @@ class NameCardInfoController extends GetxController {
     }
   }
 
-  String getCardLink() {
-    if (nameCardId.value.isEmpty) {
-      return 'cardmate.link';
-    }
-    return 'cardmate.link/@${nameCardId.value}';
-  }
-
   @override
   void onClose() {
     nameController.dispose();
     positionController.dispose();
     departmentController.dispose();
     companyController.dispose();
-    nameCardIdController.dispose();
     super.onClose();
   }
 }
