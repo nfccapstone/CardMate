@@ -59,6 +59,21 @@ class LoginController extends GetxController {
     }
   }
 
+  Future<void> loginWithGoogle() async {
+    try {
+      var user = await _loginService.signInWithGoogle();
+      if (user != null) {
+        Get.snackbar("로그인 성공", "구글 계정으로 로그인되었습니다.");
+        Get.offAllNamed('/home');
+      } else {
+        Get.snackbar("로그인 취소됨", "구글 로그인이 취소되었습니다.");
+      }
+    } catch (e) {
+      Get.snackbar("오류", "구글 로그인 중 a오류가 발생했습니다.",
+          snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.red);
+    }
+  }
+
   @override
   void onClose() {
     emailController.dispose();
