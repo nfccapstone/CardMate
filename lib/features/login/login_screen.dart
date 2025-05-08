@@ -47,15 +47,27 @@ class LoginScreen extends StatelessWidget {
               const SizedBox(height: 30),
 
               // 자동 로그인 체크박스 추가
+              // 자동 로그인 체크박스 부분 수정
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text("자동 로그인", style: TextStyle(fontSize: 14)),
+                  const Text(
+                    "자동 로그인",
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.black87, // 텍스트 색상 일치
+                    ),
+                  ),
                   Obx(() => Switch(
                         value: controller.isAutoLogin.value,
                         onChanged: (value) {
                           controller.isAutoLogin.value = value;
                         },
+                        activeColor: Colors.black, // 스위치 슬라이더 색
+                        activeTrackColor: Colors.black26, // 스위치 배경 색
+                        inactiveThumbColor:
+                            const Color.fromARGB(255, 0, 0, 0), // 비활성 슬라이더
+                        inactiveTrackColor: Colors.grey.shade300, // 비활성 배경
                       )),
                 ],
               ),
@@ -101,6 +113,7 @@ class LoginScreen extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 30),
+
               ElevatedButton(
                 onPressed: controller.loginWithGoogle,
                 style: ElevatedButton.styleFrom(
@@ -112,11 +125,17 @@ class LoginScreen extends StatelessWidget {
                     borderRadius: BorderRadius.circular(6),
                   ),
                 ),
-                child: const Row(
+                child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    SizedBox(width: 8),
-                    Text(
+                    // 구글 아이콘 이미지 추가
+                    Image.asset(
+                      'assets/images/google.png', // 경로에 맞게 수정
+                      width: 24, // 원하는 크기로 설정
+                      height: 24, // 원하는 크기로 설정
+                    ),
+                    const SizedBox(width: 8), // 텍스트와 아이콘 사이의 간격
+                    const Text(
                       "Sign in with Google",
                       style:
                           TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
@@ -124,6 +143,7 @@ class LoginScreen extends StatelessWidget {
                   ],
                 ),
               ),
+
               const SizedBox(height: 30),
             ],
           ),
