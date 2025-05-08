@@ -8,15 +8,23 @@ class EditCardService implements IEditCardService {
   final _auth = FirebaseInit.instance.auth;
   final _firestore = FirebaseInit.instance.firestore;
   final _storage = FirebaseInit.instance.storage;
-  final String cardId = "1"; // 예시 카드 ID, 실제로는 Firebase에서 가져와야 함
-  // final String cardId = FirebaseInit.instance.getCardId(_auth.currentUser!.uid) ?? '';
+
+  Future<String?> getCardId(String uid) async {
+    final doc = await _firestore.collection('users').doc(uid).get();
+    return doc.data()?['cardId'] as String?;
+  }
 
   @override
   Future<Map<String, dynamic>?> fetchBasicInfo() async {
     final uid = _auth.currentUser?.uid;
     if (uid == null) return null;
+    final cardId = await getCardId(uid);
+    if (cardId == null) return null;
     try {
-      final doc = await _firestore.collection('cards').doc(cardId).get();
+      final doc = await _firestore
+          .collection('cards')
+          .doc(cardId)
+          .get();
       return doc.exists ? doc.data() : null;
     } catch (e) {
       print('명함 정보 불러오기 오류: $e');
@@ -28,27 +36,22 @@ class EditCardService implements IEditCardService {
   Future<bool> saveBasicInfo(Map<String, dynamic> data) async {
     final uid = _auth.currentUser?.uid;
     if (uid == null) return false;
+    final cardId = await getCardId(uid);
+    if (cardId == null) return false;
     try {
       // 기존 name 값 불러오기
-      final userDoc = await _firestore.collection('cards').doc(cardId).get();
-      String? originalName = userDoc.data()?['name'];
+      final cardDoc = await _firestore.collection('cards').doc(cardId).get();
+      String? originalName = cardDoc.data()?['name'];
       // name 필드는 기존 값으로 고정
       final saveData = Map<String, dynamic>.from(data);
       if (originalName != null) {
         saveData['name'] = originalName;
       }
-      // users/{uid}에 저장
-      await _firestore
-          .collection('cards')
-          .doc(cardId)
-          .set(saveData, SetOptions(merge: true));
+      // cards/{cardId}에 저장
+      await _firestore.collection('cards').doc(cardId).set(saveData, SetOptions(merge: true));
 
-      // users/{uid}/card_data/data 문서에 createdAt, updatedAt 저장
-      final cardDataRef = _firestore
-          .collection('cards')
-          .doc(cardId)
-          .collection('card_data')
-          .doc('data');
+      // cards/{cardId}/card_data/data 문서에 createdAt, updatedAt 저장
+      final cardDataRef = _firestore.collection('cards').doc(cardId).collection('card_data').doc('data');
       final cardDataDoc = await cardDataRef.get();
       if (!cardDataDoc.exists) {
         await cardDataRef.set({
@@ -71,6 +74,8 @@ class EditCardService implements IEditCardService {
   Future<void> addBlock(Map<String, dynamic> blockData) async {
     final uid = _auth.currentUser?.uid;
     if (uid == null) return;
+    final cardId = await getCardId(uid);
+    if (cardId == null) return;
     try {
       await _firestore
           .collection('cards')
@@ -86,6 +91,8 @@ class EditCardService implements IEditCardService {
   Future<List<Map<String, dynamic>>> fetchBlocks() async {
     final uid = _auth.currentUser?.uid;
     if (uid == null) return [];
+    final cardId = await getCardId(uid);
+    if (cardId == null) return [];
     try {
       final snapshot = await _firestore
           .collection('cards')
@@ -108,10 +115,12 @@ class EditCardService implements IEditCardService {
   Future<String?> uploadImage(Uint8List imageBytes, String fileName) async {
     final uid = _auth.currentUser?.uid;
     if (uid == null) return null;
+    final cardId = await getCardId(uid);
+    if (cardId == null) return null;
 
     try {
-      // 이미지 파일 경로 설정 (users/{uid}/images/{fileName})
-      final ref = _storage.ref().child('users/$uid/images/$fileName');
+      // 이미지 파일 경로 설정 (cards/{cardId}/images/{fileName})
+      final ref = _storage.ref().child('cards/$cardId/images/$fileName');
 
       // 이미지 업로드
       final uploadTask = await ref.putData(imageBytes);
@@ -128,6 +137,8 @@ class EditCardService implements IEditCardService {
   Future<void> deleteBlock(String blockId) async {
     final uid = _auth.currentUser?.uid;
     if (uid == null) return;
+    final cardId = await getCardId(uid);
+    if (cardId == null) return;
     try {
       await _firestore
           .collection('cards')
@@ -145,6 +156,8 @@ class EditCardService implements IEditCardService {
   Future<Map<String, String>?> fetchContactsFromSubcollection() async {
     final uid = _auth.currentUser?.uid;
     if (uid == null) return null;
+    final cardId = await getCardId(uid);
+    if (cardId == null) return null;
     try {
       final doc = await _firestore
           .collection('cards')

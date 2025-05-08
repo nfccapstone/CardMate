@@ -10,39 +10,41 @@ class NameCardService implements INameCardService {
   final _firestore = FirebaseInit.instance.firestore;
   final _storage = FirebaseStorage.instance;
 
+  Future<String?> getCardId(String uid) async {
+    final doc = await _firestore.collection('users').doc(uid).get();
+    return doc.data()?['cardId'] as String?;
+  }
+
   @override
   Future<void> saveBasicInfo(Map<String, dynamic> data) async {
     final uid = _auth.currentUser?.uid;
     if (uid == null) return;
 
-    try {
-      // 트랜잭션을 사용하여 데이터 일관성 보장
-      await _firestore.runTransaction((transaction) async {
-        // 사용자 문서 업데이트 (기본 필드만 저장)
-        final basicData = {
-          'name': data['name'],
-          'position': data['position'],
-          'company': data['company'],
-          'department': data['department'],
-          'profileImageUrl': data['profileImageUrl'],
-          'uid': uid,
-        };
-        
-        transaction.set(
-          _firestore.collection('users').doc(uid),
-          basicData,
-          SetOptions(merge: true),
-        );
+    // cardId가 없으면 새로 생성
+    String? cardId = await getCardId(uid);
+    cardId ??= _firestore.collection('cards').doc().id;
 
-        // card_data 서브컬렉션 업데이트
-        transaction.set(
-          _firestore.collection('users').doc(uid).collection('card_data').doc('data'),
-          {
-            'updatedAt': FieldValue.serverTimestamp(),
-          },
-          SetOptions(merge: true),
-        );
-      });
+    try {
+      // users/{uid}에는 cardId만 저장
+      await _firestore.collection('users').doc(uid).set({
+        'cardId': cardId,
+      }, SetOptions(merge: true));
+
+      // cards/{cardId}에 명함 정보 저장
+      final basicData = {
+        'name': data['name'],
+        'position': data['position'],
+        'company': data['company'],
+        'department': data['department'],
+        'profileImageUrl': data['profileImageUrl'],
+        'uid': uid,
+      };
+      await _firestore.collection('cards').doc(cardId).set(basicData, SetOptions(merge: true));
+
+      // cards/{cardId}/card_data/data 문서에 updatedAt 저장
+      await _firestore.collection('cards').doc(cardId).collection('card_data').doc('data').set({
+        'updatedAt': FieldValue.serverTimestamp(),
+      }, SetOptions(merge: true));
     } catch (e) {
       print('기본 정보 저장 오류: $e');
       rethrow;
@@ -53,12 +55,11 @@ class NameCardService implements INameCardService {
   Future<Map<String, dynamic>?> fetchBasicInfo() async {
     final uid = _auth.currentUser?.uid;
     if (uid == null) return null;
+    final cardId = await getCardId(uid);
+    if (cardId == null) return null;
 
     try {
-      final doc = await _firestore
-          .collection('users')
-          .doc(uid)
-          .get();
+      final doc = await _firestore.collection('cards').doc(cardId).get();
       return doc.data();
     } catch (e) {
       print('기본 정보 불러오기 오류: $e');
@@ -70,17 +71,17 @@ class NameCardService implements INameCardService {
   Future<String> uploadProfileImage(File file) async {
     final uid = _auth.currentUser?.uid;
     if (uid == null) throw Exception('사용자가 로그인되어 있지 않습니다.');
+    final cardId = await getCardId(uid);
+    if (cardId == null) throw Exception('cardId가 없습니다.');
 
     try {
-      final ref = _storage.ref().child('users/$uid/images/profile.jpg');
+      final ref = _storage.ref().child('cards/$cardId/images/profile.jpg');
       await ref.putFile(file);
       final downloadUrl = await ref.getDownloadURL();
-      
-      // 프로필 이미지 URL 업데이트
-      await _firestore.collection('users').doc(uid).update({
+      // cards/{cardId}에 프로필 이미지 URL 업데이트
+      await _firestore.collection('cards').doc(cardId).update({
         'profileImageUrl': downloadUrl,
       });
-      
       return downloadUrl;
     } catch (e) {
       print('프로필 이미지 업로드 오류: $e');
