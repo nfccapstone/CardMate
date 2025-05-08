@@ -111,4 +111,9 @@ class HomeService implements IHomeService {
       return null;
     }
   }
+
+  @override
+  Future<void> logout() async {
+    await _auth.signOut();
+  }
 }

@@ -45,6 +45,23 @@ class LoginScreen extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 30),
+
+              // 자동 로그인 체크박스 추가
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text("자동 로그인", style: TextStyle(fontSize: 14)),
+                  Obx(() => Switch(
+                        value: controller.isAutoLogin.value,
+                        onChanged: (value) {
+                          controller.isAutoLogin.value = value;
+                        },
+                      )),
+                ],
+              ),
+
+              const SizedBox(height: 20),
+
               ElevatedButton(
                 onPressed: controller.login,
                 style: ElevatedButton.styleFrom(
@@ -61,6 +78,7 @@ class LoginScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 7),
+
               Column(
                 children: [
                   TextButton(
