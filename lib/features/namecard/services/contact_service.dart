@@ -6,6 +6,8 @@ import 'i_contact_service.dart';
 class ContactService implements IContactService {
   final _auth = FirebaseInit.instance.auth;
   final _firestore = FirebaseInit.instance.firestore;
+  final String cardId = "1"; // 예시 카드 ID, 실제로는 Firebase에서 가져와야 함
+  //final String cardId = FirebaseInit.instance.getCardId(_auth.currentUser!.uid) ?? '';
 
   @override
   Future<void> saveContact(String type, String value) async {
@@ -15,8 +17,8 @@ class ContactService implements IContactService {
     try {
       // card_contact 서브컬렉션에 연락처 정보 저장
       await _firestore
-          .collection('users')
-          .doc(uid)
+          .collection('cards')
+          .doc(cardId)
           .collection('card_contact')
           .doc('contacts')
           .set({
@@ -25,8 +27,8 @@ class ContactService implements IContactService {
 
       // card_data 서브컬렉션의 updatedAt 필드 업데이트
       await _firestore
-          .collection('users')
-          .doc(uid)
+          .collection('cards')
+          .doc(cardId)
           .collection('card_data')
           .doc('data')
           .set({
@@ -45,8 +47,8 @@ class ContactService implements IContactService {
 
     try {
       final doc = await _firestore
-          .collection('users')
-          .doc(uid)
+          .collection('cards')
+          .doc(cardId)
           .collection('card_contact')
           .doc('contacts')
           .get();
@@ -69,8 +71,8 @@ class ContactService implements IContactService {
     try {
       // card_contact 서브컬렉션에서 연락처 정보 삭제
       await _firestore
-          .collection('users')
-          .doc(uid)
+          .collection('cards')
+          .doc(cardId)
           .collection('card_contact')
           .doc('contacts')
           .update({
@@ -79,8 +81,8 @@ class ContactService implements IContactService {
 
       // card_data 서브컬렉션의 updatedAt 필드 업데이트
       await _firestore
-          .collection('users')
-          .doc(uid)
+          .collection('cards')
+          .doc(cardId)
           .collection('card_data')
           .doc('data')
           .set({
