@@ -13,25 +13,25 @@ class ContactService implements IContactService {
     if (uid == null) return;
 
     try {
-      // 트랜잭션을 사용하여 데이터 일관성 보장
-      await _firestore.runTransaction((transaction) async {
-        // 사용자 문서의 연락처 정보 업데이트
-        transaction.set(
-          _firestore.collection('users').doc(uid),
-          {'contact.$type': value},
-          SetOptions(merge: true),
-        );
+      // card_contact 서브컬렉션에 연락처 정보 저장
+      await _firestore
+          .collection('users')
+          .doc(uid)
+          .collection('card_contact')
+          .doc('contacts')
+          .set({
+        type: value,
+      }, SetOptions(merge: true));
 
-        // 공유 명함의 연락처 정보 업데이트
-        final nameCardId = await getNameCardId(uid);
-        if (nameCardId != null) {
-          transaction.set(
-            _firestore.collection('shared_namecards').doc(nameCardId),
-            {'contact.$type': value},
-            SetOptions(merge: true),
-          );
-        }
-      });
+      // card_data 서브컬렉션의 updatedAt 필드 업데이트
+      await _firestore
+          .collection('users')
+          .doc(uid)
+          .collection('card_data')
+          .doc('data')
+          .set({
+        'updatedAt': FieldValue.serverTimestamp(),
+      }, SetOptions(merge: true));
     } catch (e) {
       print('연락처 저장 오류: $e');
       rethrow;
@@ -43,18 +43,22 @@ class ContactService implements IContactService {
     final uid = _auth.currentUser?.uid;
     if (uid == null) return null;
 
-    // card_contact/contacts 문서에서 읽기
-    final doc = await _firestore
-        .collection('users')
-        .doc(uid)
-        .collection('card_contact')
-        .doc('contacts')
-        .get();
+    try {
+      final doc = await _firestore
+          .collection('users')
+          .doc(uid)
+          .collection('card_contact')
+          .doc('contacts')
+          .get();
 
-    if (doc.exists && doc.data() != null) {
-      return Map<String, String>.from(doc.data()!);
+      if (doc.exists && doc.data() != null) {
+        return Map<String, String>.from(doc.data()!);
+      }
+      return null;
+    } catch (e) {
+      print('연락처 불러오기 오류: $e');
+      return null;
     }
-    return null;
   }
 
   @override
@@ -63,38 +67,28 @@ class ContactService implements IContactService {
     if (uid == null) return;
 
     try {
-      await _firestore.runTransaction((transaction) async {
-        // 사용자 문서에서 연락처 정보 삭제
-        transaction.update(
-          _firestore.collection('users').doc(uid),
-          {'contact.$type': FieldValue.delete()},
-        );
-
-        // 공유 명함에서 연락처 정보 삭제
-        final nameCardId = await getNameCardId(uid);
-        if (nameCardId != null) {
-          transaction.update(
-            _firestore.collection('shared_namecards').doc(nameCardId),
-            {'contact.$type': FieldValue.delete()},
-          );
-        }
+      // card_contact 서브컬렉션에서 연락처 정보 삭제
+      await _firestore
+          .collection('users')
+          .doc(uid)
+          .collection('card_contact')
+          .doc('contacts')
+          .update({
+        type: FieldValue.delete(),
       });
+
+      // card_data 서브컬렉션의 updatedAt 필드 업데이트
+      await _firestore
+          .collection('users')
+          .doc(uid)
+          .collection('card_data')
+          .doc('data')
+          .set({
+        'updatedAt': FieldValue.serverTimestamp(),
+      }, SetOptions(merge: true));
     } catch (e) {
       print('연락처 삭제 오류: $e');
       rethrow;
-    }
-  }
-
-  Future<String?> getNameCardId(String uid) async {
-    try {
-      final doc = await _firestore
-          .collection('users')
-          .doc(uid)
-          .get();
-      return doc.data()?['nameCardId'] as String?;
-    } catch (e) {
-      print('nameCardId 조회 오류: $e');
-      return null;
     }
   }
 }

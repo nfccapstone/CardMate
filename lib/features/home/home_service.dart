@@ -42,6 +42,8 @@ class HomeService implements IHomeService {
       final doc = await _firestore
           .collection('users')
           .doc(user.uid)
+          .collection('card_contact')
+          .doc('contacts')
           .get();
 
       if (doc.exists && doc.data() != null) {
@@ -59,7 +61,19 @@ class HomeService implements IHomeService {
     if (user == null) return false;
 
     try {
+      // 기본 정보 업데이트
       await _firestore.collection('users').doc(user.uid).update(data);
+      
+      // card_data 서브컬렉션의 updatedAt 필드 업데이트
+      await _firestore
+          .collection('users')
+          .doc(user.uid)
+          .collection('card_data')
+          .doc('data')
+          .set({
+        'updatedAt': FieldValue.serverTimestamp(),
+      }, SetOptions(merge: true));
+      
       return true;
     } catch (e) {
       print('명함 수정 오류: $e');
@@ -81,6 +95,49 @@ class HomeService implements IHomeService {
     } catch (e) {
       print('명함 존재 여부 확인 실패: $e');
       return false;
+    }
+  }
+
+  @override
+  Future<List<Map<String, dynamic>>> fetchCardBlocks() async {
+    final user = _auth.currentUser;
+    if (user == null) return [];
+
+    try {
+      final snapshot = await _firestore
+          .collection('users')
+          .doc(user.uid)
+          .collection('card_block')
+          .get();
+      
+      return snapshot.docs.map((doc) {
+        final data = doc.data();
+        data['id'] = doc.id;
+        return data;
+      }).toList();
+    } catch (e) {
+      print('명함 블록 불러오기 오류: $e');
+      return [];
+    }
+  }
+
+  @override
+  Future<Map<String, dynamic>?> fetchCardStyle() async {
+    final user = _auth.currentUser;
+    if (user == null) return null;
+
+    try {
+      final doc = await _firestore
+          .collection('users')
+          .doc(user.uid)
+          .collection('card_style')
+          .doc('style')
+          .get();
+      
+      return doc.exists ? doc.data() : null;
+    } catch (e) {
+      print('명함 스타일 불러오기 오류: $e');
+      return null;
     }
   }
 }

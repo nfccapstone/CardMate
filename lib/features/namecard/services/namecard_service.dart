@@ -18,22 +18,30 @@ class NameCardService implements INameCardService {
     try {
       // 트랜잭션을 사용하여 데이터 일관성 보장
       await _firestore.runTransaction((transaction) async {
-        // 사용자 문서 업데이트
+        // 사용자 문서 업데이트 (기본 필드만 저장)
+        final basicData = {
+          'name': data['name'],
+          'position': data['position'],
+          'company': data['company'],
+          'department': data['department'],
+          'profileImageUrl': data['profileImageUrl'],
+          'uid': uid,
+        };
+        
         transaction.set(
           _firestore.collection('users').doc(uid),
-          data,
+          basicData,
           SetOptions(merge: true),
         );
 
-        // 공유용 명함 정보 저장
-        final nameCardId = data['nameCardId'] as String?;
-        if (nameCardId != null && nameCardId.isNotEmpty) {
-          transaction.set(
-            _firestore.collection('shared_namecards').doc(nameCardId),
-            data,
-            SetOptions(merge: true),
-          );
-        }
+        // card_data 서브컬렉션 업데이트
+        transaction.set(
+          _firestore.collection('users').doc(uid).collection('card_data').doc('data'),
+          {
+            'updatedAt': FieldValue.serverTimestamp(),
+          },
+          SetOptions(merge: true),
+        );
       });
     } catch (e) {
       print('기본 정보 저장 오류: $e');
@@ -64,9 +72,16 @@ class NameCardService implements INameCardService {
     if (uid == null) throw Exception('사용자가 로그인되어 있지 않습니다.');
 
     try {
-      final ref = _storage.ref().child('profile_images/$uid.jpg');
+      final ref = _storage.ref().child('users/$uid/images/profile.jpg');
       await ref.putFile(file);
-      return await ref.getDownloadURL();
+      final downloadUrl = await ref.getDownloadURL();
+      
+      // 프로필 이미지 URL 업데이트
+      await _firestore.collection('users').doc(uid).update({
+        'profileImageUrl': downloadUrl,
+      });
+      
+      return downloadUrl;
     } catch (e) {
       print('프로필 이미지 업로드 오류: $e');
       rethrow;
@@ -90,8 +105,8 @@ class NameCardService implements INameCardService {
       final contactsDoc = await _firestore
           .collection('shared_namecards')
           .doc(nameCardId)
-          .collection('contacts')
-          .doc('list')
+          .collection('card_contact')
+          .doc('contacts')
           .get();
 
       if (contactsDoc.exists) {
