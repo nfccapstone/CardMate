@@ -29,25 +29,51 @@ class LoginScreen extends StatelessWidget {
               const SizedBox(height: 40),
               Column(
                 children: [
-                  _buildClippedField(
+                  _buildInputField(
                     controller.emailController,
                     "Email",
                     Icons.person,
                     false,
-                    clipper: TopDiagonalClipper(),
-                    isTop: true,
                   ),
-                  _buildClippedField(
+                  const SizedBox(height: 16),
+                  _buildInputField(
                     controller.passwordController,
                     "Password",
                     Icons.lock,
                     true,
-                    clipper: BottomDiagonalClipper(),
-                    isTop: false,
                   ),
                 ],
               ),
               const SizedBox(height: 30),
+
+              // 자동 로그인 체크박스 추가
+              // 자동 로그인 체크박스 부분 수정
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    "자동 로그인",
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.black87, // 텍스트 색상 일치
+                    ),
+                  ),
+                  Obx(() => Switch(
+                        value: controller.isAutoLogin.value,
+                        onChanged: (value) {
+                          controller.isAutoLogin.value = value;
+                        },
+                        activeColor: Colors.black, // 스위치 슬라이더 색
+                        activeTrackColor: Colors.black26, // 스위치 배경 색
+                        inactiveThumbColor:
+                            const Color.fromARGB(255, 0, 0, 0), // 비활성 슬라이더
+                        inactiveTrackColor: Colors.grey.shade300, // 비활성 배경
+                      )),
+                ],
+              ),
+
+              const SizedBox(height: 20),
+
               ElevatedButton(
                 onPressed: controller.login,
                 style: ElevatedButton.styleFrom(
@@ -64,6 +90,7 @@ class LoginScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 7),
+
               Column(
                 children: [
                   TextButton(
@@ -86,6 +113,38 @@ class LoginScreen extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 30),
+
+              ElevatedButton(
+                onPressed: controller.loginWithGoogle,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.white,
+                  foregroundColor: Colors.black,
+                  minimumSize: const Size(double.infinity, 50),
+                  side: const BorderSide(color: Colors.grey),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    // 구글 아이콘 이미지 추가
+                    Image.asset(
+                      'assets/images/google.png', // 경로에 맞게 수정
+                      width: 24, // 원하는 크기로 설정
+                      height: 24, // 원하는 크기로 설정
+                    ),
+                    const SizedBox(width: 8), // 텍스트와 아이콘 사이의 간격
+                    const Text(
+                      "Sign in with Google",
+                      style:
+                          TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 30),
             ],
           ),
         ),
@@ -93,122 +152,39 @@ class LoginScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildClippedField(
+  Widget _buildInputField(
     TextEditingController controller,
     String hint,
     IconData icon,
-    bool isPassword, {
-    required CustomClipper<Path> clipper,
-    required bool isTop,
-  }) {
-    return CustomPaint(
-      painter: DiagonalBorderPainter(isTop: isTop),
-      child: ClipPath(
-        clipper: clipper,
-        child: Container(
-          height: 65,
-          color: const Color(0xFFF9F9F9),
-          child: Stack(
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(left: 48.0, right: 16.0),
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: TextField(
-                    controller: controller,
-                    obscureText: isPassword,
-                    style: const TextStyle(color: Colors.black87),
-                    cursorColor: const Color.fromARGB(255, 106, 105, 105),
-                    decoration: const InputDecoration(
-                      hintText: '',
-                      border: InputBorder.none,
-                      isDense: true,
-                    ).copyWith(
-                      hintText: hint,
-                      hintStyle: const TextStyle(color: Colors.grey),
-                      contentPadding: const EdgeInsets.only(top: 7),
-                    ),
-                  ),
-                ),
+    bool isPassword,
+  ) {
+    return Container(
+      height: 60,
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF9F9F9),
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(color: Colors.grey.shade300),
+      ),
+      child: Row(
+        children: [
+          Icon(icon, color: Colors.black87),
+          const SizedBox(width: 12),
+          Expanded(
+            child: TextField(
+              controller: controller,
+              obscureText: isPassword,
+              style: const TextStyle(color: Colors.black87),
+              cursorColor: Colors.grey,
+              decoration: InputDecoration(
+                hintText: hint,
+                border: InputBorder.none,
+                hintStyle: const TextStyle(color: Colors.grey),
               ),
-              Positioned(
-                left: 12,
-                top: 23,
-                child: Icon(
-                  icon,
-                  color: Colors.black87,
-                ),
-              ),
-            ],
+            ),
           ),
-        ),
+        ],
       ),
     );
   }
-}
-
-// ───────── Clipper / Painter ─────────
-
-class DiagonalBorderPainter extends CustomPainter {
-  final bool isTop;
-
-  DiagonalBorderPainter({required this.isTop});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = const Color(0xFF333333)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 4;
-
-    final path = Path();
-    if (isTop) {
-      path.moveTo(0, 0);
-      path.lineTo(size.width, 0);
-      path.lineTo(size.width, size.height - 20);
-      path.lineTo(0, size.height);
-      path.close();
-    } else {
-      path.moveTo(0, 20);
-      path.lineTo(size.width, 0);
-      path.lineTo(size.width, size.height);
-      path.lineTo(0, size.height);
-      path.close();
-    }
-
-    canvas.drawPath(path, paint);
-  }
-
-  @override
-  bool shouldRepaint(CustomPainter oldDelegate) => false;
-}
-
-class TopDiagonalClipper extends CustomClipper<Path> {
-  @override
-  Path getClip(Size size) {
-    return Path()
-      ..moveTo(0, 0)
-      ..lineTo(size.width, 0)
-      ..lineTo(size.width, size.height - 20)
-      ..lineTo(0, size.height)
-      ..close();
-  }
-
-  @override
-  bool shouldReclip(CustomClipper<Path> oldClipper) => false;
-}
-
-class BottomDiagonalClipper extends CustomClipper<Path> {
-  @override
-  Path getClip(Size size) {
-    return Path()
-      ..moveTo(0, 20)
-      ..lineTo(size.width, 0)
-      ..lineTo(size.width, size.height)
-      ..lineTo(0, size.height)
-      ..close();
-  }
-
-  @override
-  bool shouldReclip(CustomClipper<Path> oldClipper) => false;
 }

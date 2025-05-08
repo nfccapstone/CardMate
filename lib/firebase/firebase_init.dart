@@ -16,6 +16,22 @@ class FirebaseInit {
     return _instance;
   }
 
+  Future<String?> getCardId(String userId) async {
+    try {
+      DocumentSnapshot userDoc =
+          await firestore.collection('users').doc(userId).get();
+      if (userDoc.exists) {
+        print("카드ID: ${userDoc.get('cardID')}");
+        return userDoc.get('cardID');
+      } else {
+        return null;
+      }
+    } catch (e) {
+      print('Error fetching card ID: $e');
+      return null;
+    }
+  }
+
   FirebaseInit._internal();
 
   Future<void> initializeFirebase() async {
