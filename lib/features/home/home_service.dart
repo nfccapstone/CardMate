@@ -7,8 +7,6 @@ import 'services/i_home_service.dart';
 class HomeService implements IHomeService {
   final FirebaseFirestore _firestore = FirebaseInit.instance.firestore;
   final FirebaseAuth _auth = FirebaseInit.instance.auth;
-  final String cardId = "1"; // 예시 카드 ID, 실제로는 Firebase에서 가져와야 함
-  //final String cardId = FirebaseInit.instance.getCardId(_auth.currentUser!.uid) ?? '';
 
   @override
   Future<Map<String, dynamic>?> fetchCardData() async {
@@ -16,7 +14,7 @@ class HomeService implements IHomeService {
     if (user == null) return null;
 
     try {
-      final doc = await _firestore.collection('cards').doc(cardId).get();
+      final doc = await _firestore.collection('users').doc(user.uid).get();
       return doc.data();
     } catch (e) {
       print('명함 정보 가져오기 오류: $e');
@@ -61,7 +59,7 @@ class HomeService implements IHomeService {
     if (user == null) return false;
 
     try {
-      final doc = await _firestore.collection('cards').doc(cardId).get();
+      final doc = await _firestore.collection('users').doc(user.uid).get();
       return doc.exists;
     } catch (e) {
       print('명함 존재 여부 확인 실패: $e');
