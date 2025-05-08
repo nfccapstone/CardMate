@@ -30,6 +30,9 @@ class LoginService implements ILoginService {
   @override
   Future<User?> signInWithGoogle() async {
     try {
+      // 기존 세션이 있을 경우 로그아웃 처리
+      await _googleSignIn.signOut();
+
       final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
       if (googleUser == null) return null; // 로그인 취소
 
