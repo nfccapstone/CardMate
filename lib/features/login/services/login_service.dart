@@ -1,10 +1,11 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cardmate/firebase/firebase_init.dart';
 import 'i_login_service.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 class LoginService implements ILoginService {
-  // FirebaseAuth는 FirebaseInit에서 가져옵니다.
   final FirebaseAuth _auth = FirebaseInit.instance.auth;
+  final GoogleSignIn _googleSignIn = GoogleSignIn();
 
   @override
   Future<User?> signIn(String email, String password) async {
@@ -15,7 +16,6 @@ class LoginService implements ILoginService {
       );
       return userCredential.user;
     } catch (e) {
-      // 에러 발생 시 로그를 남기고 예외를 전파하여 컨트롤러에서 처리하도록 합니다.
       print("로그인 오류: $e");
       rethrow;
     }
@@ -24,5 +24,29 @@ class LoginService implements ILoginService {
   @override
   Future<void> signOut() async {
     await _auth.signOut();
+    await _googleSignIn.signOut(); // Google 로그아웃도 함께 처리
+  }
+
+  @override
+  Future<User?> signInWithGoogle() async {
+    try {
+      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
+      if (googleUser == null) return null; // 로그인 취소
+
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser.authentication;
+
+      final credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+
+      final UserCredential userCredential =
+          await _auth.signInWithCredential(credential);
+      return userCredential.user;
+    } catch (e) {
+      print("구글 로그인 오류: $e");
+      rethrow;
+    }
   }
 }
