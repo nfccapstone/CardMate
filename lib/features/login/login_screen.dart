@@ -86,6 +86,30 @@ class LoginScreen extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 30),
+              ElevatedButton(
+                onPressed: controller.loginWithGoogle,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.white,
+                  foregroundColor: Colors.black,
+                  minimumSize: const Size(double.infinity, 50),
+                  side: const BorderSide(color: Colors.grey),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                ),
+                child: const Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    SizedBox(width: 8),
+                    Text(
+                      "Sign in with Google",
+                      style:
+                          TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 30),
             ],
           ),
         ),
