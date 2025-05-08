@@ -71,8 +71,7 @@ class CardIdService implements ICardIdService {
 
       final exists = await _checkCardIdExists(cardId);
       if (!exists) {
-        await _firestore.collection('cards').doc(cardId).set(
-            {'createdAt': FieldValue.serverTimestamp(), 'status': 'available'});
+        await _firestore.collection('cards').doc(cardId).set({});
         return true;
       }
 
@@ -109,14 +108,14 @@ class CardIdService implements ICardIdService {
 
         transaction.update(
           _firestore.collection('cards').doc(cardId),
-          {'userId': userId, 'linkedAt': FieldValue.serverTimestamp()},
+          {'userId': userId},
         );
 
         // 사용자 문서에 카드 ID 추가
-        transaction.update(
-          _firestore.collection('users').doc(userId),
-          {'cardId': cardId, 'updatedAt': FieldValue.serverTimestamp()},
-        );
+        transaction.set(
+            _firestore.collection('users').doc(userId),
+            {'cardId': cardId, 'updatedAt': FieldValue.serverTimestamp()},
+            SetOptions(merge: true));
       });
 
       return true;
