@@ -14,11 +14,22 @@ import 'features/namecard/screens/namecard_info_screen.dart';
 import 'features/namecard/screens/edit_contact_screen.dart';
 import 'features/namecard/namecard_bindings.dart';
 import 'features/login/login_bindings.dart';
+import 'features/namecard/screens/shared_card_check_screen.dart';
+import 'features/namecard/screens/shared_namecard_screen.dart';
+import 'features/namecard/services/namecard_service.dart';
+import 'features/namecard/services/i_namecard_service.dart';
+import 'features/namecard/screens/my_namecard_screen.dart';
+import 'features/namecard/controllers/my_namecard_controller.dart';
+import 'features/namecard/services/edit_card_service.dart';
+import 'features/namecard/services/i_edit_card_service.dart';
 //import 'features/register/register_binding.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await FirebaseInit.instance.initializeFirebase(); // ✅ Firebase 초기화 완료 후 앱 실행
+
+  // INameCardService를 GetX에 등록
+  Get.put<INameCardService>(NameCardService());
 
   runApp(const CardMateApp());
 }
@@ -51,7 +62,11 @@ class CardMateApp extends StatelessWidget {
           binding: RegisterBinding()),
         GetPage(
           name: '/editCard', 
-          page: () => const EditCardScreen(), 
+          page: () {
+            final args = Get.arguments as Map<String, dynamic>?;
+            final cardId = args?['cardId'] ?? '';
+            return EditCardScreen(cardId: cardId);
+          },
           binding: NameCardBindings()),
         GetPage(
           // ✅ 바인딩 포함된 단 하나의 등록만 유지
@@ -67,6 +82,25 @@ class CardMateApp extends StatelessWidget {
         GetPage(
           name: '/blockCreate',
           page: () => BlockCreateScreen(),
+        ),
+        GetPage(
+          name: '/sharedCardCheck',
+          page: () => const SharedCardCheckScreen(),
+        ),
+        GetPage(
+          name: '/sharedNameCard/:cardId',
+          page: () {
+            final cardId = Get.parameters['cardId'] ?? '';
+            return SharedNameCardScreen(nameCardId: cardId);
+          },
+        ),
+        GetPage(
+          name: '/myNameCard',
+          page: () => const MyNameCardScreen(),
+          binding: BindingsBuilder(() {
+            Get.put<IEditCardService>(EditCardService());
+            Get.put(MyNameCardController(editCardService: Get.find<IEditCardService>()));
+          }),
         ),
       ],
     );

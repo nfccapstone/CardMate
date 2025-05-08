@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:cardmate/features/namecard/services/i_namecard_service.dart';
+import 'package:cardmate/features/namecard/services/i_profile_image_service.dart';
 
 class NameCardInfoController extends GetxController {
   final nameController = TextEditingController();
@@ -12,14 +13,19 @@ class NameCardInfoController extends GetxController {
   final nameCardIdController = TextEditingController();
 
   final isSaving = false.obs;
-  final INameCardService _service;
+  final INameCardService _nameCardService;
+  final IProfileImageService _profileImageService;
   Rx<File?> profileImage = Rx<File?>(null);
   RxString profileImageUrl = ''.obs;
+  RxString nameCardId = ''.obs;
   final ImagePicker _picker = ImagePicker();
 
-  // 의존성 주입: INameCardService 구현체를 전달 받습니다.
-  NameCardInfoController({required INameCardService nameCardService})
-      : _service = nameCardService;
+  // 의존성 주입: INameCardService와 IProfileImageService 구현체를 전달 받습니다.
+  NameCardInfoController({
+    required INameCardService nameCardService,
+    required IProfileImageService profileImageService,
+  })  : _nameCardService = nameCardService,
+        _profileImageService = profileImageService;
 
   @override
   void onInit() {
@@ -35,13 +41,14 @@ class NameCardInfoController extends GetxController {
   }
 
   Future<void> loadBasicInfo() async {
-    final data = await _service.fetchBasicInfo();
+    final data = await _nameCardService.fetchBasicInfo();
     if (data != null) {
       nameController.text = data['name'] ?? '';
       positionController.text = data['position'] ?? '';
       departmentController.text = data['department'] ?? '';
       companyController.text = data['company'] ?? '';
       nameCardIdController.text = data['nameCardId'] ?? '';
+      nameCardId.value = data['nameCardId'] ?? '';
       final url = data['photoUrl'] ?? '';
       if (url.isNotEmpty) {
         profileImageUrl.value = url;
@@ -50,26 +57,41 @@ class NameCardInfoController extends GetxController {
   }
 
   Future<void> saveToFirebase() async {
+    if (nameController.text.isEmpty) {
+      Get.snackbar('오류', '이름을 입력해주세요.');
+      return;
+    }
+
     isSaving.value = true;
-    String photoUrl = 'https://default-profile-image.com/default.jpg';
-    if (profileImage.value != null) {
-      photoUrl = await _service.uploadProfileImage(profileImage.value!);
-    } else if (profileImageUrl.isNotEmpty) {
-      photoUrl = profileImageUrl.value;
+    try {
+      String? photoUrl = profileImageUrl.value;
+      if (profileImage.value != null) {
+        photoUrl = await _profileImageService.uploadProfileImage(profileImage.value!);
+      }
+
+      final data = {
+        'name': nameController.text,
+        'position': positionController.text,
+        'department': departmentController.text,
+        'company': companyController.text,
+        'nameCardId': nameCardIdController.text,
+        'photoUrl': photoUrl,
+      };
+
+      await _nameCardService.saveBasicInfo(data);
+      Get.back(result: true);
+    } catch (e) {
+      Get.snackbar('오류', '저장에 실패했습니다.');
+    } finally {
+      isSaving.value = false;
     }
-    final data = {
-      'name': nameController.text.trim(),
-      'position': positionController.text.trim(),
-      'department': departmentController.text.trim(),
-      'company': companyController.text.trim(),
-      'nameCardId': nameCardIdController.text.trim(),
-      'photoUrl': photoUrl,
-    };
-    final success = await _service.saveBasicInfo(data);
-    if (success) {
-      Get.snackbar('저장 완료', '기본 정보가 저장되었습니다.');
+  }
+
+  String getCardLink() {
+    if (nameCardId.value.isEmpty) {
+      return 'cardmate.link';
     }
-    isSaving.value = false;
+    return 'cardmate.link/@${nameCardId.value}';
   }
 
   @override

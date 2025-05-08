@@ -1,24 +1,19 @@
 // block_section.dart
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:cardmate/features/namecard/controllers/edit_card_controller.dart';
-import 'package:cardmate/features/namecard/widgets/block_preview_card.dart'; // 경로는 프로젝트 구조에 맞게 수정
+import 'package:cardmate/features/namecard/widgets/block_preview_card.dart';
 
 class BlockSection extends StatelessWidget {
-  final EditCardController controller;
-  const BlockSection({Key? key, required this.controller}) : super(key: key);
+  final List<Map<String, dynamic>> blocks;
+  const BlockSection({Key? key, required this.blocks}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Obx(() {
-      if (controller.blocks.isEmpty) return const SizedBox();
-
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: controller.blocks
-            .map((block) => BlockPreviewCard(block: block))
-            .toList(),
-      );
-    });
+    if (blocks.isEmpty) return const SizedBox();
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: blocks
+          .map((block) => BlockPreviewCard(block: block))
+          .toList(),
+    );
   }
 }
