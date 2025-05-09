@@ -8,13 +8,19 @@ class HomeService implements IHomeService {
   final FirebaseFirestore _firestore = FirebaseInit.instance.firestore;
   final FirebaseAuth _auth = FirebaseInit.instance.auth;
 
+  Future<String?> getCardId(String uid) async {
+    final doc = await _firestore.collection('users').doc(uid).get();
+    return doc.data()?['cardId'] as String?;
+  }
+
   @override
   Future<Map<String, dynamic>?> fetchCardData() async {
     final user = _auth.currentUser;
     if (user == null) return null;
-
     try {
-      final doc = await _firestore.collection('users').doc(user.uid).get();
+      final cardId = await getCardId(user.uid);
+      if (cardId == null) return null;
+      final doc = await _firestore.collection('cards').doc(cardId).get();
       return doc.data();
     } catch (e) {
       print('명함 정보 가져오기 오류: $e');
@@ -26,10 +32,10 @@ class HomeService implements IHomeService {
   Future<Map<String, String>?> fetchContactInfo() async {
     final user = _auth.currentUser;
     if (user == null) return null;
-
     try {
-      final doc = await _firestore.collection('users').doc(user.uid).get();
-
+      final cardId = await getCardId(user.uid);
+      if (cardId == null) return null;
+      final doc = await _firestore.collection('cards').doc(cardId).collection('card_contact').doc('contacts').get();
       if (doc.exists && doc.data() != null) {
         return Map<String, String>.from(doc.data()!);
       }
@@ -43,9 +49,10 @@ class HomeService implements IHomeService {
   Future<bool> updateCardData(Map<String, dynamic> data) async {
     final user = _auth.currentUser;
     if (user == null) return false;
-
     try {
-      await _firestore.collection('users').doc(user.uid).update(data);
+      final cardId = await getCardId(user.uid);
+      if (cardId == null) return false;
+      await _firestore.collection('cards').doc(cardId).update(data);
       return true;
     } catch (e) {
       print('명함 수정 오류: $e');
@@ -57,9 +64,10 @@ class HomeService implements IHomeService {
   Future<bool> checkCardExists() async {
     final user = _auth.currentUser;
     if (user == null) return false;
-
     try {
-      final doc = await _firestore.collection('users').doc(user.uid).get();
+      final cardId = await getCardId(user.uid);
+      if (cardId == null) return false;
+      final doc = await _firestore.collection('cards').doc(cardId).get();
       return doc.exists;
     } catch (e) {
       print('명함 존재 여부 확인 실패: $e');
@@ -71,14 +79,10 @@ class HomeService implements IHomeService {
   Future<List<Map<String, dynamic>>> fetchCardBlocks() async {
     final user = _auth.currentUser;
     if (user == null) return [];
-
     try {
-      final snapshot = await _firestore
-          .collection('users')
-          .doc(user.uid)
-          .collection('card_block')
-          .get();
-
+      final cardId = await getCardId(user.uid);
+      if (cardId == null) return [];
+      final snapshot = await _firestore.collection('cards').doc(cardId).collection('card_block').get();
       return snapshot.docs.map((doc) {
         final data = doc.data();
         data['id'] = doc.id;
@@ -94,15 +98,10 @@ class HomeService implements IHomeService {
   Future<Map<String, dynamic>?> fetchCardStyle() async {
     final user = _auth.currentUser;
     if (user == null) return null;
-
     try {
-      final doc = await _firestore
-          .collection('users')
-          .doc(user.uid)
-          .collection('card_style')
-          .doc('style')
-          .get();
-
+      final cardId = await getCardId(user.uid);
+      if (cardId == null) return null;
+      final doc = await _firestore.collection('cards').doc(cardId).collection('card_style').doc('style').get();
       return doc.exists ? doc.data() : null;
     } catch (e) {
       print('명함 스타일 불러오기 오류: $e');
