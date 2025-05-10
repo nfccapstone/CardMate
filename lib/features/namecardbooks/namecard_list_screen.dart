@@ -1,3 +1,4 @@
+import 'package:cardmate/features/namecard/namecard_bindings.dart';
 import 'package:cardmate/features/namecardbooks/card_controller.dart';
 import 'package:cardmate/features/namecardbooks/edit_othercard_screen.dart';
 import 'package:flutter/material.dart';
@@ -28,7 +29,9 @@ class NameCardListScreen extends StatelessWidget {
               ),
               title: Text(card.name ?? '이름 없음'),
               onTap: () {
-                Get.to(() => EditOtherCardScreen(card: card));
+                Get.to(() => EditOtherCardScreen(cardId: card.id),
+                    binding: NameCardBindings());
+                //Get.toNamed('/editOtherCard');
               },
             );
           },

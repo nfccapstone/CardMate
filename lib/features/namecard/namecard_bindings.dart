@@ -30,8 +30,8 @@ class NameCardBindings extends Bindings {
     Get.lazyPut<EditCardController>(
       () => EditCardController(editCardService: Get.find<IEditCardService>()),
     );
-    Get.lazyPut<ContactController>(
-      () => ContactController(contactService: Get.find<IContactService>()),
-    );
+
+    // ContactController는 cardId가 필요하므로 여기서는 등록하지 않음
+    // 대신 필요한 곳에서 직접 생성하여 사용
   }
 }

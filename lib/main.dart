@@ -1,7 +1,6 @@
 import 'package:cardmate/features/card_id/card_id_binding.dart';
 import 'package:cardmate/features/card_id/card_id_screen.dart';
 import 'package:cardmate/features/home/home_binding.dart';
-import 'package:cardmate/features/namecardbooks/add_card_screen.dart';
 import 'package:cardmate/features/namecard/screens/block_create_screen.dart';
 import 'package:cardmate/features/namecardbooks/edit_othercard_screen.dart';
 import 'package:cardmate/features/register/register_binding.dart';
@@ -84,7 +83,7 @@ class CardMateApp extends StatelessWidget {
           name: '/editContact',
           page: () => EditContactScreen(),
         ),
-        GetPage(name: '/addNamecard', page: () => AddCardScreen()),
+        //GetPage(name: '/addNamecard', page: () => AddCardScreen()),
         GetPage(
           name: '/blockCreate',
           page: () => BlockCreateScreen(),

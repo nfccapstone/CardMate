@@ -94,7 +94,8 @@ class ContactSection extends StatelessWidget {
               icon = Icons.language;
               actions = [
                 IconButton(
-                  icon: const Icon(Icons.open_in_browser, color: Colors.black87),
+                  icon:
+                      const Icon(Icons.open_in_browser, color: Colors.black87),
                   onPressed: () {
                     launchUrl(Uri.parse(value));
                   },

@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cardmate/firebase/firebase_init.dart';
 import 'i_login_service.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:get/get.dart';
 
 class LoginService implements ILoginService {
   final FirebaseAuth _auth = FirebaseInit.instance.auth;
@@ -14,6 +15,7 @@ class LoginService implements ILoginService {
         email: email,
         password: password,
       );
+
       return userCredential.user;
     } catch (e) {
       print("로그인 오류: $e");
@@ -46,6 +48,7 @@ class LoginService implements ILoginService {
 
       final UserCredential userCredential =
           await _auth.signInWithCredential(credential);
+
       return userCredential.user;
     } catch (e) {
       print("구글 로그인 오류: $e");

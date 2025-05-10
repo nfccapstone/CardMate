@@ -60,7 +60,8 @@ class _ContactSectionReadOnly extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('연락처', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+        const Text('연락처',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
         ...contacts.map<Widget>((contact) {
           final type = contact['type'];
           final value = contact['value'];
@@ -88,4 +89,4 @@ class _ContactSectionReadOnly extends StatelessWidget {
       ],
     );
   }
-} 
+}

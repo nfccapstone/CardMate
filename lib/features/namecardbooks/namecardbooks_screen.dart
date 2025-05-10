@@ -94,7 +94,6 @@ class NamecardbooksScreen extends StatelessWidget {
                 const SizedBox(height: 12),
                 _buildOptionButton(context, Icons.edit, '아이디로 명함 등록', () {
                   Get.to(() => AddCardScreen());
-                  //Get.toNamed('/addNamecard');
                 }),
               ],
             ),
