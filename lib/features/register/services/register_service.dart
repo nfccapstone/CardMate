@@ -35,28 +35,28 @@ class RegisterService implements IRegisterService {
       // 2️⃣ Firestore에 추가 정보 저장
       if (user != null) {
         // 사용자 기본 정보 저장
-        await _firestore.collection("users").doc(user.uid).set({
-          'name': name,
-          'position': position ?? '',
-          'company': company ?? '',
-          'department': department ?? '',
-          'profileImageUrl': profileImageUrl ?? '',
-          'createdAt': FieldValue.serverTimestamp(),
-        });
-        print('사용자 기본 정보 저장 성공');
+        // await _firestore.collection("users").doc(user.uid).set({
+        //   'name': name,
+        //   'position': position ?? '',
+        //   'company': company ?? '',
+        //   'department': department ?? '',
+        //   'profileImageUrl': profileImageUrl ?? '',
+        //   'createdAt': FieldValue.serverTimestamp(),
+        // });
+        // print('사용자 기본 정보 저장 성공');
 
         // 연락처 정보 저장
-        await _firestore
-            .collection("users")
-            .doc(user.uid)
-            .collection("card_contact")
-            .doc("contacts")
-            .set({
-          'email': email,
-          'phoneNumber': phoneNumber,
-          'updatedAt': FieldValue.serverTimestamp(),
-        }, SetOptions(merge: true));
-        print('연락처 정보 저장 성공');
+        // await _firestore
+        //     .collection("users")
+        //     .doc(user.uid)
+        //     .collection("card_contact")
+        //     .doc("contacts")
+        //     .set({
+        //   'email': email,
+        //   'phoneNumber': phoneNumber,
+        //   'updatedAt': FieldValue.serverTimestamp(),
+        // }, SetOptions(merge: true));
+        // print('연락처 정보 저장 성공');
       }
 
       return user;

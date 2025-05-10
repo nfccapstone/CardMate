@@ -4,9 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:cardmate/features/namecardbooks/other_contact_controller.dart';
 import 'package:cardmate/features/namecardbooks/card_controller.dart';
-import 'package:cardmate/features/namecardbooks/edit_card_info_screen.dart';
 import 'package:cardmate/features/namecardbooks/card_model.dart';
-import 'package:cardmate/features/namecard/services/i_contact_service.dart';
+import 'package:cardmate/features/namecardbooks/widgets/profile_section.dart';
+import 'package:cardmate/features/namecardbooks/widgets/contact_section.dart';
 
 class EditOtherCardScreen extends StatelessWidget {
   final CardModel card;
@@ -18,11 +18,11 @@ class EditOtherCardScreen extends StatelessWidget {
     final contactController = Get.put(
         OtherContactController(contactService: Get.put(OtherContactService())));
 
-    // 이 카드의 연락처 불러오기
-    contactController.loadContacts(card.id);
+    // 카드 ID 설정 및 연락처 불러오기
+    contactController.setCardId(card.id);
 
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.black,
         iconTheme: const IconThemeData(color: Colors.white),
@@ -36,170 +36,169 @@ class EditOtherCardScreen extends StatelessWidget {
         );
 
         return SingleChildScrollView(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              _buildNameCardPreview(currentCard),
+              ProfileSection(basicInfo: currentCard),
               const SizedBox(height: 20),
-              _buildContactList(contactController, card.id),
+              ContactSection(controller: contactController),
               const SizedBox(height: 20),
-              _buildContactAddButton(context, contactController, card.id),
-              const Divider(height: 40, color: Colors.white24),
-              _buildAddButton('+ 연락처 추가'),
-              const Divider(height: 40, color: Colors.white24),
-              _buildAddButton('+ 블록 추가'),
+              _buildContactAddButton(context, contactController),
+              const SizedBox(height: 12),
+              _buildBlockAddButton(context),
+              const SizedBox(height: 40),
             ],
           ),
         );
       }),
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: Colors.deepPurple,
+        onPressed: () {
+          // SNS 목록 및 추가 기능 BottomSheet 표시
+          showModalBottomSheet(
+            context: context,
+            backgroundColor: Colors.white,
+            shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+            ),
+            builder: (_) => const SNSBottomSheetUI(),
+          );
+        },
+        child: const Icon(Icons.public),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }
 
-  Widget _buildNameCardPreview(CardModel card) {
+  Widget _buildContactAddButton(
+      BuildContext context, OtherContactController controller) {
     return GestureDetector(
-      onTap: () async {
-        final result = await Get.to(EditCardScreen2(card: card));
-        if (result == true) {
-          Get.find<CardController>().fetchCards(); // reload
-        }
-      },
+      onTap: () => controller.showContactTypeSelector(context, card.id),
       child: Container(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.symmetric(vertical: 16),
+        alignment: Alignment.center,
         decoration: BoxDecoration(
-          color: Colors.green[700],
-          borderRadius: BorderRadius.circular(12),
+          color: Colors.black,
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: const Text(
+          '+ 연락처 추가',
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w500,
+            color: Colors.white,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBlockAddButton(BuildContext context) {
+    return GestureDetector(
+      onTap: () => _showBlockTypeBottomSheet(),
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 16),
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: Colors.black,
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: const Text(
+          '+ 블록 추가',
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w500,
+            color: Colors.white,
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showBlockTypeBottomSheet() {
+    Get.bottomSheet(
+      Container(
+        padding: const EdgeInsets.symmetric(vertical: 20),
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(20),
+            topRight: Radius.circular(20),
+          ),
         ),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Text(
-              card.name,
-              style: const TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white),
+            ListTile(
+              leading: const Icon(Icons.text_fields),
+              title: const Text('텍스트 블록'),
+              onTap: () => _navigateToBlockCreateScreen('text'),
             ),
-            const SizedBox(height: 8),
-            Text(
-              '${card.department} / ${card.position}',
-              style: const TextStyle(fontSize: 14, color: Colors.white70),
+            ListTile(
+              leading: const Icon(Icons.link),
+              title: const Text('링크 블록'),
+              onTap: () => _navigateToBlockCreateScreen('link'),
             ),
-            const SizedBox(height: 8),
-            Text(
-              card.company,
-              style: const TextStyle(fontSize: 14, color: Colors.white70),
+            ListTile(
+              leading: const Icon(Icons.photo),
+              title: const Text('사진 블록'),
+              onTap: () => _navigateToBlockCreateScreen('photo'),
             ),
-            const SizedBox(height: 12),
-            ElevatedButton(
-              onPressed: () {},
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.white,
-                foregroundColor: Colors.black,
-                textStyle: const TextStyle(fontSize: 14),
-              ),
-              child: const Text('+ 태그 추가'),
-            )
           ],
         ),
       ),
     );
   }
 
-  Widget _buildContactList(OtherContactController controller, String cardId) {
-    final contactTitles = {
-      'mobile': '휴대전화',
-      'phone': '유선전화',
-      'email': '이메일',
-      'website': '홈페이지',
-      'address': '주소',
-      'fax': '팩스',
-    };
-
-    final contacts = controller.getContactsForCard(cardId);
-
-    if (contacts.isEmpty) return const SizedBox();
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: contacts.entries.map((entry) {
-        final type = entry.key;
-        final value = entry.value;
-
-        return Container(
-          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
-          margin: const EdgeInsets.only(bottom: 1),
-          color: Colors.white,
-          child: Row(
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(contactTitles[type] ?? '연락처',
-                        style:
-                            const TextStyle(fontSize: 14, color: Colors.grey)),
-                    const SizedBox(height: 4),
-                    Text(
-                      value,
-                      style: const TextStyle(
-                        fontSize: 18,
-                        color: Colors.black,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              if (type == 'mobile' || type == 'phone') ...[
-                IconButton(
-                  icon: const Icon(Icons.call, color: Colors.black87),
-                  onPressed: () {},
-                ),
-                IconButton(
-                  icon: const Icon(Icons.message, color: Colors.black87),
-                  onPressed: () {},
-                ),
-              ]
-            ],
-          ),
-        );
-      }).toList(),
+  void _navigateToBlockCreateScreen(String blockType) async {
+    Get.back(); // BottomSheet 닫기
+    final result = await Get.toNamed(
+      '/blockCreate',
+      arguments: {'type': blockType},
     );
+    if (result != null && result is Map<String, dynamic>) {
+      // TODO: 블록 추가 로직 구현
+    }
   }
+}
 
-  Widget _buildContactAddButton(
-      BuildContext context, OtherContactController controller, String cardId) {
-    return GestureDetector(
-      onTap: () => controller.showContactTypeSelector(context, cardId),
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 16),
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: const Text(
-          '+ 연락처 추가',
-          style: TextStyle(
-              fontSize: 16, fontWeight: FontWeight.w500, color: Colors.black),
-        ),
-      ),
-    );
-  }
+class SNSBottomSheetUI extends StatelessWidget {
+  const SNSBottomSheetUI({Key? key}) : super(key: key);
 
-  Widget _buildAddButton(String text) {
+  @override
+  Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 16),
-      alignment: Alignment.center,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(10),
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Text(
+            'SNS 추가',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 20),
+          _buildSNSItem(Icons.facebook, 'Facebook'),
+          _buildSNSItem(Icons.camera_alt, 'Instagram'),
+          _buildSNSItem(Icons.link, 'LinkedIn'),
+          _buildSNSItem(Icons.chat, 'KakaoTalk'),
+          const SizedBox(height: 20),
+        ],
       ),
-      child: Text(
-        text,
-        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-      ),
+    );
+  }
+
+  Widget _buildSNSItem(IconData icon, String label) {
+    return ListTile(
+      leading: Icon(icon),
+      title: Text(label),
+      onTap: () {
+        // TODO: SNS 추가 로직 구현
+        Get.back();
+      },
     );
   }
 }

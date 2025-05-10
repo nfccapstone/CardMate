@@ -9,17 +9,19 @@ class OtherContactController extends GetxController {
       <String, Map<String, String>>{}.obs;
   final IOtherContactService _service;
   var cards = <CardModel>[].obs;
+  late String cardId;
 
   final CardController cardController = Get.find<CardController>();
 
   OtherContactController({required IOtherContactService contactService})
       : _service = contactService;
 
+  void setCardId(String id) {
+    cardId = id;
+    loadContacts(id);
+  }
+
   Future<void> loadContacts(String cardId) async {
-    // final data = await _service.fetchContacts(cardId);
-    // if (data != null) {
-    //   allContacts[cardId] = data;
-    // }
     final currentCard = cardController.cards.firstWhere(
       (c) => c.id == cardId,
     );
@@ -36,6 +38,18 @@ class OtherContactController extends GetxController {
       await loadContacts(cardId);
     } catch (_) {
       Get.snackbar('오류', '연락처 저장에 실패했어요.');
+    }
+  }
+
+  Future<void> deleteContact(String type) async {
+    try {
+      final contacts = allContacts[cardId] ?? {};
+      contacts.remove(type);
+      allContacts[cardId] = contacts;
+      await _service.saveContact(cardId, type, ''); // 빈 값으로 저장하여 삭제 효과
+      Get.snackbar('성공', '연락처가 삭제되었습니다.');
+    } catch (e) {
+      Get.snackbar('오류', '연락처 삭제에 실패했습니다.');
     }
   }
 

@@ -1,3 +1,4 @@
+import 'package:cardmate/features/namecardbooks/card_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:cardmate/features/namecard/controllers/edit_card_controller.dart';
@@ -6,7 +7,6 @@ import 'package:cardmate/features/namecard/widgets/profile_section.dart';
 import 'package:cardmate/features/namecard/widgets/contact_section.dart';
 import 'package:cardmate/features/namecard/widgets/block_section.dart';
 import 'package:cardmate/features/namecard/widgets/sns_bottom_sheet.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:cardmate/features/namecard/services/i_contact_service.dart';
 
 class EditCardScreen extends StatelessWidget {
