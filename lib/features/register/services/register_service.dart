@@ -20,33 +20,54 @@ class RegisterService implements IRegisterService {
     String? profileImageUrl,
   }) async {
     try {
+      print('회원가입 시작: $email');
+
       // 1️⃣ Firebase Authentication으로 계정 생성
-      UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
+      UserCredential userCredential =
+          await _auth.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
 
       User? user = userCredential.user;
-    
+      print('Firebase Auth 계정 생성 성공: ${user?.uid}');
+
       // 2️⃣ Firestore에 추가 정보 저장
       if (user != null) {
-        await _firestore.collection("users").doc(user.uid).set({
-          'name': name,
-          'position': position ?? '',
-          'company': company ?? '',
-          'department': department ?? '', //회사내 부서 또는 학교내 부서
-          'profileImageUrl': profileImageUrl ?? '', // 프로필 이미지 URL
-        });
-        await _firestore.collection("users").doc(user.uid).collection("card_contact").doc("contacts").set({
-          'email': email,
-          'phoneNumber': phoneNumber,
-        }, SetOptions(merge: true));
+        // 사용자 기본 정보 저장
+        // await _firestore.collection("users").doc(user.uid).set({
+        //   'name': name,
+        //   'position': position ?? '',
+        //   'company': company ?? '',
+        //   'department': department ?? '',
+        //   'profileImageUrl': profileImageUrl ?? '',
+        //   'createdAt': FieldValue.serverTimestamp(),
+        // });
+        // print('사용자 기본 정보 저장 성공');
+
+        // 연락처 정보 저장
+        // await _firestore
+        //     .collection("users")
+        //     .doc(user.uid)
+        //     .collection("card_contact")
+        //     .doc("contacts")
+        //     .set({
+        //   'email': email,
+        //   'phoneNumber': phoneNumber,
+        //   'updatedAt': FieldValue.serverTimestamp(),
+        // }, SetOptions(merge: true));
+        // print('연락처 정보 저장 성공');
       }
 
       return user;
+    } on FirebaseAuthException catch (e) {
+      print('Firebase Auth 오류: ${e.code} - ${e.message}');
+      rethrow;
+    } on FirebaseException catch (e) {
+      print('Firebase 오류: ${e.code} - ${e.message}');
+      rethrow;
     } catch (e) {
-      print("회원가입 오류: $e");
-      // 예외를 전파해서 컨트롤러에서 한 번에 처리할 수 있습니다.
+      print('회원가입 중 예기치 못한 오류: $e');
       rethrow;
     }
   }

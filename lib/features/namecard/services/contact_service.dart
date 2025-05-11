@@ -46,11 +46,13 @@ class ContactService implements IContactService {
   }
 
   @override
-  Future<Map<String, String>?> fetchContacts([String? _]) async {
-    final uid = _auth.currentUser?.uid;
-    if (uid == null) return null;
-    final cardId = await getCardId(uid);
-    if (cardId == null) return null;
+  Future<Map<String, String>?> fetchContacts([String? cardId]) async {
+    if (cardId!.isEmpty) {
+      final uid = _auth.currentUser?.uid;
+      if (uid == null) return null;
+      cardId = await getCardId(uid);
+      if (cardId == null) return null;
+    }
 
     try {
       final doc = await _firestore

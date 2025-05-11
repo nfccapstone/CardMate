@@ -8,4 +8,7 @@ abstract class IEditCardService {
   Future<String?> uploadImage(Uint8List imageBytes, String fileName);
   Future<void> deleteBlock(String blockId);
   Future<Map<String, String>?> fetchContactsFromSubcollection();
+  Future<Map<String, String>?> fetchContactsByCardId(String cardId);
+  Future<List<Map<String, dynamic>>> fetchBlocksByCardId(String cardId);
+  Future<Map<String, dynamic>?> fetchBasicInfoByCardId(String cardId);
 }

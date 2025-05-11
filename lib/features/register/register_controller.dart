@@ -52,10 +52,10 @@ class RegisterController extends GetxController {
       if (user != null) {
         Get.snackbar(
           "회원가입 성공",
-          "홈 화면으로 이동합니다.",
+          "CardId 입력 화면으로 이동합니다.",
           snackPosition: SnackPosition.BOTTOM,
         );
-        Get.offAllNamed('/home'); // 홈 화면으로 이동
+        Get.offAllNamed('/cardId', arguments: {'userId': user.uid});
       } else {
         Get.snackbar(
           "회원가입 실패",

@@ -87,7 +87,8 @@ class ContactController extends GetxController {
     );
   }
 
-  Widget _buildContactTypeItem(BuildContext context, String label, String type) {
+  Widget _buildContactTypeItem(
+      BuildContext context, String label, String type) {
     return ListTile(
       leading: const Icon(Icons.chevron_right),
       title: Text(label, style: const TextStyle(fontSize: 16)),

@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cardmate/firebase/firebase_init.dart';
 import 'package:cardmate/features/namecard/services/i_namecard_service.dart';
@@ -39,10 +38,18 @@ class NameCardService implements INameCardService {
         'profileImageUrl': data['profileImageUrl'],
         'uid': uid,
       };
-      await _firestore.collection('cards').doc(cardId).set(basicData, SetOptions(merge: true));
+      await _firestore
+          .collection('cards')
+          .doc(cardId)
+          .set(basicData, SetOptions(merge: true));
 
       // cards/{cardId}/card_data/data 문서에 updatedAt 저장
-      await _firestore.collection('cards').doc(cardId).collection('card_data').doc('data').set({
+      await _firestore
+          .collection('cards')
+          .doc(cardId)
+          .collection('card_data')
+          .doc('data')
+          .set({
         'updatedAt': FieldValue.serverTimestamp(),
       }, SetOptions(merge: true));
     } catch (e) {
@@ -92,10 +99,8 @@ class NameCardService implements INameCardService {
   @override
   Future<Map<String, dynamic>?> fetchSharedNameCard(String nameCardId) async {
     try {
-      final doc = await _firestore
-          .collection('shared_namecards')
-          .doc(nameCardId)
-          .get();
+      final doc =
+          await _firestore.collection('shared_namecards').doc(nameCardId).get();
 
       if (!doc.exists) return null;
 

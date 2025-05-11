@@ -1,5 +1,6 @@
+import 'package:cardmate/features/card_id/card_id_binding.dart';
+import 'package:cardmate/features/card_id/card_id_screen.dart';
 import 'package:cardmate/features/home/home_binding.dart';
-import 'package:cardmate/features/namecardbooks/add_card_screen.dart';
 import 'package:cardmate/features/namecard/screens/block_create_screen.dart';
 import 'package:cardmate/features/namecardbooks/edit_othercard_screen.dart';
 import 'package:cardmate/features/register/register_binding.dart';
@@ -49,25 +50,29 @@ class CardMateApp extends StatelessWidget {
       initialRoute: '/', // 기본 시작 화면 (로그인 화면)
       getPages: [
         GetPage(
-          name: '/',
-          page: () => const LoginScreen(),
-          binding: LoginBinding()),
+            name: '/',
+            page: () => const LoginScreen(),
+            binding: LoginBinding()),
         GetPage(
-          name: '/home', 
-          page: () => const HomeScreen(),
-          binding: HomeBinding()),
+            name: '/home',
+            page: () => const HomeScreen(),
+            binding: HomeBinding()),
         GetPage(
-          name: '/register', 
-          page: () => const RegisterScreen(),
-          binding: RegisterBinding()),
+            name: '/register',
+            page: () => const RegisterScreen(),
+            binding: RegisterBinding()),
         GetPage(
-          name: '/editCard', 
-          page: () {
-            final args = Get.arguments as Map<String, dynamic>?;
-            final cardId = args?['cardId'] ?? '';
-            return EditCardScreen(cardId: cardId);
-          },
-          binding: NameCardBindings()),
+            name: '/cardId',
+            page: () => const CardIdScreen(),
+            binding: CardIdBinding()),
+        GetPage(
+            name: '/editCard',
+            page: () {
+              final args = Get.arguments as Map<String, dynamic>?;
+              final cardId = args?['cardId'] ?? '';
+              return EditCardScreen(cardId: cardId);
+            },
+            binding: NameCardBindings()),
         GetPage(
           // ✅ 바인딩 포함된 단 하나의 등록만 유지
           name: '/namecardInfo',
@@ -78,7 +83,7 @@ class CardMateApp extends StatelessWidget {
           name: '/editContact',
           page: () => EditContactScreen(),
         ),
-        GetPage(name: '/addNamecard', page: () => AddCardScreen()),
+        //GetPage(name: '/addNamecard', page: () => AddCardScreen()),
         GetPage(
           name: '/blockCreate',
           page: () => BlockCreateScreen(),
@@ -99,7 +104,8 @@ class CardMateApp extends StatelessWidget {
           page: () => const MyNameCardScreen(),
           binding: BindingsBuilder(() {
             Get.put<IEditCardService>(EditCardService());
-            Get.put(MyNameCardController(editCardService: Get.find<IEditCardService>()));
+            Get.put(MyNameCardController(
+                editCardService: Get.find<IEditCardService>()));
           }),
         ),
       ],

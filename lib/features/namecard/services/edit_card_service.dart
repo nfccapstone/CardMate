@@ -1,6 +1,5 @@
 import 'package:cardmate/firebase/firebase_init.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'dart:typed_data';
 import 'i_edit_card_service.dart';
 
@@ -21,10 +20,7 @@ class EditCardService implements IEditCardService {
     final cardId = await getCardId(uid);
     if (cardId == null) return null;
     try {
-      final doc = await _firestore
-          .collection('cards')
-          .doc(cardId)
-          .get();
+      final doc = await _firestore.collection('cards').doc(cardId).get();
       return doc.exists ? doc.data() : null;
     } catch (e) {
       print('명함 정보 불러오기 오류: $e');
@@ -48,10 +44,17 @@ class EditCardService implements IEditCardService {
         saveData['name'] = originalName;
       }
       // cards/{cardId}에 저장
-      await _firestore.collection('cards').doc(cardId).set(saveData, SetOptions(merge: true));
+      await _firestore
+          .collection('cards')
+          .doc(cardId)
+          .set(saveData, SetOptions(merge: true));
 
       // cards/{cardId}/card_data/data 문서에 createdAt, updatedAt 저장
-      final cardDataRef = _firestore.collection('cards').doc(cardId).collection('card_data').doc('data');
+      final cardDataRef = _firestore
+          .collection('cards')
+          .doc(cardId)
+          .collection('card_data')
+          .doc('data');
       final cardDataDoc = await cardDataRef.get();
       if (!cardDataDoc.exists) {
         await cardDataRef.set({
@@ -171,6 +174,54 @@ class EditCardService implements IEditCardService {
       return null;
     } catch (e) {
       print('연락처 서브컬렉션 불러오기 오류: $e');
+      return null;
+    }
+  }
+
+  // 타인의 명함 정보 불러오기
+  Future<Map<String, dynamic>?> fetchBasicInfoByCardId(String cardId) async {
+    try {
+      final doc = await _firestore.collection('cards').doc(cardId).get();
+      return doc.exists ? doc.data() : null;
+    } catch (e) {
+      print('타인 명함 정보 불러오기 오류: $e');
+      return null;
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> fetchBlocksByCardId(String cardId) async {
+    try {
+      final snapshot = await _firestore
+          .collection('cards')
+          .doc(cardId)
+          .collection('card_block')
+          .get();
+
+      return snapshot.docs.map((doc) {
+        final data = doc.data();
+        data['id'] = doc.id;
+        return data;
+      }).toList();
+    } catch (e) {
+      print('타인 블록 불러오기 오류: $e');
+      return [];
+    }
+  }
+
+  Future<Map<String, String>?> fetchContactsByCardId(String cardId) async {
+    try {
+      final doc = await _firestore
+          .collection('cards')
+          .doc(cardId)
+          .collection('card_contact')
+          .doc('contacts')
+          .get();
+      if (doc.exists && doc.data() != null) {
+        return Map<String, String>.from(doc.data()!);
+      }
+      return null;
+    } catch (e) {
+      print('타인 연락처 불러오기 오류: $e');
       return null;
     }
   }

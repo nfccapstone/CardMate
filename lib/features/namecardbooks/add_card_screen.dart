@@ -5,10 +5,6 @@ import 'package:get/get.dart';
 class AddCardScreen extends StatelessWidget {
   final CardController cardController = Get.find();
 
-  // final nameCtrl = TextEditingController();
-  // final positionCtrl = TextEditingController();
-  // final departmentCtrl = TextEditingController();
-  // final companyCtrl = TextEditingController();
   final idCtrl = TextEditingController();
 
   @override
@@ -28,13 +24,6 @@ class AddCardScreen extends StatelessWidget {
               SizedBox(height: 20),
               ElevatedButton(
                 onPressed: () {
-                  // final newCard = CardModel(
-                  //   id: '',
-                  //   name: nameCtrl.text,
-                  //   position: positionCtrl.text,
-                  //   department: departmentCtrl.text,
-                  //   company: companyCtrl.text,
-                  // );
                   cardController.addCardById(idCtrl.text);
                   Get.back();
                 },
