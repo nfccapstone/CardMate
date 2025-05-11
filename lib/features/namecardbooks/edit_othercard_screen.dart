@@ -3,12 +3,11 @@ import 'package:get/get.dart';
 import 'package:cardmate/features/namecard/controllers/edit_card_controller.dart';
 import 'package:cardmate/features/namecard/controllers/contact_controller.dart';
 import 'package:cardmate/features/namecard/widgets/profile_section.dart';
+import 'package:cardmate/features/namecard/widgets/contact_section.dart';
 import 'package:cardmate/features/namecard/widgets/block_section.dart';
 import 'package:cardmate/features/namecard/widgets/sns_bottom_sheet.dart';
 import 'package:cardmate/features/namecard/services/i_contact_service.dart';
 import 'package:cardmate/features/namecard/services/i_edit_card_service.dart';
-
-import '../namecard/widgets/contact_section.dart';
 
 class EditOtherCardScreen extends StatelessWidget {
   final String cardId;
@@ -56,11 +55,11 @@ class EditOtherCardScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              ProfileSection(basicInfo: editController.otherBasicInfo),
+              ProfileSection(basicInfo: editController.basicInfo),
               const SizedBox(height: 20),
               ContactSection(controller: contactController),
               const SizedBox(height: 20),
-              BlockSection(blocks: editController.otherBlocks),
+              BlockSection(blocks: editController.blocks),
               const SizedBox(height: 20),
               _buildContactAddButton(context, contactController),
               const SizedBox(height: 12),

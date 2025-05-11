@@ -10,7 +10,7 @@ class AddCardScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("카드 아이디로 명함 등록")),
+      appBar: AppBar(title: Text("아이디로 명함 등록")),
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(16),

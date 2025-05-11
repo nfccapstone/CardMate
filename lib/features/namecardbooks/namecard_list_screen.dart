@@ -31,6 +31,7 @@ class NameCardListScreen extends StatelessWidget {
               onTap: () {
                 Get.to(() => EditOtherCardScreen(cardId: card.id),
                     binding: NameCardBindings());
+                //Get.toNamed('/editOtherCard');
               },
             );
           },
