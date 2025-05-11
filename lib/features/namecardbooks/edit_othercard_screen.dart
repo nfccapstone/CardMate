@@ -55,11 +55,11 @@ class EditOtherCardScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              ProfileSection(basicInfo: editController.basicInfo),
+              ProfileSection(basicInfo: editController.otherBasicInfo),
               const SizedBox(height: 20),
               ContactSection(controller: contactController),
               const SizedBox(height: 20),
-              BlockSection(blocks: editController.blocks),
+              BlockSection(blocks: editController.otherBlocks),
               const SizedBox(height: 20),
               _buildContactAddButton(context, contactController),
               const SizedBox(height: 12),

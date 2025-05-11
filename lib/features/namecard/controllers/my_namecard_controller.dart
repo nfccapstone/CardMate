@@ -23,10 +23,12 @@ class MyNameCardController extends GetxController {
       // 연락처 서브컬렉션에서 불러오기
       final contactsMap = await _service.fetchContactsFromSubcollection();
       if (contactsMap != null && contactsMap.isNotEmpty) {
-        data['contacts'] = contactsMap.entries.map((e) => {
-          'type': e.key,
-          'value': e.value,
-        }).toList();
+        data['contacts'] = contactsMap.entries
+            .map((e) => {
+                  'type': e.key,
+                  'value': e.value,
+                })
+            .toList();
       } else {
         data['contacts'] = [];
       }
@@ -36,4 +38,4 @@ class MyNameCardController extends GetxController {
     blocks.assignAll(blocksData);
     isLoading.value = false;
   }
-} 
+}
