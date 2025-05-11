@@ -3,7 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 
-class NameCard {
+class NameCard extends GetxController {
   final String id;
   final String? name;
   final String? profileUrl;

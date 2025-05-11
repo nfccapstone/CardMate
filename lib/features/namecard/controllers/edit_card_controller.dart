@@ -6,6 +6,8 @@ class EditCardController extends GetxController {
   final isLoading = true.obs;
   final basicInfo = <String, dynamic>{}.obs;
   final blocks = <Map<String, dynamic>>[].obs;
+  final otherBasicInfo = <String, dynamic>{}.obs;
+  final otherBlocks = <Map<String, dynamic>>[].obs;
   final IEditCardService _service;
   String? _loadedCardId;
 
@@ -77,13 +79,13 @@ class EditCardController extends GetxController {
     try {
       final data = await _service.fetchBasicInfoByCardId(cardId);
       if (data != null) {
-        basicInfo.assignAll(data);
+        otherBasicInfo.assignAll(data);
       } else {
         Get.snackbar('오류', '명함 정보를 불러오지 못했습니다.');
       }
 
       final blocksData = await _service.fetchBlocksByCardId(cardId);
-      blocks.assignAll(blocksData);
+      otherBlocks.assignAll(blocksData);
     } catch (e) {
       Get.snackbar('오류', '명함 정보를 불러오는 중 오류가 발생했습니다.');
     } finally {
