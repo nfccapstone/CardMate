@@ -1,5 +1,7 @@
 // block_preview_card.dart
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:cardmate/features/namecard/controllers/edit_card_controller.dart';
 
 class BlockPreviewCard extends StatefulWidget {
   final Map<String, dynamic> block;
@@ -11,11 +13,35 @@ class BlockPreviewCard extends StatefulWidget {
 
 class _BlockPreviewCardState extends State<BlockPreviewCard> {
   final PageController _pageController = PageController();
+  final _editController = Get.find<EditCardController>();
 
   @override
   void dispose() {
     _pageController.dispose();
     super.dispose();
+  }
+
+  Future<void> _deleteBlock() async {
+    final result = await Get.dialog<bool>(
+      AlertDialog(
+        title: const Text('블록 삭제'),
+        content: const Text('이 블록을 삭제하시겠습니까?'),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(result: false),
+            child: const Text('취소'),
+          ),
+          TextButton(
+            onPressed: () => Get.back(result: true),
+            child: const Text('삭제'),
+          ),
+        ],
+      ),
+    );
+
+    if (result == true) {
+      await _editController.deleteBlock(widget.block['id']);
+    }
   }
 
   @override
@@ -49,6 +75,10 @@ class _BlockPreviewCardState extends State<BlockPreviewCard> {
                   '[${type.toUpperCase()}] $title',
                   style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                 ),
+              ),
+              IconButton(
+                icon: const Icon(Icons.delete_outline, color: Colors.red),
+                onPressed: _deleteBlock,
               ),
             ],
           ),
