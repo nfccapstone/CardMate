@@ -160,12 +160,9 @@ class EditCardScreen extends StatelessWidget {
   void _navigateToBlockCreateScreen(
       String blockType, EditCardController controller) async {
     Get.back(); // BottomSheet 닫기
-    final result = await Get.toNamed(
+    await Get.toNamed(
       '/blockCreate',
       arguments: {'type': blockType},
     );
-    if (result != null && result is Map<String, dynamic>) {
-      controller.addBlock(result);
-    }
   }
 }

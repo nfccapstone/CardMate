@@ -14,6 +14,7 @@ class BlockPreviewCard extends StatefulWidget {
 class _BlockPreviewCardState extends State<BlockPreviewCard> {
   final PageController _pageController = PageController();
   final _editController = Get.find<EditCardController>();
+  bool _isDeleted = false;
 
   @override
   void dispose() {
@@ -40,12 +41,19 @@ class _BlockPreviewCardState extends State<BlockPreviewCard> {
     );
 
     if (result == true) {
+      setState(() {
+        _isDeleted = true;
+      });
       await _editController.deleteBlock(widget.block['id']);
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    if (_isDeleted) {
+      return const SizedBox.shrink();
+    }
+    
     final type = widget.block['type'] ?? 'text';
     final title = widget.block['title'] ?? '';
     final content = widget.block['content'];

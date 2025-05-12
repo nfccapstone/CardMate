@@ -80,13 +80,18 @@ class EditCardService implements IEditCardService {
     final cardId = await getCardId(uid);
     if (cardId == null) return;
     try {
+      // 새로운 Map을 생성하여 원본 데이터 보존
+      final dataToSave = Map<String, dynamic>.from(blockData);
+      dataToSave['createdAt'] = FieldValue.serverTimestamp();
+      
       await _firestore
           .collection('cards')
           .doc(cardId)
           .collection('card_block')
-          .add(blockData);
+          .add(dataToSave);
     } catch (e) {
       print('블록 저장 오류: $e');
+      rethrow;  // 에러를 상위로 전파하여 컨트롤러에서 처리할 수 있도록 함
     }
   }
 
@@ -101,6 +106,7 @@ class EditCardService implements IEditCardService {
           .collection('cards')
           .doc(cardId)
           .collection('card_block')
+          .orderBy('createdAt', descending: false)
           .get();
 
       return snapshot.docs.map((doc) {
