@@ -1,4 +1,6 @@
 import 'dart:io';
+import 'package:cardmate/features/home/home_controller.dart';
+import 'package:cardmate/features/namecard/controllers/edit_card_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
@@ -61,7 +63,8 @@ class NameCardInfoController extends GetxController {
     try {
       String? imageUrl = profileImageUrl.value;
       if (profileImage.value != null) {
-        imageUrl = await _profileImageService.uploadProfileImage(profileImage.value!);
+        imageUrl =
+            await _profileImageService.uploadProfileImage(profileImage.value!);
         profileImageUrl.value = imageUrl ?? '';
       }
 
@@ -74,6 +77,12 @@ class NameCardInfoController extends GetxController {
       };
 
       await _nameCardService.saveBasicInfo(data);
+
+      final editCardController = Get.find<EditCardController>();
+      await editCardController.loadNameCardData();
+      final homeController = Get.find<HomeController>();
+      await homeController.fetchCardInfo();
+
       Get.back(result: true);
     } catch (e) {
       Get.snackbar('오류', '저장에 실패했습니다.');

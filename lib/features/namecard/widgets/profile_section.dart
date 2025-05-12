@@ -1,5 +1,4 @@
 // profile_section.dart
-import 'package:cardmate/features/namecard/services/namecard_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -15,9 +14,7 @@ class ProfileSection extends StatelessWidget {
 
     return GestureDetector(
       onTap: () {
-        if (data['uid'] == uid) {
-          Get.toNamed('/namecardInfo');
-        }
+        Get.toNamed('/namecardInfo');
       },
       child: Container(
         padding: const EdgeInsets.all(20),
