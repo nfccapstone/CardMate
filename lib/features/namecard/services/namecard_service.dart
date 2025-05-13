@@ -125,4 +125,46 @@ class NameCardService implements INameCardService {
       return null;
     }
   }
+
+  @override
+  Future<Map<String, dynamic>?> getNameCardById(String cardId) async {
+    try {
+      final doc = await _firestore.collection('namecards').doc(cardId).get();
+      if (doc.exists) {
+        return doc.data();
+      }
+      return null;
+    } catch (e) {
+      print('Error getting namecard: $e');
+      return null;
+    }
+  }
+
+  @override
+  Future<Map<String, dynamic>?> getCardForWeb(String cardId) async {
+    try {
+      final doc = await _firestore.collection('cards').doc(cardId).get();
+      if (!doc.exists) return null;
+
+      final data = doc.data();
+      if (data == null) return null;
+
+      // 연락처 정보 가져오기
+      final contactsDoc = await _firestore
+          .collection('cards')
+          .doc(cardId)
+          .collection('contacts')
+          .doc('data')
+          .get();
+
+      if (contactsDoc.exists) {
+        data['contacts'] = contactsDoc.data();
+      }
+
+      return data;
+    } catch (e) {
+      print('웹 공유 명함 불러오기 오류: $e');
+      return null;
+    }
+  }
 }

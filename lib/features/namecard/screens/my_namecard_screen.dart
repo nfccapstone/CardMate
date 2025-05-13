@@ -10,7 +10,14 @@ class MyNameCardScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.find<MyNameCardController>();
+    final cardId = Get.parameters['cardId'] ?? '';
+    final controller = Get.put<MyNameCardController>(
+      MyNameCardController(
+        editCardService: Get.find(),
+        cardId: cardId,
+      ),
+      permanent: true,
+    );
 
     return Scaffold(
       backgroundColor: Colors.white,

@@ -19,6 +19,7 @@ dependencies:
   nfc_manager:
   google_sign_in: ^6.1.5
   shared_preferences: ^2.2.2
+  url_strategy: ^0.2.0
 
 dev_dependencies:
   flutter_test:
