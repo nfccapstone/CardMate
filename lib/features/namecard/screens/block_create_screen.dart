@@ -107,14 +107,18 @@ class _BlockCreateScreenState extends State<BlockCreateScreen> {
                   'content': imageUrls,
                 };
                 
-                Get.back(result: blockData);
+                await _editController.addBlock(blockData);
+                Get.offAllNamed('/home');
+                Get.toNamed('/editCard', arguments: {'cardId': _editController.basicInfo['cardId']});
               } else {
                 final blockData = {
                   'type': blockType,
                   'title': _titleController.text,
                   'content': _contentController.text
                 };
-                Get.back(result: blockData);
+                await _editController.addBlock(blockData);
+                Get.offAllNamed('/home');
+                Get.toNamed('/editCard', arguments: {'cardId': _editController.basicInfo['cardId']});
               }
             },
           ),

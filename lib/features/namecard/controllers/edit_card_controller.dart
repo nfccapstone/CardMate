@@ -51,16 +51,31 @@ class EditCardController extends GetxController {
     isLoading.value = false;
   }
 
-  void addBlock(Map<String, dynamic> blockData) {
-    blocks.add(blockData);
-    _service.addBlock(blockData); // Firebase에 저장
+  Future<void> addBlock(Map<String, dynamic> blockData) async {
+    try {
+      await _service.addBlock(blockData);
+      // Firebase에서 최신 블록 목록을 다시 가져옴
+      final blocksData = await _service.fetchBlocks();
+      blocks.assignAll(blocksData);
+      Get.snackbar('성공', '블록이 추가되었습니다.');
+    } catch (e) {
+      Get.snackbar('오류', '블록 추가에 실패했습니다.');
+    }
   }
 
   Future<void> deleteBlock(String blockId) async {
     try {
-      await _service.deleteBlock(blockId);
+      // 로컬 상태에서 먼저 제거하여 즉시 UI 업데이트
       blocks.removeWhere((block) => block['id'] == blockId);
+      
+      // Firebase에서 블록 삭제
+      await _service.deleteBlock(blockId);
+      
+      Get.snackbar('성공', '블록이 삭제되었습니다.');
     } catch (e) {
+      // 실패 시 다시 블록 목록을 가져와서 상태 복구
+      final blocksData = await _service.fetchBlocks();
+      blocks.assignAll(blocksData);
       Get.snackbar('오류', '블록 삭제에 실패했습니다.');
     }
   }

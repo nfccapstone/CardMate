@@ -1,10 +1,12 @@
 // block_section.dart
 import 'package:flutter/material.dart';
 import 'package:cardmate/features/namecard/widgets/block_preview_card.dart';
+import 'package:cardmate/features/namecard/widgets/block_readonly_card.dart';
 
 class BlockSection extends StatelessWidget {
   final List<Map<String, dynamic>> blocks;
-  const BlockSection({Key? key, required this.blocks}) : super(key: key);
+  final bool readOnly;
+  const BlockSection({Key? key, required this.blocks, this.readOnly = false}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -12,7 +14,9 @@ class BlockSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: blocks
-          .map((block) => BlockPreviewCard(block: block))
+          .map((block) => readOnly
+              ? BlockReadOnlyCard(block: block)
+              : BlockPreviewCard(block: block))
           .toList(),
     );
   }

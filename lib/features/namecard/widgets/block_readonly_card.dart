@@ -1,20 +1,15 @@
-// block_preview_card.dart
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:cardmate/features/namecard/controllers/edit_card_controller.dart';
 
-class BlockPreviewCard extends StatefulWidget {
+class BlockReadOnlyCard extends StatefulWidget {
   final Map<String, dynamic> block;
-  const BlockPreviewCard({Key? key, required this.block}) : super(key: key);
+  const BlockReadOnlyCard({Key? key, required this.block}) : super(key: key);
 
   @override
-  State<BlockPreviewCard> createState() => _BlockPreviewCardState();
+  State<BlockReadOnlyCard> createState() => _BlockReadOnlyCardState();
 }
 
-class _BlockPreviewCardState extends State<BlockPreviewCard> {
+class _BlockReadOnlyCardState extends State<BlockReadOnlyCard> {
   final PageController _pageController = PageController();
-  final _editController = Get.find<EditCardController>();
-  bool _isDeleted = false;
 
   @override
   void dispose() {
@@ -22,38 +17,8 @@ class _BlockPreviewCardState extends State<BlockPreviewCard> {
     super.dispose();
   }
 
-  Future<void> _deleteBlock() async {
-    final result = await Get.dialog<bool>(
-      AlertDialog(
-        title: const Text('블록 삭제'),
-        content: const Text('이 블록을 삭제하시겠습니까?'),
-        actions: [
-          TextButton(
-            onPressed: () => Get.back(result: false),
-            child: const Text('취소'),
-          ),
-          TextButton(
-            onPressed: () => Get.back(result: true),
-            child: const Text('삭제'),
-          ),
-        ],
-      ),
-    );
-
-    if (result == true) {
-      setState(() {
-        _isDeleted = true;
-      });
-      await _editController.deleteBlock(widget.block['id']);
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    if (_isDeleted) {
-      return const SizedBox.shrink();
-    }
-    
     final type = widget.block['type'] ?? 'text';
     final title = widget.block['title'] ?? '';
     final content = widget.block['content'];
@@ -75,20 +40,9 @@ class _BlockPreviewCardState extends State<BlockPreviewCard> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                child: Text(
-                  '[${type.toUpperCase()}] $title',
-                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                ),
-              ),
-              IconButton(
-                icon: const Icon(Icons.delete_outline, color: Colors.red),
-                onPressed: _deleteBlock,
-              ),
-            ],
+          Text(
+            '[${type.toUpperCase()}] $title',
+            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
           ),
           const SizedBox(height: 8),
           if (type == 'photo' && content is List) ...[
@@ -171,4 +125,4 @@ class _BlockPreviewCardState extends State<BlockPreviewCard> {
       ),
     );
   }
-}
+} 

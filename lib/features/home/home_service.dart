@@ -21,7 +21,12 @@ class HomeService implements IHomeService {
       final cardId = await getCardId(user.uid);
       if (cardId == null) return null;
       final doc = await _firestore.collection('cards').doc(cardId).get();
-      return doc.data();
+      if (doc.exists && doc.data() != null) {
+        final data = doc.data()!;
+        data['cardId'] = cardId;
+        return data;
+      }
+      return null;
     } catch (e) {
       print('명함 정보 가져오기 오류: $e');
       return null;
