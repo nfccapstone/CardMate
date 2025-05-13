@@ -1,3 +1,4 @@
+import 'package:cardmate/features/namecardbooks/card_controller.dart';
 import 'package:get/get.dart';
 import 'home_controller.dart';
 import 'home_service.dart';
@@ -12,5 +13,6 @@ class HomeBinding extends Bindings {
     Get.lazyPut<HomeController>(
       () => HomeController(homeService: Get.find<IHomeService>()),
     );
+    Get.put(CardController());
   }
 }
