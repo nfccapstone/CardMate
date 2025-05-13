@@ -4,6 +4,8 @@ import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:cardmate/features/namecard/controllers/edit_card_controller.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:file_picker/file_picker.dart';
 
 class BlockCreateScreen extends StatefulWidget {
   const BlockCreateScreen({Key? key}) : super(key: key);
@@ -18,6 +20,7 @@ class _BlockCreateScreenState extends State<BlockCreateScreen> {
   late String blockType;
   final List<File> _imageFiles = [];
   final List<Uint8List> _imageBytes = [];
+  final List<String> _imageNames = [];
   final _editController = Get.find<EditCardController>();
   final _pageController = PageController();
 
@@ -36,26 +39,53 @@ class _BlockCreateScreenState extends State<BlockCreateScreen> {
   }
 
   Future<void> _pickImages() async {
-    final ImagePicker picker = ImagePicker();
-    final List<XFile> images = await picker.pickMultiImage();
-    
-    if (images.isNotEmpty) {
-      setState(() {
-        for (var image in images) {
-          final file = File(image.path);
-          _imageFiles.add(file);
-          _imageBytes.add(file.readAsBytesSync());
-        }
-      });
+    if (kIsWeb) {
+      FilePickerResult? result = await FilePicker.platform.pickFiles(
+        type: FileType.image,
+        allowMultiple: true,
+        withData: true,
+      );
+      if (result != null) {
+        setState(() {
+          _imageFiles.clear();
+          _imageBytes.clear();
+          _imageNames.clear();
+          for (var file in result.files) {
+            if (file.bytes != null) {
+              _imageBytes.add(file.bytes!);
+              _imageNames.add(file.name);
+            }
+          }
+        });
+      }
+    } else {
+      final ImagePicker picker = ImagePicker();
+      final List<XFile> images = await picker.pickMultiImage();
+      if (images.isNotEmpty) {
+        setState(() {
+          _imageFiles.clear();
+          _imageBytes.clear();
+          _imageNames.clear();
+          for (var image in images) {
+            final file = File(image.path);
+            _imageFiles.add(file);
+            _imageBytes.add(file.readAsBytesSync());
+            _imageNames.add(image.name);
+          }
+        });
+      }
     }
   }
 
   Future<List<String>> _uploadImages() async {
     List<String> imageUrls = [];
     for (int i = 0; i < _imageBytes.length; i++) {
+      final fileName = _imageNames.isNotEmpty
+          ? _imageNames[i]
+          : '${DateTime.now().millisecondsSinceEpoch}_$i.jpg';
       final imageUrl = await _editController.uploadImage(
         _imageBytes[i],
-        '${DateTime.now().millisecondsSinceEpoch}_$i.jpg'
+        fileName,
       );
       if (imageUrl != null) {
         imageUrls.add(imageUrl);
@@ -154,21 +184,28 @@ class _BlockCreateScreenState extends State<BlockCreateScreen> {
                 child: const Text('사진 선택'),
               ),
               const SizedBox(height: 16),
-              if (_imageFiles.isNotEmpty) ...[
+              if (_imageBytes.isNotEmpty) ...[
                 Expanded(
                   child: Stack(
                     children: [
                       PageView.builder(
                         controller: _pageController,
-                        itemCount: _imageFiles.length,
+                        itemCount: _imageBytes.length,
                         itemBuilder: (context, index) {
-                          return Image.file(
-                            _imageFiles[index],
-                            fit: BoxFit.contain,
-                          );
+                          if (kIsWeb) {
+                            return Image.memory(
+                              _imageBytes[index],
+                              fit: BoxFit.contain,
+                            );
+                          } else {
+                            return Image.file(
+                              _imageFiles[index],
+                              fit: BoxFit.contain,
+                            );
+                          }
                         },
                       ),
-                      if (_imageFiles.length > 1)
+                      if (_imageBytes.length > 1)
                         Positioned(
                           bottom: 16,
                           left: 0,
@@ -176,7 +213,7 @@ class _BlockCreateScreenState extends State<BlockCreateScreen> {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: List.generate(
-                              _imageFiles.length,
+                              _imageBytes.length,
                               (index) => Container(
                                 width: 8,
                                 height: 8,
@@ -197,7 +234,7 @@ class _BlockCreateScreenState extends State<BlockCreateScreen> {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  '${_imageFiles.length}장의 사진이 선택되었습니다.',
+                  '${_imageBytes.length}장의 사진이 선택되었습니다.',
                   style: const TextStyle(color: Colors.grey),
                 ),
               ],
