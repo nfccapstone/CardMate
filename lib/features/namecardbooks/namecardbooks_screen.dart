@@ -37,13 +37,17 @@ class NamecardbooksScreen extends StatelessWidget {
                       hintStyle: TextStyle(color: Colors.white54),
                       border: InputBorder.none,
                     ),
+                    onChanged: (value) {
+                      value.isEmpty
+                          ? cardController.fetchNameCards()
+                          : cardController.searchCard(value);
+                    },
                   ),
                 ),
                 IconButton(
                   icon: const Icon(Icons.search, color: Colors.white),
                   onPressed: () {
                     print("검색 버튼 눌러짐");
-                    print(_searchController.text.trim());
                     _searchController.text.trim().isEmpty
                         ? cardController.fetchNameCards()
                         : cardController

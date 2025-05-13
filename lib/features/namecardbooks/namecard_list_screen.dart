@@ -9,7 +9,7 @@ class NameCardListScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final CardController cardController = Get.put(CardController());
+    final CardController cardController = Get.find<CardController>();
 
     return Scaffold(
       body: Obx(() {
