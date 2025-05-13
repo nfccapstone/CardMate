@@ -136,8 +136,10 @@ class HomeScreen extends StatelessWidget {
       final data = controller.cardData;
       final contact = data['contact'] ?? {};
       final nameCardId = data['nameCardId'] ?? '';
-      final profileLink =
-          nameCardId.isEmpty ? 'cardmate.link' : 'cardmate.link/@$nameCardId';
+      final cardId = data['cardId'] ?? '';
+      final profileLink = cardId.isEmpty 
+          ? 'cardmate.link' 
+          : 'cardmate.link/@$cardId';
 
       return GestureDetector(
         onTap: () async {
