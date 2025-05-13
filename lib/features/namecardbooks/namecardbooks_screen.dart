@@ -1,4 +1,6 @@
-import 'package:cardmate/features/namecardbooks/add_card_screen.dart';
+import 'package:cardmate/features/namecardbooks/add_card_byId_screen.dart';
+import 'package:cardmate/features/namecardbooks/add_card_byNFC_screen.dart';
+import 'package:cardmate/features/namecardbooks/card_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -7,6 +9,9 @@ class NamecardbooksScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final CardController cardController = Get.find<CardController>();
+    final TextEditingController _searchController = TextEditingController();
+
     return Row(
       children: [
         Expanded(
@@ -21,19 +26,34 @@ class NamecardbooksScreen extends StatelessWidget {
               border: Border.all(color: Colors.white30),
             ),
             child: Row(
-              children: const [
-                Icon(Icons.search, color: Colors.white54),
-                SizedBox(width: 8),
+              children: [
+                const SizedBox(width: 8),
                 Expanded(
                   child: TextField(
-                    style: TextStyle(color: Colors.white),
-                    decoration: InputDecoration(
+                    style: const TextStyle(color: Colors.white),
+                    controller: _searchController,
+                    decoration: const InputDecoration(
                       hintText: '이름이나 회사명으로 검색',
                       hintStyle: TextStyle(color: Colors.white54),
                       border: InputBorder.none,
                     ),
+                    onChanged: (value) {
+                      value.isEmpty
+                          ? cardController.fetchNameCards()
+                          : cardController.searchCard(value);
+                    },
                   ),
                 ),
+                IconButton(
+                  icon: const Icon(Icons.search, color: Colors.white),
+                  onPressed: () {
+                    print("검색 버튼 눌러짐");
+                    _searchController.text.trim().isEmpty
+                        ? cardController.fetchNameCards()
+                        : cardController
+                            .searchCard(_searchController.text.trim());
+                  },
+                )
               ],
             ),
           ),
@@ -84,7 +104,7 @@ class NamecardbooksScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 24),
                 _buildOptionButton(context, Icons.nfc, 'NFC 명함 태그', () {
-                  // NFC 기능
+                  Get.to(() => AddCardByNFCScreen());
                 }),
                 const SizedBox(height: 12),
                 _buildOptionButton(context, Icons.qr_code_scanner, 'QR 코드 찍기',
@@ -93,7 +113,7 @@ class NamecardbooksScreen extends StatelessWidget {
                 }),
                 const SizedBox(height: 12),
                 _buildOptionButton(context, Icons.edit, '아이디로 명함 등록', () {
-                  Get.to(() => AddCardScreen());
+                  Get.to(() => AddCardByIdScreen());
                 }),
               ],
             ),

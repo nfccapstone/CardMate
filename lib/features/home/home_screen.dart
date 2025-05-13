@@ -138,7 +138,9 @@ class HomeScreen extends StatelessWidget {
       final contact = data['contact'] ?? {};
       final nameCardId = data['nameCardId'] ?? '';
       final cardId = data['cardId'] ?? '';
-      final profileLink = 'https://cardmate-37be3.web.app/card/myNameCard/$cardId';
+      final profileLink = cardId.isEmpty 
+          ? 'cardmate.link' 
+          : 'cardmate.link/@$cardId';
 
       return GestureDetector(
         onTap: () async {
