@@ -71,4 +71,29 @@ class CardController extends GetxController {
       print(stack);
     }
   }
+
+  Future<void> searchCard(String input) async {
+    final uid = _auth.currentUser?.uid;
+    final cardIdSnapshots =
+        await _db.collection('users').doc(uid).collection('card_book').get();
+
+    final searchedCards = <NameCard>[];
+
+    await Future.wait(
+      cardIdSnapshots.docs.map((doc) async {
+        final cardId = doc.id;
+        final cardDoc = await _db.collection('cards').doc(cardId).get();
+        final data = cardDoc.data();
+
+        if (data != null) {
+          if (data['name'] == input || data['company'] == input) {
+            searchedCards.add(NameCard.fromMap(cardId, data));
+            print(searchedCards);
+          }
+        }
+      }),
+    );
+
+    cards.assignAll(searchedCards);
+  }
 }

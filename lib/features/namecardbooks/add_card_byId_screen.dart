@@ -2,7 +2,7 @@ import 'package:cardmate/features/namecardbooks/card_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-class AddCardScreen extends StatelessWidget {
+class AddCardByIdScreen extends StatelessWidget {
   final CardController cardController = Get.find();
 
   final idCtrl = TextEditingController();
