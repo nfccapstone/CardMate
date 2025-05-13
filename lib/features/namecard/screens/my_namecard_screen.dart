@@ -36,7 +36,7 @@ class MyNameCardScreen extends StatelessWidget {
               const SizedBox(height: 20),
               _ContactSectionReadOnly(controller: controller),
               const SizedBox(height: 20),
-              BlockSection(blocks: controller.blocks),
+              BlockSection(blocks: controller.blocks, readOnly: true),
               const SizedBox(height: 40),
             ],
           ),
