@@ -11,4 +11,5 @@ abstract class IEditCardService {
   Future<Map<String, String>?> fetchContactsByCardId(String cardId);
   Future<List<Map<String, dynamic>>> fetchBlocksByCardId(String cardId);
   Future<Map<String, dynamic>?> fetchBasicInfoByCardId(String cardId);
+  Future<void> updateBlockOrder(List<Map<String, dynamic>> blocks);
 }

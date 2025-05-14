@@ -102,6 +102,7 @@ class EditCardService implements IEditCardService {
     final cardId = await getCardId(uid);
     if (cardId == null) return [];
     try {
+      // 먼저 createdAt으로 정렬하여 가져옴
       final snapshot = await _firestore
           .collection('cards')
           .doc(cardId)
@@ -109,11 +110,30 @@ class EditCardService implements IEditCardService {
           .orderBy('createdAt', descending: false)
           .get();
 
-      return snapshot.docs.map((doc) {
+      final blocks = snapshot.docs.map((doc) {
         final data = doc.data();
-        data['id'] = doc.id; // 문서 ID도 함께 저장
+        data['id'] = doc.id;
         return data;
       }).toList();
+
+      // order 필드가 없는 블록이 있다면 초기화
+      bool needsUpdate = false;
+      for (int i = 0; i < blocks.length; i++) {
+        if (!blocks[i].containsKey('order')) {
+          needsUpdate = true;
+          await _firestore
+              .collection('cards')
+              .doc(cardId)
+              .collection('card_block')
+              .doc(blocks[i]['id'])
+              .update({'order': i});
+          blocks[i]['order'] = i;
+        }
+      }
+
+      // order 필드로 다시 정렬
+      blocks.sort((a, b) => (a['order'] ?? 0).compareTo(b['order'] ?? 0));
+      return blocks;
     } catch (e) {
       print('블록 불러오기 오류: $e');
       return [];
@@ -197,17 +217,38 @@ class EditCardService implements IEditCardService {
 
   Future<List<Map<String, dynamic>>> fetchBlocksByCardId(String cardId) async {
     try {
+      // 먼저 createdAt으로 정렬하여 가져옴
       final snapshot = await _firestore
           .collection('cards')
           .doc(cardId)
           .collection('card_block')
+          .orderBy('createdAt', descending: false)
           .get();
 
-      return snapshot.docs.map((doc) {
+      final blocks = snapshot.docs.map((doc) {
         final data = doc.data();
         data['id'] = doc.id;
         return data;
       }).toList();
+
+      // order 필드가 없는 블록이 있다면 초기화
+      bool needsUpdate = false;
+      for (int i = 0; i < blocks.length; i++) {
+        if (!blocks[i].containsKey('order')) {
+          needsUpdate = true;
+          await _firestore
+              .collection('cards')
+              .doc(cardId)
+              .collection('card_block')
+              .doc(blocks[i]['id'])
+              .update({'order': i});
+          blocks[i]['order'] = i;
+        }
+      }
+
+      // order 필드로 다시 정렬
+      blocks.sort((a, b) => (a['order'] ?? 0).compareTo(b['order'] ?? 0));
+      return blocks;
     } catch (e) {
       print('타인 블록 불러오기 오류: $e');
       return [];
@@ -229,6 +270,32 @@ class EditCardService implements IEditCardService {
     } catch (e) {
       print('타인 연락처 불러오기 오류: $e');
       return null;
+    }
+  }
+
+  @override
+  Future<void> updateBlockOrder(List<Map<String, dynamic>> blocks) async {
+    final uid = _auth.currentUser?.uid;
+    if (uid == null) return;
+    final cardId = await getCardId(uid);
+    if (cardId == null) return;
+
+    try {
+      // 각 블록의 순서를 업데이트
+      for (int i = 0; i < blocks.length; i++) {
+        final block = blocks[i];
+        await _firestore
+            .collection('cards')
+            .doc(cardId)
+            .collection('card_block')
+            .doc(block['id'])
+            .update({
+          'order': i,
+        });
+      }
+    } catch (e) {
+      print('블록 순서 업데이트 오류: $e');
+      rethrow;
     }
   }
 }

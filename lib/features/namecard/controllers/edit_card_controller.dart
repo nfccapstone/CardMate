@@ -107,4 +107,22 @@ class EditCardController extends GetxController {
       isLoading.value = false;
     }
   }
+
+  Future<void> reorderBlocks(int oldIndex, int newIndex) async {
+    try {
+      // 로컬 상태 먼저 업데이트
+      final block = blocks.removeAt(oldIndex);
+      blocks.insert(newIndex, block);
+      
+      // Firebase에 순서 업데이트
+      await _service.updateBlockOrder(blocks);
+      
+      Get.snackbar('성공', '블록 순서가 변경되었습니다.');
+    } catch (e) {
+      // 실패 시 원래 순서로 복구
+      final blocksData = await _service.fetchBlocks();
+      blocks.assignAll(blocksData);
+      Get.snackbar('오류', '블록 순서 변경에 실패했습니다.');
+    }
+  }
 }
