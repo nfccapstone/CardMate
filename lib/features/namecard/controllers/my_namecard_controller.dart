@@ -6,14 +6,19 @@ class MyNameCardController extends GetxController {
   final basicInfo = <String, dynamic>{}.obs;
   final blocks = <Map<String, dynamic>>[].obs;
   final IEditCardService _service;
+  final String? cardId;
 
-  MyNameCardController({required IEditCardService editCardService})
+  MyNameCardController({required IEditCardService editCardService, this.cardId})
       : _service = editCardService;
 
   @override
   void onInit() {
     super.onInit();
-    loadNameCardData();
+    if (cardId != null && cardId!.isNotEmpty) {
+      loadNameCardDataByCardId(cardId!);
+    } else {
+      loadNameCardData();
+    }
   }
 
   Future<void> loadNameCardData() async {
@@ -35,6 +40,28 @@ class MyNameCardController extends GetxController {
       basicInfo.assignAll(data);
     }
     final blocksData = await _service.fetchBlocks();
+    blocks.assignAll(blocksData);
+    isLoading.value = false;
+  }
+
+  Future<void> loadNameCardDataByCardId(String cardId) async {
+    isLoading.value = true;
+    final data = await _service.fetchBasicInfoByCardId(cardId);
+    if (data != null) {
+      final contactsMap = await _service.fetchContactsByCardId(cardId);
+      if (contactsMap != null && contactsMap.isNotEmpty) {
+        data['contacts'] = contactsMap.entries
+            .map((e) => {
+                  'type': e.key,
+                  'value': e.value,
+                })
+            .toList();
+      } else {
+        data['contacts'] = [];
+      }
+      basicInfo.assignAll(data);
+    }
+    final blocksData = await _service.fetchBlocksByCardId(cardId);
     blocks.assignAll(blocksData);
     isLoading.value = false;
   }

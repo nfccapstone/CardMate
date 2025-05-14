@@ -1,0 +1,266 @@
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:url_launcher/url_launcher.dart';
+import '../services/i_namecard_service.dart';
+import '../services/namecard_service.dart';
+
+class CardWebScreen extends StatelessWidget {
+  final String cardId;
+  
+  const CardWebScreen({
+    super.key,
+    required this.cardId,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final nameCardService = Get.put<INameCardService>(NameCardService());
+    final RxBool isLoading = true.obs;
+    final RxString error = ''.obs;
+    final RxMap<String, dynamic> cardData = RxMap<String, dynamic>();
+
+    // 명함 데이터 로드
+    Future<void> loadCardData() async {
+      try {
+        isLoading.value = true;
+        final data = await nameCardService.getCardForWeb(cardId);
+        if (data != null) {
+          cardData.value = data;
+        } else {
+          error.value = '명함을 찾을 수 없습니다.';
+        }
+      } catch (e) {
+        error.value = '명함을 불러오는 중 오류가 발생했습니다.';
+      } finally {
+        isLoading.value = false;
+      }
+    }
+
+    // 초기 데이터 로드
+    loadCardData();
+
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: Obx(() {
+        if (isLoading.value) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        if (error.value.isNotEmpty) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(Icons.error_outline, size: 48, color: Colors.red),
+                const SizedBox(height: 16),
+                Text(
+                  error.value,
+                  style: const TextStyle(fontSize: 16),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+          );
+        }
+
+        return SingleChildScrollView(
+          child: Column(
+            children: [
+              // 프로필 이미지
+              Container(
+                width: double.infinity,
+                height: 300,
+                decoration: BoxDecoration(
+                  color: Colors.grey[200],
+                  image: cardData['profileImageUrl'] != null
+                      ? DecorationImage(
+                          image: NetworkImage(cardData['profileImageUrl']),
+                          fit: BoxFit.cover,
+                        )
+                      : null,
+                ),
+                child: cardData['profileImageUrl'] == null
+                    ? const Icon(Icons.person, size: 120, color: Colors.grey)
+                    : null,
+              ),
+
+              // 기본 정보
+              Padding(
+                padding: const EdgeInsets.all(32),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      cardData['name'] ?? '',
+                      style: const TextStyle(
+                        fontSize: 32,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    if (cardData['position'] != null) ...[
+                      Text(
+                        cardData['position'],
+                        style: const TextStyle(
+                          fontSize: 24,
+                          color: Colors.grey,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                    ],
+                    if (cardData['department'] != null) ...[
+                      Text(
+                        cardData['department'],
+                        style: const TextStyle(
+                          fontSize: 20,
+                          color: Colors.grey,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                    ],
+                    if (cardData['company'] != null) ...[
+                      Text(
+                        cardData['company'],
+                        style: const TextStyle(
+                          fontSize: 20,
+                          color: Colors.grey,
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+
+              // 연락처 정보
+              if (cardData['contacts'] != null) ...[
+                const Divider(height: 1),
+                Padding(
+                  padding: const EdgeInsets.all(32),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        '연락처',
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+                      ...(cardData['contacts'] as Map<String, dynamic>).entries.map((entry) {
+                        final type = entry.key;
+                        final value = entry.value;
+                        IconData icon;
+                        List<Widget> actions = [];
+
+                        if (type == 'mobile' || type == 'phone') {
+                          icon = Icons.phone;
+                          actions = [
+                            IconButton(
+                              icon: const Icon(Icons.call, color: Colors.black87),
+                              onPressed: () => _launchUrl('tel:$value'),
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.message, color: Colors.black87),
+                              onPressed: () => _launchUrl('sms:$value'),
+                            ),
+                          ];
+                        } else if (type == 'email') {
+                          icon = Icons.email;
+                          actions = [
+                            IconButton(
+                              icon: const Icon(Icons.email, color: Colors.black87),
+                              onPressed: () => _launchUrl('mailto:$value'),
+                            ),
+                          ];
+                        } else if (type == 'website') {
+                          icon = Icons.language;
+                          actions = [
+                            IconButton(
+                              icon: const Icon(Icons.open_in_browser, color: Colors.black87),
+                              onPressed: () => _launchUrl(value),
+                            ),
+                          ];
+                        } else {
+                          icon = Icons.contact_phone;
+                        }
+
+                        return Container(
+                          margin: const EdgeInsets.only(bottom: 16),
+                          padding: const EdgeInsets.all(24),
+                          decoration: BoxDecoration(
+                            color: Colors.grey[50],
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: Colors.grey[200]!),
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(icon, color: Colors.deepPurple, size: 32),
+                              const SizedBox(width: 16),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      _getContactTypeLabel(type),
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        color: Colors.grey,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      value,
+                                      style: const TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              ...actions,
+                            ],
+                          ),
+                        );
+                      }).toList(),
+                    ],
+                  ),
+                ),
+              ],
+            ],
+          ),
+        );
+      }),
+    );
+  }
+
+  String _getContactTypeLabel(String type) {
+    switch (type) {
+      case 'mobile':
+        return '휴대전화';
+      case 'phone':
+        return '유선전화';
+      case 'email':
+        return '이메일';
+      case 'website':
+        return '홈페이지';
+      case 'address':
+        return '주소';
+      case 'fax':
+        return '팩스';
+      default:
+        return type;
+    }
+  }
+
+  Future<void> _launchUrl(String url) async {
+    if (!await launchUrl(Uri.parse(url))) {
+      Get.snackbar(
+        '오류',
+        'URL을 열 수 없습니다.',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    }
+  }
+} 

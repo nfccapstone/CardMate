@@ -21,9 +21,12 @@ import 'features/namecard/screens/my_namecard_screen.dart';
 import 'features/namecard/controllers/my_namecard_controller.dart';
 import 'features/namecard/services/edit_card_service.dart';
 import 'features/namecard/services/i_edit_card_service.dart';
-//import 'features/register/register_binding.dart';
+import 'features/namecard/screens/card_web_screen.dart';
+import 'package:flutter/foundation.dart';
+import 'package:url_strategy/url_strategy.dart';
 
 void main() async {
+  setPathUrlStrategy(); // 웹에서 # 없는 URL 사용
   WidgetsFlutterBinding.ensureInitialized();
   await FirebaseInit.instance.initializeFirebase(); // ✅ Firebase 초기화 완료 후 앱 실행
 
@@ -45,7 +48,7 @@ class CardMateApp extends StatelessWidget {
       theme: ThemeData(
         brightness: Brightness.dark, // 기본 다크 모드 테마
       ),
-      initialRoute: '/', // 기본 시작 화면 (로그인 화면)
+      initialRoute: kIsWeb ? null : '/', // 웹은 URL 해석, 앱은 로그인화면
       getPages: [
         GetPage(
             name: '/',
@@ -72,7 +75,6 @@ class CardMateApp extends StatelessWidget {
             },
             binding: NameCardBindings()),
         GetPage(
-          // ✅ 바인딩 포함된 단 하나의 등록만 유지
           name: '/namecardInfo',
           page: () => const NameCardInfoScreen(),
           binding: NameCardBindings(),
@@ -81,19 +83,24 @@ class CardMateApp extends StatelessWidget {
           name: '/editContact',
           page: () => EditContactScreen(),
         ),
-        //GetPage(name: '/addNamecard', page: () => AddCardScreen()),
         GetPage(
           name: '/blockCreate',
           page: () => BlockCreateScreen(),
         ),
         GetPage(
-          name: '/myNameCard',
-          page: () => const MyNameCardScreen(),
+          name: '/card/myNameCard/:cardId',
+          page: () => MyNameCardScreen(),
           binding: BindingsBuilder(() {
             Get.put<IEditCardService>(EditCardService());
+            final cardId = Get.parameters['cardId'] ?? '';
             Get.put(MyNameCardController(
-                editCardService: Get.find<IEditCardService>()));
+                editCardService: Get.find<IEditCardService>(),
+                cardId: cardId));
           }),
+        ),
+        GetPage(
+          name: '/card',
+          page: () => const CardWebScreen(cardId: '11'),
         ),
       ],
     );

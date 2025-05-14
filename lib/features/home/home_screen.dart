@@ -1,5 +1,6 @@
 import 'package:cardmate/features/namecardbooks/namecard_list_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'home_controller.dart';
@@ -137,8 +138,7 @@ class HomeScreen extends StatelessWidget {
       final contact = data['contact'] ?? {};
       final nameCardId = data['nameCardId'] ?? '';
       final cardId = data['cardId'] ?? '';
-      final profileLink =
-          cardId.isEmpty ? 'cardmate.link' : 'cardmate.link/@$cardId';
+      final profileLink = 'https://cardmate-37be3.web.app/card/myNameCard/$cardId';
 
       return GestureDetector(
         onTap: () async {
@@ -234,7 +234,15 @@ class HomeScreen extends StatelessWidget {
                       icon: const Icon(Icons.copy,
                           size: 16, color: Colors.white54),
                       onPressed: () {
-                        // 복사 기능 추가 예정
+                        Clipboard.setData(ClipboardData(text: profileLink));
+                        Get.snackbar(
+                          '복사 완료',
+                          '링크가 클립보드에 복사되었습니다.',
+                          snackPosition: SnackPosition.BOTTOM,
+                          backgroundColor: Colors.black87,
+                          colorText: Colors.white,
+                          duration: const Duration(seconds: 2),
+                        );
                       },
                     ),
                     const SizedBox(width: 12),
@@ -275,7 +283,8 @@ class HomeScreen extends StatelessWidget {
                 const SizedBox(height: 16),
                 ElevatedButton(
                   onPressed: () {
-                    Get.toNamed('/myNameCard');
+                    final cardId = data['cardId'] ?? '';
+                    Get.toNamed('/card/myNameCard/$cardId');
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.deepPurple,
