@@ -7,6 +7,7 @@ import 'package:cardmate/features/namecard/widgets/contact_section.dart';
 import 'package:cardmate/features/namecard/widgets/block_section.dart';
 import 'package:cardmate/features/namecard/widgets/sns_bottom_sheet.dart';
 import 'package:cardmate/features/namecard/services/i_contact_service.dart';
+import 'package:cardmate/features/namecard/widgets/block_preview_card.dart';
 
 class EditCardScreen extends StatelessWidget {
   final String cardId;
@@ -37,8 +38,8 @@ class EditCardScreen extends StatelessWidget {
         if (editController.isLoading.value) {
           return const Center(child: CircularProgressIndicator());
         }
+        final blocks = editController.blocks;
         return SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -46,7 +47,21 @@ class EditCardScreen extends StatelessWidget {
               const SizedBox(height: 20),
               ContactSection(controller: contactController),
               const SizedBox(height: 20),
-              BlockSection(blocks: editController.blocks),
+              // 블록 영역만 shrinkWrap ReorderableListView로 구현
+              ReorderableListView(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                onReorder: (oldIndex, newIndex) {
+                  if (newIndex > oldIndex) newIndex -= 1;
+                  editController.reorderBlocks(oldIndex, newIndex);
+                },
+                children: blocks
+                    .map((block) => BlockPreviewCard(
+                          key: ValueKey(block['id']),
+                          block: block,
+                        ))
+                    .toList(),
+              ),
               const SizedBox(height: 20),
               _buildContactAddButton(context, contactController),
               const SizedBox(height: 12),
@@ -56,11 +71,9 @@ class EditCardScreen extends StatelessWidget {
           ),
         );
       }),
-      // 우측 하단에 SNS 버튼 고정 (floatingActionButton)
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.deepPurple,
         onPressed: () {
-          // SNS 목록 및 추가 기능 BottomSheet 표시
           showModalBottomSheet(
             context: context,
             backgroundColor: Colors.white,
@@ -165,4 +178,11 @@ class EditCardScreen extends StatelessWidget {
       arguments: {'type': blockType},
     );
   }
+}
+
+class _NonReorderable extends StatelessWidget {
+  final Widget child;
+  const _NonReorderable({Key? key, required this.child}) : super(key: key);
+  @override
+  Widget build(BuildContext context) => child;
 }
