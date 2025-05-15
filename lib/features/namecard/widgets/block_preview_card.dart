@@ -2,6 +2,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:cardmate/features/namecard/controllers/edit_card_controller.dart';
+import 'package:flutter_quill/flutter_quill.dart' as quill;
+import 'dart:convert';
 
 class BlockPreviewCard extends StatefulWidget {
   final Map<String, dynamic> block;
@@ -159,13 +161,35 @@ class _BlockPreviewCardState extends State<BlockPreviewCard> {
               style: const TextStyle(color: Colors.grey),
             ),
           ] else if (type == 'text' || type == 'link') ...[
-            Text(
-              content?.toString() ?? '',
-              style: TextStyle(
-                fontSize: 14,
-                color: type == 'link' ? Colors.blue : Colors.black,
+            if (content != null && content is String)
+              Builder(
+                builder: (context) {
+                  try {
+                    final quillDoc = quill.Document.fromJson(jsonDecode(content));
+                    final quillController = quill.QuillController(
+                      document: quillDoc,
+                      selection: const TextSelection.collapsed(offset: 0),
+                    );
+                    return quill.QuillEditor(
+                      focusNode: FocusNode(),
+                      scrollController: ScrollController(),
+                      configurations: quill.QuillEditorConfigurations(
+                        controller: quillController,
+                        sharedConfigurations: const quill.QuillSharedConfigurations(),
+                        enableInteractiveSelection: false,
+                      ),
+                    );
+                  } catch (e) {
+                    return Text(
+                      content,
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: type == 'link' ? Colors.blue : Colors.black,
+                      ),
+                    );
+                  }
+                },
               ),
-            ),
           ],
         ],
       ),
