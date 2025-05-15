@@ -39,36 +39,46 @@ class EditCardScreen extends StatelessWidget {
           return const Center(child: CircularProgressIndicator());
         }
         final blocks = editController.blocks;
-        return SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              ProfileSection(basicInfo: editController.basicInfo),
-              const SizedBox(height: 20),
-              ContactSection(controller: contactController),
-              const SizedBox(height: 20),
-              // 블록 영역만 ReorderableListView로 분리
-              ReorderableListView(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                onReorder: (oldIndex, newIndex) {
-                  if (newIndex > oldIndex) newIndex -= 1;
-                  editController.reorderBlocks(oldIndex, newIndex);
-                },
-                children: blocks
-                    .map((block) => BlockPreviewCard(
-                          key: ValueKey(block['id']),
-                          block: block,
-                        ))
-                    .toList(),
-              ),
-              const SizedBox(height: 20),
-              _buildContactAddButton(context, contactController),
-              const SizedBox(height: 12),
-              _buildBlockAddButton(context, editController),
-              const SizedBox(height: 40),
-            ],
-          ),
+        // children 리스트를 만들면서 blockStartIndex를 동적으로 계산
+        final List<Widget> children = [];
+        children.add(_NonReorderable(key: const ValueKey('profile'), child: ProfileSection(basicInfo: editController.basicInfo)));
+        children.add(_NonReorderable(key: const ValueKey('profile_space'), child: const SizedBox(height: 20)));
+        children.add(_NonReorderable(key: const ValueKey('contact'), child: ContactSection(controller: contactController)));
+        children.add(_NonReorderable(key: const ValueKey('contact_space'), child: const SizedBox(height: 20)));
+
+        final int blockStartIndex = children.length; // 블록이 시작되는 인덱스
+
+        children.addAll(blocks.map((block) => BlockPreviewCard(
+          key: ValueKey(block['id']),
+          block: block,
+        )));
+
+        children.add(_NonReorderable(key: const ValueKey('block_space'), child: const SizedBox(height: 20)));
+        children.add(_NonReorderable(key: const ValueKey('contact_add_btn'), child: _buildContactAddButton(context, contactController)));
+        children.add(_NonReorderable(key: const ValueKey('contact_add_space'), child: const SizedBox(height: 12)));
+        children.add(_NonReorderable(key: const ValueKey('block_add_btn'), child: _buildBlockAddButton(context, editController)));
+        children.add(_NonReorderable(key: const ValueKey('bottom_space'), child: const SizedBox(height: 40)));
+
+        return ReorderableListView(
+          onReorder: (oldIndex, newIndex) {
+            final blockStart = blockStartIndex;
+            final blockEnd = blockStart + blocks.length - 1;
+
+
+            // 블록 영역이 아닐 때만 무시 (맨 뒤로 이동도 허용)
+            if (oldIndex < blockStart || oldIndex > blockEnd || newIndex < blockStart || newIndex > blockEnd + 1) {
+              return;
+            }
+
+            int blockOldIndex = oldIndex - blockStart;
+            int blockNewIndex = newIndex - blockStart;
+            if (blockNewIndex > blockOldIndex) blockNewIndex -= 1;
+            if (blockNewIndex < 0) blockNewIndex = 0;
+            if (blockNewIndex > blocks.length) blockNewIndex = blocks.length;
+
+            editController.reorderBlocks(blockOldIndex, blockNewIndex);
+          },
+          children: children,
         );
       }),
       floatingActionButton: FloatingActionButton(
