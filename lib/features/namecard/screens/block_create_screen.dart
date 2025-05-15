@@ -171,6 +171,8 @@ class _BlockCreateScreenState extends State<BlockCreateScreen> {
             if (blockType != 'photo')
               TextField(
                 controller: _contentController,
+                maxLines: null,
+                keyboardType: TextInputType.multiline,
                 decoration: InputDecoration(
                   labelText: blockType == 'link' ? '링크 URL' : '블록 내용',
                   hintText: blockType == 'link'
