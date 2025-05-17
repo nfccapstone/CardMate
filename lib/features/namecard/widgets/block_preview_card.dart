@@ -160,7 +160,7 @@ class _BlockPreviewCardState extends State<BlockPreviewCard> {
               '${content.length}장의 사진',
               style: const TextStyle(color: Colors.grey),
             ),
-          ] else if (type == 'text' || type == 'link') ...[
+          ] else if (type == 'text') ...[
             if (content != null && content is String)
               Builder(
                 builder: (context) {
@@ -182,9 +182,9 @@ class _BlockPreviewCardState extends State<BlockPreviewCard> {
                   } catch (e) {
                     return Text(
                       content,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 14,
-                        color: type == 'link' ? Colors.blue : Colors.black,
+                        color: Colors.black,
                       ),
                     );
                   }

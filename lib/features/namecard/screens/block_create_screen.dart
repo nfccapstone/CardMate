@@ -110,9 +110,7 @@ class _BlockCreateScreenState extends State<BlockCreateScreen> {
       appBar: AppBar(
         title: Text(blockType == 'text' 
             ? '텍스트 블록' 
-            : blockType == 'link'
-                ? '링크 블록'
-                : '사진 블록'),
+            : '사진 블록'),
         actions: [
           IconButton(
             icon: const Icon(Icons.check),

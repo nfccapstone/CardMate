@@ -5,7 +5,6 @@ import 'package:cardmate/features/namecard/controllers/contact_controller.dart';
 import 'package:cardmate/features/namecard/widgets/profile_section.dart';
 import 'package:cardmate/features/namecard/widgets/contact_section.dart';
 import 'package:cardmate/features/namecard/widgets/block_section.dart';
-import 'package:cardmate/features/namecard/widgets/sns_bottom_sheet.dart';
 import 'package:cardmate/features/namecard/services/i_contact_service.dart';
 import 'package:cardmate/features/namecard/services/i_edit_card_service.dart';
 
@@ -69,21 +68,6 @@ class EditOtherCardScreen extends StatelessWidget {
           ),
         );
       }),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.deepPurple,
-        onPressed: () {
-          showModalBottomSheet(
-            context: context,
-            backgroundColor: Colors.white,
-            shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-            ),
-            builder: (_) => const SNSBottomSheetUI(),
-          );
-        },
-        child: const Icon(Icons.public),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }
 
