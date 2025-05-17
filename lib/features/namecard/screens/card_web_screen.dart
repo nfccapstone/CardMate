@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../services/i_namecard_service.dart';
 import '../services/namecard_service.dart';
+import '../widgets/profile_section.dart';
 
 class CardWebScreen extends StatelessWidget {
   final String cardId;
@@ -90,43 +91,15 @@ class CardWebScreen extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      cardData['name'] ?? '',
-                      style: const TextStyle(
-                        fontSize: 32,
-                        fontWeight: FontWeight.bold,
-                      ),
+                    ProfileSection(
+                      basicInfo: {
+                        'name': cardData['name'],
+                        'department': cardData['department'],
+                        'position': cardData['position'],
+                        'company': cardData['company'],
+                      },
+                      readOnly: true,
                     ),
-                    const SizedBox(height: 12),
-                    if (cardData['position'] != null) ...[
-                      Text(
-                        cardData['position'],
-                        style: const TextStyle(
-                          fontSize: 24,
-                          color: Colors.grey,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                    ],
-                    if (cardData['department'] != null) ...[
-                      Text(
-                        cardData['department'],
-                        style: const TextStyle(
-                          fontSize: 20,
-                          color: Colors.grey,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                    ],
-                    if (cardData['company'] != null) ...[
-                      Text(
-                        cardData['company'],
-                        style: const TextStyle(
-                          fontSize: 20,
-                          color: Colors.grey,
-                        ),
-                      ),
-                    ],
                   ],
                 ),
               ),
