@@ -7,6 +7,7 @@ import 'package:cardmate/features/namecard/widgets/contact_section.dart';
 import 'package:cardmate/features/namecard/widgets/block_section.dart';
 import 'package:cardmate/features/namecard/services/i_contact_service.dart';
 import 'package:cardmate/features/namecard/widgets/block_preview_card.dart';
+import 'package:cardmate/features/namecard/widgets/link_section.dart';
 
 enum LinkPlatform { direct, instagram, github }
 
@@ -46,11 +47,8 @@ class EditCardScreen extends StatelessWidget {
         children.add(_NonReorderable(key: const ValueKey('profile_space'), child: const SizedBox(height: 20)));
         children.add(_NonReorderable(key: const ValueKey('contact'), child: ContactSection(controller: contactController)));
         children.add(_NonReorderable(key: const ValueKey('contact_space'), child: const SizedBox(height: 20)));
-        // 링크 리스트 표시
-        if (editController.basicInfo['links'] != null && (editController.basicInfo['links'] as List).isNotEmpty) {
-          children.add(_NonReorderable(key: const ValueKey('links'), child: _LinkListSection(links: List<Map<String, String>>.from(editController.basicInfo['links']))));
-          children.add(_NonReorderable(key: const ValueKey('links_space'), child: const SizedBox(height: 20)));
-        }
+        children.add(_NonReorderable(key: const ValueKey('links'), child: const LinkSection()));
+        children.add(_NonReorderable(key: const ValueKey('links_space'), child: const SizedBox(height: 20)));
 
         final int blockStartIndex = children.length; // 블록이 시작되는 인덱스
 
@@ -71,7 +69,6 @@ class EditCardScreen extends StatelessWidget {
           onReorder: (oldIndex, newIndex) {
             final blockStart = blockStartIndex;
             final blockEnd = blockStart + blocks.length - 1;
-
 
             // 블록 영역이 아닐 때만 무시 (맨 뒤로 이동도 허용)
             if (oldIndex < blockStart || oldIndex > blockEnd || newIndex < blockStart || newIndex > blockEnd + 1) {
@@ -305,9 +302,7 @@ class EditCardScreen extends StatelessWidget {
                         }
                         final title = titleController.text.trim();
                         final link = {'title': title, 'url': url};
-                        final links = List<Map<String, String>>.from(editController.basicInfo['links'] ?? []);
-                        links.add(link);
-                        editController.basicInfo['links'] = links;
+                        editController.addLink(link);
                         Navigator.pop(context);
                       },
                       child: const Text('저장'),
@@ -328,60 +323,4 @@ class _NonReorderable extends StatelessWidget {
   const _NonReorderable({Key? key, required this.child}) : super(key: key);
   @override
   Widget build(BuildContext context) => child;
-}
-
-// 링크 리스트 위젯
-class _LinkListSection extends StatelessWidget {
-  final List<Map<String, String>> links;
-  const _LinkListSection({required this.links});
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text('링크', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-        const SizedBox(height: 8),
-        ...links.map((link) => Padding(
-          padding: const EdgeInsets.only(bottom: 8),
-          child: Row(
-            children: [
-              const Icon(Icons.link, color: Colors.deepPurple),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  link['title'] ?? '',
-                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-                ),
-              ),
-              IconButton(
-                icon: const Icon(Icons.open_in_new, color: Colors.deepPurple),
-                onPressed: () {
-                  final url = link['url'] ?? '';
-                  if (url.isNotEmpty) {
-                    Get.to(() => _LinkWebView(url: url));
-                  }
-                },
-              ),
-            ],
-          ),
-        )),
-      ],
-    );
-  }
-}
-
-// 링크 웹뷰(간단 예시, 실제로는 url_launcher 등으로 대체 가능)
-class _LinkWebView extends StatelessWidget {
-  final String url;
-  const _LinkWebView({required this.url});
-
-  @override
-  Widget build(BuildContext context) {
-    // 실제 앱에서는 WebView 위젯 또는 url_launcher 사용 권장
-    return Scaffold(
-      appBar: AppBar(title: const Text('링크 열기')),
-      body: Center(child: Text('웹뷰로 $url 열기')),
-    );
-  }
 }

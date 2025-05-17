@@ -298,4 +298,75 @@ class EditCardService implements IEditCardService {
       rethrow;
     }
   }
+
+  @override
+  Future<void> addLink(Map<String, String> linkData) async {
+    final uid = _auth.currentUser?.uid;
+    if (uid == null) return;
+    final cardId = await getCardId(uid);
+    if (cardId == null) return;
+
+    try {
+      await _firestore
+          .collection('cards')
+          .doc(cardId)
+          .collection('card_link')
+          .add({
+        ...linkData,
+        'createdAt': FieldValue.serverTimestamp(),
+      });
+    } catch (e) {
+      print('링크 저장 오류: $e');
+      rethrow;
+    }
+  }
+
+  @override
+  Future<List<Map<String, String>>> fetchLinks() async {
+    final uid = _auth.currentUser?.uid;
+    if (uid == null) return [];
+    final cardId = await getCardId(uid);
+    if (cardId == null) return [];
+
+    try {
+      final snapshot = await _firestore
+          .collection('cards')
+          .doc(cardId)
+          .collection('card_link')
+          .orderBy('createdAt', descending: false)
+          .get();
+
+      return snapshot.docs.map((doc) {
+        final data = doc.data();
+        return {
+          'id': doc.id,
+          'title': data['title'] as String,
+          'url': data['url'] as String,
+        };
+      }).toList();
+    } catch (e) {
+      print('링크 불러오기 오류: $e');
+      return [];
+    }
+  }
+
+  @override
+  Future<void> deleteLink(String linkId) async {
+    final uid = _auth.currentUser?.uid;
+    if (uid == null) return;
+    final cardId = await getCardId(uid);
+    if (cardId == null) return;
+
+    try {
+      await _firestore
+          .collection('cards')
+          .doc(cardId)
+          .collection('card_link')
+          .doc(linkId)
+          .delete();
+    } catch (e) {
+      print('링크 삭제 오류: $e');
+      rethrow;
+    }
+  }
 }

@@ -8,6 +8,7 @@ class EditCardController extends GetxController {
   final blocks = <Map<String, dynamic>>[].obs;
   final otherBasicInfo = <String, dynamic>{}.obs;
   final otherBlocks = <Map<String, dynamic>>[].obs;
+  final links = <Map<String, String>>[].obs;
   final IEditCardService _service;
   String? _loadedCardId;
 
@@ -35,6 +36,10 @@ class EditCardController extends GetxController {
     // 블록 데이터 불러오기
     final blocksData = await _service.fetchBlocks();
     blocks.assignAll(blocksData);
+
+    // 링크 데이터 불러오기
+    final linksData = await _service.fetchLinks();
+    links.assignAll(linksData);
 
     isLoading.value = false;
   }
@@ -123,6 +128,35 @@ class EditCardController extends GetxController {
       final blocksData = await _service.fetchBlocks();
       blocks.assignAll(blocksData);
       Get.snackbar('오류', '블록 순서 변경에 실패했습니다.');
+    }
+  }
+
+  Future<void> addLink(Map<String, String> linkData) async {
+    try {
+      await _service.addLink(linkData);
+      // Firebase에서 최신 링크 목록을 다시 가져옴
+      final linksData = await _service.fetchLinks();
+      links.assignAll(linksData);
+      Get.snackbar('성공', '링크가 추가되었습니다.');
+    } catch (e) {
+      Get.snackbar('오류', '링크 추가에 실패했습니다.');
+    }
+  }
+
+  Future<void> deleteLink(String linkId) async {
+    try {
+      // 로컬 상태에서 먼저 제거하여 즉시 UI 업데이트
+      links.removeWhere((link) => link['id'] == linkId);
+      
+      // Firebase에서 링크 삭제
+      await _service.deleteLink(linkId);
+      
+      Get.snackbar('성공', '링크가 삭제되었습니다.');
+    } catch (e) {
+      // 실패 시 다시 링크 목록을 가져와서 상태 복구
+      final linksData = await _service.fetchLinks();
+      links.assignAll(linksData);
+      Get.snackbar('오류', '링크 삭제에 실패했습니다.');
     }
   }
 }
