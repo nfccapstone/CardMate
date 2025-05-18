@@ -398,4 +398,28 @@ class EditCardService implements IEditCardService {
       rethrow;
     }
   }
+
+  @override
+  Future<void> updateBlock(String blockId, Map<String, dynamic> blockData) async {
+    final uid = _auth.currentUser?.uid;
+    if (uid == null) return;
+    final cardId = await getCardId(uid);
+    if (cardId == null) return;
+
+    try {
+      // 새로운 Map을 생성하여 원본 데이터 보존
+      final dataToSave = Map<String, dynamic>.from(blockData);
+      dataToSave['updatedAt'] = FieldValue.serverTimestamp();
+      
+      await _firestore
+          .collection('cards')
+          .doc(cardId)
+          .collection('card_block')
+          .doc(blockId)
+          .update(dataToSave);
+    } catch (e) {
+      print('블록 수정 오류: $e');
+      rethrow;
+    }
+  }
 }
