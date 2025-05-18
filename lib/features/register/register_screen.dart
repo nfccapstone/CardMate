@@ -7,51 +7,90 @@ class RegisterScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // GetX 바인딩을 통해 등록된 컨트롤러를 가져옵니다.
     final RegisterController controller = Get.find<RegisterController>();
 
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: Colors.white,
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 32.0),
           child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                "회원가입",
-                style: TextStyle(
-                  fontSize: 30,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
+              const Text.rich(
+                TextSpan(
+                  children: [
+                    TextSpan(
+                      text: 'Card',
+                      style: TextStyle(
+                        fontSize: 32,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
+                    ),
+                    TextSpan(
+                      text: 'Mate',
+                      style: TextStyle(
+                        fontSize: 32,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.blueAccent,
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              const SizedBox(height: 30),
-              _buildTextField(controller.emailController, "이메일", false,
-                  TextInputType.emailAddress),
-              const SizedBox(height: 12),
-              _buildTextField(
-                  controller.passwordController, "비밀번호(6자 이상)", true),
-              const SizedBox(height: 12),
-              _buildTextField(
-                  controller.confirmPasswordController, "비밀번호 확인", true),
-              const SizedBox(height: 12),
-              _buildTextField(controller.phoneController, "전화번호", false,
-                  TextInputType.phone),
-              const SizedBox(height: 24),
+              const SizedBox(height: 4),
+              const Text(
+                "Sign Up",
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Colors.grey,
+                  fontWeight: FontWeight.w400,
+                  letterSpacing: 1.2,
+                ),
+              ),
+              const SizedBox(height: 36),
+              _buildInputField(
+                  controller.emailController, "Email", Icons.email, false),
+              const SizedBox(height: 16),
+              _buildInputField(controller.passwordController,
+                  "Password (min. 6)", Icons.lock, true),
+              const SizedBox(height: 16),
+              _buildInputField(controller.confirmPasswordController,
+                  "Confirm Password", Icons.lock_outline, true),
+              const SizedBox(height: 16),
+              _buildInputField(
+                  controller.phoneController, "Phone", Icons.phone, false),
+              const SizedBox(height: 32),
               ElevatedButton(
                 onPressed: controller.register,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.white,
-                  foregroundColor: Colors.black,
-                  minimumSize: const Size(double.infinity, 50),
+                  backgroundColor: Colors.black,
+                  foregroundColor: Colors.white,
+                  minimumSize: const Size(double.infinity, 48),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(6),
+                  ),
                 ),
-                child: const Text("회원가입", style: TextStyle(fontSize: 18)),
-              ),
-              TextButton(
-                onPressed: () => Get.back(),
                 child: const Text(
-                  "로그인 화면으로 돌아가기",
-                  style: TextStyle(color: Colors.white, fontSize: 16),
+                  "Create Account",
+                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+                ),
+              ),
+              const SizedBox(height: 20),
+              Center(
+                child: TextButton(
+                  onPressed: () => Get.back(),
+                  child: const Text(
+                    "Already have an account? Log In",
+                    style: TextStyle(
+                      color: Colors.black54,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w500,
+                      letterSpacing: 1.1,
+                    ),
+                  ),
                 ),
               ),
             ],
@@ -61,25 +100,38 @@ class RegisterScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildTextField(
-      TextEditingController controller, String label, bool isPassword,
-      [TextInputType keyboardType = TextInputType.text]) {
-    return TextField(
-      controller: controller,
-      obscureText: isPassword,
-      keyboardType: keyboardType,
-      style: const TextStyle(color: Colors.white),
-      decoration: InputDecoration(
-        labelText: label,
-        labelStyle: const TextStyle(color: Colors.white),
-        enabledBorder: OutlineInputBorder(
-          borderSide: const BorderSide(color: Colors.white),
-          borderRadius: BorderRadius.circular(8),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderSide: const BorderSide(color: Colors.blueAccent),
-          borderRadius: BorderRadius.circular(8),
-        ),
+  Widget _buildInputField(
+    TextEditingController controller,
+    String hint,
+    IconData icon,
+    bool isPassword,
+  ) {
+    return Container(
+      height: 52,
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF9F9F9),
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(color: Colors.grey.shade300),
+      ),
+      child: Row(
+        children: [
+          Icon(icon, color: Colors.black87, size: 20),
+          const SizedBox(width: 12),
+          Expanded(
+            child: TextField(
+              controller: controller,
+              obscureText: isPassword,
+              style: const TextStyle(color: Colors.black87, fontSize: 14),
+              cursorColor: Colors.grey,
+              decoration: InputDecoration(
+                hintText: hint,
+                border: InputBorder.none,
+                hintStyle: const TextStyle(color: Colors.grey),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

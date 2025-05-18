@@ -39,7 +39,10 @@ class MyNameCardScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              ProfileSection(basicInfo: controller.basicInfo),
+              ProfileSection(
+                basicInfo: controller.basicInfo,
+                readOnly: true,
+              ),
               const SizedBox(height: 20),
               _ContactSectionReadOnly(controller: controller),
               const SizedBox(height: 20),

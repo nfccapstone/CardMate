@@ -5,9 +5,11 @@ import 'package:cardmate/features/namecard/controllers/contact_controller.dart';
 import 'package:cardmate/features/namecard/widgets/profile_section.dart';
 import 'package:cardmate/features/namecard/widgets/contact_section.dart';
 import 'package:cardmate/features/namecard/widgets/block_section.dart';
-import 'package:cardmate/features/namecard/widgets/sns_bottom_sheet.dart';
 import 'package:cardmate/features/namecard/services/i_contact_service.dart';
 import 'package:cardmate/features/namecard/widgets/block_preview_card.dart';
+import 'package:cardmate/features/namecard/widgets/link_section.dart';
+
+enum LinkPlatform { direct, instagram, github }
 
 class EditCardScreen extends StatelessWidget {
   final String cardId;
@@ -39,53 +41,51 @@ class EditCardScreen extends StatelessWidget {
           return const Center(child: CircularProgressIndicator());
         }
         final blocks = editController.blocks;
-        return SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              ProfileSection(basicInfo: editController.basicInfo),
-              const SizedBox(height: 20),
-              ContactSection(controller: contactController),
-              const SizedBox(height: 20),
-              // 블록 영역만 shrinkWrap ReorderableListView로 구현
-              ReorderableListView(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                onReorder: (oldIndex, newIndex) {
-                  if (newIndex > oldIndex) newIndex -= 1;
-                  editController.reorderBlocks(oldIndex, newIndex);
-                },
-                children: blocks
-                    .map((block) => BlockPreviewCard(
-                          key: ValueKey(block['id']),
-                          block: block,
-                        ))
-                    .toList(),
-              ),
-              const SizedBox(height: 20),
-              _buildContactAddButton(context, contactController),
-              const SizedBox(height: 12),
-              _buildBlockAddButton(context, editController),
-              const SizedBox(height: 40),
-            ],
-          ),
+        // children 리스트를 만들면서 blockStartIndex를 동적으로 계산
+        final List<Widget> children = [];
+        children.add(_NonReorderable(key: const ValueKey('profile'), child: ProfileSection(basicInfo: editController.basicInfo)));
+        children.add(_NonReorderable(key: const ValueKey('profile_space'), child: const SizedBox(height: 20)));
+        children.add(_NonReorderable(key: const ValueKey('contact'), child: ContactSection(controller: contactController)));
+        children.add(_NonReorderable(key: const ValueKey('contact_space'), child: const SizedBox(height: 20)));
+        children.add(_NonReorderable(key: const ValueKey('links'), child: const LinkSection()));
+        children.add(_NonReorderable(key: const ValueKey('links_space'), child: const SizedBox(height: 20)));
+
+        final int blockStartIndex = children.length; // 블록이 시작되는 인덱스
+
+        children.addAll(blocks.map((block) => BlockPreviewCard(
+          key: ValueKey(block['id']),
+          block: block,
+        )));
+
+        children.add(_NonReorderable(key: const ValueKey('block_space'), child: const SizedBox(height: 20)));
+        children.add(_NonReorderable(key: const ValueKey('contact_add_btn'), child: _buildContactAddButton(context, contactController)));
+        children.add(_NonReorderable(key: const ValueKey('contact_add_space'), child: const SizedBox(height: 12)));
+        children.add(_NonReorderable(key: const ValueKey('block_add_btn'), child: _buildBlockAddButton(context, editController)));
+        children.add(_NonReorderable(key: const ValueKey('block_add_space'), child: const SizedBox(height: 12)));
+        children.add(_NonReorderable(key: const ValueKey('link_add_btn'), child: _buildLinkAddButton(context)));
+        children.add(_NonReorderable(key: const ValueKey('bottom_space'), child: const SizedBox(height: 40)));
+
+        return ReorderableListView(
+          onReorder: (oldIndex, newIndex) {
+            final blockStart = blockStartIndex;
+            final blockEnd = blockStart + blocks.length - 1;
+
+            // 블록 영역이 아닐 때만 무시 (맨 뒤로 이동도 허용)
+            if (oldIndex < blockStart || oldIndex > blockEnd || newIndex < blockStart || newIndex > blockEnd + 1) {
+              return;
+            }
+
+            int blockOldIndex = oldIndex - blockStart;
+            int blockNewIndex = newIndex - blockStart;
+            if (blockNewIndex > blockOldIndex) blockNewIndex -= 1;
+            if (blockNewIndex < 0) blockNewIndex = 0;
+            if (blockNewIndex > blocks.length) blockNewIndex = blocks.length;
+
+            editController.reorderBlocks(blockOldIndex, blockNewIndex);
+          },
+          children: children,
         );
       }),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.deepPurple,
-        onPressed: () {
-          showModalBottomSheet(
-            context: context,
-            backgroundColor: Colors.white,
-            shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-            ),
-            builder: (_) => const SNSBottomSheetUI(),
-          );
-        },
-        child: const Icon(Icons.public),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }
 
@@ -155,11 +155,6 @@ class EditCardScreen extends StatelessWidget {
               onTap: () => _navigateToBlockCreateScreen('text', controller),
             ),
             ListTile(
-              leading: const Icon(Icons.link),
-              title: const Text('링크 블록'),
-              onTap: () => _navigateToBlockCreateScreen('link', controller),
-            ),
-            ListTile(
               leading: const Icon(Icons.photo),
               title: const Text('사진 블록'),
               onTap: () => _navigateToBlockCreateScreen('photo', controller),
@@ -176,6 +171,149 @@ class EditCardScreen extends StatelessWidget {
     await Get.toNamed(
       '/blockCreate',
       arguments: {'type': blockType},
+    );
+  }
+
+  Widget _buildLinkAddButton(BuildContext context) {
+    return GestureDetector(
+      onTap: () => showAddLinkBottomSheet(context),
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 16),
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: Colors.black,
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: const Text(
+          '+ 링크 추가',
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w500,
+            color: Colors.white,
+          ),
+        ),
+      ),
+    );
+  }
+
+  void showAddLinkBottomSheet(BuildContext context) {
+    final editController = Get.find<EditCardController>();
+    final TextEditingController titleController = TextEditingController();
+    final TextEditingController urlController = TextEditingController();
+    LinkPlatform selectedPlatform = LinkPlatform.direct;
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            String getHintText() {
+              switch (selectedPlatform) {
+                case LinkPlatform.instagram:
+                  return '인스타그램 닉네임 입력';
+                case LinkPlatform.github:
+                  return 'Repository 이름 입력';
+                case LinkPlatform.direct:
+                default:
+                  return 'https://your.site';
+              }
+            }
+            return Padding(
+              padding: EdgeInsets.only(
+                left: 24,
+                right: 24,
+                top: 32,
+                bottom: MediaQuery.of(context).viewInsets.bottom + 24,
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    '링크 추가',
+                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 24),
+                  const Text('제목', style: TextStyle(fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 8),
+                  TextField(
+                    controller: titleController,
+                    decoration: const InputDecoration(
+                      hintText: '예: 회사 홈페이지',
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  Row(
+                    children: [
+                      IconButton(
+                        icon: Icon(Icons.language, color: selectedPlatform == LinkPlatform.direct ? Colors.deepPurple : Colors.grey),
+                        onPressed: () => setState(() => selectedPlatform = LinkPlatform.direct),
+                        tooltip: '직접 입력',
+                      ),
+                      IconButton(
+                        icon: Image.asset('assets/icons/instagram.png', width: 28),
+                        onPressed: () => setState(() => selectedPlatform = LinkPlatform.instagram),
+                        tooltip: 'Instagram',
+                      ),
+                      IconButton(
+                        icon: Image.asset('assets/icons/github.png', width: 28),
+                        onPressed: () => setState(() => selectedPlatform = LinkPlatform.github),
+                        tooltip: 'GitHub',
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  const Text('링크', style: TextStyle(fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 8),
+                  TextField(
+                    controller: urlController,
+                    decoration: InputDecoration(
+                      hintText: getHintText(),
+                      border: const OutlineInputBorder(),
+                    ),
+                    keyboardType: TextInputType.text,
+                  ),
+                  const SizedBox(height: 8),
+                  const Text(
+                    'https:// 포함한 웹사이트 주소를 입력하세요.',
+                    style: TextStyle(fontSize: 12, color: Colors.black54),
+                  ),
+                  const SizedBox(height: 24),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        String input = urlController.text.trim();
+                        String url;
+                        switch (selectedPlatform) {
+                          case LinkPlatform.instagram:
+                            url = 'https://instagram.com/$input';
+                            break;
+                          case LinkPlatform.github:
+                            url = 'https://github.com/$input';
+                            break;
+                          case LinkPlatform.direct:
+                          default:
+                            url = input;
+                        }
+                        final title = titleController.text.trim();
+                        final link = {'title': title, 'url': url};
+                        editController.addLink(link);
+                        Navigator.pop(context);
+                      },
+                      child: const Text('저장'),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
     );
   }
 }

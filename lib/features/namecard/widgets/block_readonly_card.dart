@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_quill/flutter_quill.dart' as quill;
+import 'dart:convert';
 
 class BlockReadOnlyCard extends StatefulWidget {
   final Map<String, dynamic> block;
@@ -112,14 +114,36 @@ class _BlockReadOnlyCardState extends State<BlockReadOnlyCard> {
               '${content.length}장의 사진',
               style: const TextStyle(color: Colors.grey),
             ),
-          ] else if (type == 'text' || type == 'link') ...[
-            Text(
-              content?.toString() ?? '',
-              style: TextStyle(
-                fontSize: 14,
-                color: type == 'link' ? Colors.blue : Colors.black,
+          ] else if (type == 'text') ...[
+            if (content != null && content is String)
+              Builder(
+                builder: (context) {
+                  try {
+                    final quillDoc = quill.Document.fromJson(jsonDecode(content));
+                    final quillController = quill.QuillController(
+                      document: quillDoc,
+                      selection: const TextSelection.collapsed(offset: 0),
+                    );
+                    return quill.QuillEditor(
+                      focusNode: FocusNode(),
+                      scrollController: ScrollController(),
+                      configurations: quill.QuillEditorConfigurations(
+                        controller: quillController,
+                        sharedConfigurations: const quill.QuillSharedConfigurations(),
+                        enableInteractiveSelection: false,
+                      ),
+                    );
+                  } catch (e) {
+                    return Text(
+                      content,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        color: Colors.black,
+                      ),
+                    );
+                  }
+                },
               ),
-            ),
           ],
         ],
       ),
