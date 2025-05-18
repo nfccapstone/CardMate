@@ -4,9 +4,19 @@ import 'package:cardmate/features/namecard/controllers/my_namecard_controller.da
 import 'package:cardmate/features/namecard/widgets/profile_section.dart';
 import 'package:cardmate/features/namecard/widgets/block_section.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:cardmate/features/namecard/utils/platform_icon_utils.dart';
 
 class MyNameCardScreen extends StatelessWidget {
   const MyNameCardScreen({Key? key}) : super(key: key);
+
+  Future<void> _launchUrl(String url) async {
+    final uri = Uri.parse(url);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri);
+    } else {
+      Get.snackbar('오류', '링크를 열 수 없습니다.');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -45,6 +55,8 @@ class MyNameCardScreen extends StatelessWidget {
               ),
               const SizedBox(height: 20),
               _ContactSectionReadOnly(controller: controller),
+              const SizedBox(height: 20),
+              _LinkSectionReadOnly(controller: controller),
               const SizedBox(height: 20),
               BlockSection(blocks: controller.blocks, readOnly: true),
               const SizedBox(height: 40),
@@ -96,6 +108,76 @@ class _ContactSectionReadOnly extends StatelessWidget {
             onTap: onTap,
           );
         }).toList(),
+      ],
+    );
+  }
+}
+
+// 링크 읽기 전용 위젯
+class _LinkSectionReadOnly extends StatelessWidget {
+  final MyNameCardController controller;
+  const _LinkSectionReadOnly({required this.controller});
+
+  Future<void> _launchUrl(String url) async {
+    final uri = Uri.parse(url);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri);
+    } else {
+      Get.snackbar('오류', '링크를 열 수 없습니다.');
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final links = controller.basicInfo['links'] ?? [];
+    if (links.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          '링크',
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        const SizedBox(height: 12),
+        ...links.map<Widget>((link) => Padding(
+          padding: const EdgeInsets.only(bottom: 12),
+          child: InkWell(
+            onTap: () {
+              final url = link['url'] ?? '';
+              if (url.isNotEmpty) {
+                _launchUrl(url);
+              }
+            },
+            child: Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.grey[100],
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Row(
+                children: [
+                  PlatformIconUtils.getPlatformIcon(link['platform'] ?? 'direct'),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      link['title'] ?? '',
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        )).toList(),
       ],
     );
   }

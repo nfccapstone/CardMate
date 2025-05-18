@@ -37,6 +37,11 @@ class MyNameCardController extends GetxController {
       } else {
         data['contacts'] = [];
       }
+
+      // 링크 데이터 불러오기
+      final linksData = await _service.fetchLinks();
+      data['links'] = linksData;
+
       basicInfo.assignAll(data);
     }
     final blocksData = await _service.fetchBlocks();
@@ -59,6 +64,11 @@ class MyNameCardController extends GetxController {
       } else {
         data['contacts'] = [];
       }
+
+      // 링크 데이터 불러오기
+      final linksData = await _service.fetchLinksByCardId(cardId);
+      data['links'] = linksData;
+
       basicInfo.assignAll(data);
     }
     final blocksData = await _service.fetchBlocksByCardId(cardId);

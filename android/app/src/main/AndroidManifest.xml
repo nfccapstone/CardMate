@@ -1,6 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <!-- ✅ NFC 사용 권한 추가 -->
     <uses-permission android:name="android.permission.NFC"/>
+    <!-- 인터넷 사용 권한 추가 -->
+    <uses-permission android:name="android.permission.INTERNET"/>
 
     <!-- ✅ NFC 기능이 필수적으로 요구되도록 설정 -->
     <uses-feature android:name="android.hardware.nfc" android:required="true"/>
@@ -42,6 +44,15 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
 
+            <!-- URL 처리 인텐트 필터 추가 -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="http" />
+                <data android:scheme="https" />
+            </intent-filter>
+
         </activity>
 
         <!-- Don't delete the meta-data below.
@@ -57,6 +68,15 @@
         <intent>
             <action android:name="android.intent.action.PROCESS_TEXT"/>
             <data android:mimeType="text/plain"/>
+        </intent>
+        <!-- 브라우저 관련 쿼리 추가 -->
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:scheme="http" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:scheme="https" />
         </intent>
     </queries>
 

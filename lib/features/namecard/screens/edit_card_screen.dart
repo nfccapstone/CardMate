@@ -8,6 +8,7 @@ import 'package:cardmate/features/namecard/widgets/block_section.dart';
 import 'package:cardmate/features/namecard/services/i_contact_service.dart';
 import 'package:cardmate/features/namecard/widgets/block_preview_card.dart';
 import 'package:cardmate/features/namecard/widgets/link_section.dart';
+import 'package:cardmate/features/namecard/utils/platform_icon_utils.dart';
 
 enum LinkPlatform { direct, instagram, github }
 
@@ -255,12 +256,12 @@ class EditCardScreen extends StatelessWidget {
                         tooltip: '직접 입력',
                       ),
                       IconButton(
-                        icon: Image.asset('assets/icons/instagram.png', width: 28),
+                        icon: PlatformIconUtils.getPlatformIcon('instagram', size: 28),
                         onPressed: () => setState(() => selectedPlatform = LinkPlatform.instagram),
                         tooltip: 'Instagram',
                       ),
                       IconButton(
-                        icon: Image.asset('assets/icons/github.png', width: 28),
+                        icon: PlatformIconUtils.getPlatformIcon('github', size: 28),
                         onPressed: () => setState(() => selectedPlatform = LinkPlatform.github),
                         tooltip: 'GitHub',
                       ),
@@ -289,19 +290,27 @@ class EditCardScreen extends StatelessWidget {
                       onPressed: () {
                         String input = urlController.text.trim();
                         String url;
+                        String platform;
                         switch (selectedPlatform) {
                           case LinkPlatform.instagram:
                             url = 'https://instagram.com/$input';
+                            platform = 'instagram';
                             break;
                           case LinkPlatform.github:
                             url = 'https://github.com/$input';
+                            platform = 'github';
                             break;
                           case LinkPlatform.direct:
                           default:
                             url = input;
+                            platform = 'direct';
                         }
                         final title = titleController.text.trim();
-                        final link = {'title': title, 'url': url};
+                        final link = {
+                          'title': title, 
+                          'url': url,
+                          'platform': platform
+                        };
                         editController.addLink(link);
                         Navigator.pop(context);
                       },
