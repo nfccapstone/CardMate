@@ -9,7 +9,8 @@ class NamecardbooksScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final CardController cardController = Get.find<CardController>();
+    // final CardController cardController = Get.find<CardController>();
+    final CardController cardController = Get.put(CardController());
     final TextEditingController _searchController = TextEditingController();
 
     return Row(
