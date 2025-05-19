@@ -37,7 +37,7 @@ class CardController extends GetxController {
     fetchNameCards();
   }
 
-  void addCardById(String cardId) async {
+  Future<void> addCardById(String cardId) async {
     await _db
         .collection('users')
         .doc(_auth.currentUser?.uid)
@@ -45,7 +45,7 @@ class CardController extends GetxController {
         .doc(cardId)
         .set({});
 
-    fetchNameCards();
+    await fetchNameCards();
   }
 
   Future<void> fetchNameCards() async {

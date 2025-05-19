@@ -1,14 +1,14 @@
 import 'package:get/get.dart';
-import 'controllers/namecard_info_controller.dart';
-import 'controllers/edit_card_controller.dart';
-import 'services/i_namecard_service.dart';
-import 'services/namecard_service.dart';
-import 'services/i_edit_card_service.dart';
-import 'services/edit_card_service.dart';
-import 'services/i_profile_image_service.dart';
-import 'services/profile_image_service.dart';
-import 'services/i_contact_service.dart';
-import 'services/contact_service.dart';
+import 'package:cardmate/features/namecard/controllers/namecard_info_controller.dart';
+import 'package:cardmate/features/namecard/controllers/edit_card_controller.dart';
+import 'package:cardmate/features/namecard/services/i_namecard_service.dart';
+import 'package:cardmate/features/namecard/services/namecard_service.dart';
+import 'package:cardmate/features/namecard/services/i_edit_card_service.dart';
+import 'package:cardmate/features/namecard/services/edit_card_service.dart';
+import 'package:cardmate/features/namecard/services/i_profile_image_service.dart';
+import 'package:cardmate/features/namecard/services/profile_image_service.dart';
+import 'package:cardmate/features/namecard/services/i_contact_service.dart';
+import 'package:cardmate/features/namecard/services/contact_service.dart';
 
 class MainNameCardBindings extends Bindings {
   @override

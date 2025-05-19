@@ -13,7 +13,7 @@ import 'features/register/register_screen.dart';
 import 'features/namecard/screens/edit_card_screen.dart';
 import 'features/namecard/screens/namecard_info_screen.dart';
 import 'features/namecard/screens/edit_contact_screen.dart';
-import 'features/namecard/main_namecard_bindings.dart';
+import 'features/namecard/bindings/main_namecard_bindings.dart';
 import 'features/login/login_bindings.dart';
 import 'features/namecard/services/namecard_service.dart';
 import 'features/namecard/services/i_namecard_service.dart';
@@ -25,6 +25,7 @@ import 'features/namecard/screens/card_web_screen.dart';
 import 'package:flutter/foundation.dart';
 import 'package:url_strategy/url_strategy.dart';
 import 'features/namecard/bindings/contact_bindings.dart';
+import 'features/namecardbooks/qr_scan_screen.dart';
 
 void main() async {
   setPathUrlStrategy(); // 웹에서 # 없는 URL 사용
@@ -103,6 +104,10 @@ class CardMateApp extends StatelessWidget {
         GetPage(
           name: '/card',
           page: () => const CardWebScreen(cardId: '11'),
+        ),
+        GetPage(
+          name: '/qr-scan',
+          page: () => const QRScanScreen(),
         ),
       ],
     );

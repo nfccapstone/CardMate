@@ -109,7 +109,7 @@ class NamecardbooksScreen extends StatelessWidget {
                 const SizedBox(height: 12),
                 _buildOptionButton(context, Icons.qr_code_scanner, 'QR 코드 찍기',
                     () {
-                  // QR 기능
+                  Get.toNamed('/qr-scan');
                 }),
                 const SizedBox(height: 12),
                 _buildOptionButton(context, Icons.edit, '아이디로 명함 등록', () {
