@@ -53,35 +53,80 @@ class _QRScanScreenState extends State<QRScanScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.black,
       appBar: AppBar(
-        title: const Text('QR 코드 스캔'),
+        backgroundColor: Colors.black,
+        title: const Text(
+          'QR 코드 스캔',
+          style: TextStyle(color: Colors.white),
+        ),
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: Column(
         children: <Widget>[
-          Expanded(
-            flex: 5,
-            child: MobileScanner(
-              controller: controller,
-              onDetect: (capture) {
-                final List<Barcode> barcodes = capture.barcodes;
-                for (final barcode in barcodes) {
-                  if (barcode.rawValue != null) {
-                    _processQRCode(barcode.rawValue!);
-                    return;
-                  }
-                }
-              },
+          const SizedBox(height: 20),
+          const Text(
+            'QR 코드를 스캔하여\n명함을 추가하세요',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
             ),
           ),
+          const SizedBox(height: 30),
           Expanded(
-            flex: 1,
             child: Center(
-              child: Text(
-                'QR 코드를 카메라에 비춰주세요',
-                style: Theme.of(context).textTheme.bodyLarge,
+              child: Container(
+                width: MediaQuery.of(context).size.width * 0.8,
+                height: MediaQuery.of(context).size.width * 0.8,
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: Colors.white,
+                    width: 2,
+                  ),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(18),
+                  child: Stack(
+                    children: [
+                      MobileScanner(
+                        controller: controller,
+                        onDetect: (capture) {
+                          final List<Barcode> barcodes = capture.barcodes;
+                          for (final barcode in barcodes) {
+                            if (barcode.rawValue != null) {
+                              _processQRCode(barcode.rawValue!);
+                              return;
+                            }
+                          }
+                        },
+                      ),
+                      // 스캔 영역 표시
+                      Positioned.fill(
+                        child: CustomPaint(
+                          painter: ScannerOverlayPainter(),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ),
             ),
-          )
+          ),
+          const SizedBox(height: 30),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            child: const Text(
+              'QR 코드를 사각형 안에 맞춰주세요',
+              style: TextStyle(
+                color: Colors.white70,
+                fontSize: 16,
+              ),
+            ),
+          ),
+          const SizedBox(height: 20),
         ],
       ),
     );
@@ -92,4 +137,83 @@ class _QRScanScreenState extends State<QRScanScreen> {
     controller.dispose();
     super.dispose();
   }
+}
+
+class ScannerOverlayPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = Colors.white.withOpacity(0.3)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2;
+
+    // 스캔 영역의 크기
+    final scanAreaSize = size.width * 0.7;
+    final scanAreaLeft = (size.width - scanAreaSize) / 2;
+    final scanAreaTop = (size.height - scanAreaSize) / 2;
+
+    // 스캔 영역 그리기
+    canvas.drawRect(
+      Rect.fromLTWH(scanAreaLeft, scanAreaTop, scanAreaSize, scanAreaSize),
+      paint,
+    );
+
+    // 모서리 강조
+    final cornerLength = scanAreaSize * 0.1;
+    final cornerPaint = Paint()
+      ..color = Colors.white
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 4;
+
+    // 왼쪽 상단 모서리
+    canvas.drawLine(
+      Offset(scanAreaLeft, scanAreaTop),
+      Offset(scanAreaLeft + cornerLength, scanAreaTop),
+      cornerPaint,
+    );
+    canvas.drawLine(
+      Offset(scanAreaLeft, scanAreaTop),
+      Offset(scanAreaLeft, scanAreaTop + cornerLength),
+      cornerPaint,
+    );
+
+    // 오른쪽 상단 모서리
+    canvas.drawLine(
+      Offset(scanAreaLeft + scanAreaSize, scanAreaTop),
+      Offset(scanAreaLeft + scanAreaSize - cornerLength, scanAreaTop),
+      cornerPaint,
+    );
+    canvas.drawLine(
+      Offset(scanAreaLeft + scanAreaSize, scanAreaTop),
+      Offset(scanAreaLeft + scanAreaSize, scanAreaTop + cornerLength),
+      cornerPaint,
+    );
+
+    // 왼쪽 하단 모서리
+    canvas.drawLine(
+      Offset(scanAreaLeft, scanAreaTop + scanAreaSize),
+      Offset(scanAreaLeft + cornerLength, scanAreaTop + scanAreaSize),
+      cornerPaint,
+    );
+    canvas.drawLine(
+      Offset(scanAreaLeft, scanAreaTop + scanAreaSize),
+      Offset(scanAreaLeft, scanAreaTop + scanAreaSize - cornerLength),
+      cornerPaint,
+    );
+
+    // 오른쪽 하단 모서리
+    canvas.drawLine(
+      Offset(scanAreaLeft + scanAreaSize, scanAreaTop + scanAreaSize),
+      Offset(scanAreaLeft + scanAreaSize - cornerLength, scanAreaTop + scanAreaSize),
+      cornerPaint,
+    );
+    canvas.drawLine(
+      Offset(scanAreaLeft + scanAreaSize, scanAreaTop + scanAreaSize),
+      Offset(scanAreaLeft + scanAreaSize, scanAreaTop + scanAreaSize - cornerLength),
+      cornerPaint,
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 } 
