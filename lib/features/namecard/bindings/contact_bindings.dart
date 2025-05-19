@@ -3,7 +3,7 @@ import 'package:cardmate/features/namecard/controllers/contact_controller.dart';
 import 'package:cardmate/features/namecard/services/contact_service.dart';
 import 'package:cardmate/features/namecard/services/i_contact_service.dart';
 
-class NameCardBindings extends Bindings {
+class ContactBindings extends Bindings {
   @override
   void dependencies() {
     // ContactService를 싱글톤으로 등록

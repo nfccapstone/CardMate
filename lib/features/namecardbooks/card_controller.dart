@@ -7,14 +7,21 @@ class NameCard {
   final String id;
   final String? name;
   final String? profileUrl;
+  final String? webLink;
 
-  NameCard({required this.id, this.name, this.profileUrl});
+  NameCard({
+    required this.id, 
+    this.name, 
+    this.profileUrl,
+    this.webLink,
+  });
 
   factory NameCard.fromMap(String id, Map<String, dynamic> data) {
     return NameCard(
       id: id,
       name: data['name'],
       profileUrl: data['profileUrl'],
+      webLink: 'https://cardmate-37be3.web.app/card/myNameCard/$id',
     );
   }
 }
@@ -73,11 +80,17 @@ class CardController extends GetxController {
   }
 
   Future<void> searchCard(String input) async {
+    if (input.isEmpty) {
+      fetchNameCards();
+      return;
+    }
+
     final uid = _auth.currentUser?.uid;
     final cardIdSnapshots =
         await _db.collection('users').doc(uid).collection('card_book').get();
 
     final searchedCards = <NameCard>[];
+    final searchInput = input.toLowerCase(); // 검색어를 소문자로 변환
 
     await Future.wait(
       cardIdSnapshots.docs.map((doc) async {
@@ -86,9 +99,17 @@ class CardController extends GetxController {
         final data = cardDoc.data();
 
         if (data != null) {
-          if (data['name'] == input || data['company'] == input) {
+          final name = (data['name'] ?? '').toString().toLowerCase();
+          final company = (data['company'] ?? '').toString().toLowerCase();
+          final department = (data['department'] ?? '').toString().toLowerCase();
+          final position = (data['position'] ?? '').toString().toLowerCase();
+
+          // 이름, 회사, 부서, 직책 중 하나라도 검색어를 포함하면 결과에 추가
+          if (name.contains(searchInput) ||
+              company.contains(searchInput) ||
+              department.contains(searchInput) ||
+              position.contains(searchInput)) {
             searchedCards.add(NameCard.fromMap(cardId, data));
-            print(searchedCards);
           }
         }
       }),

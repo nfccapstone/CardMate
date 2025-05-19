@@ -15,7 +15,7 @@ dependencies:
   firebase_auth: ^5.5.1
   firebase_storage: ^12.4.4
   image_picker: ^1.0.7
-  url_launcher: ^6.1.7
+  url_launcher: ^6.2.5
   nfc_manager: ^3.3.0
   flutter_nfc_kit: ^3.3.0
   google_sign_in: ^6.1.5
