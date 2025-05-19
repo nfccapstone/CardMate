@@ -307,14 +307,18 @@ class EditCardService implements IEditCardService {
     if (cardId == null) return;
 
     try {
+      final dataToSave = {
+        'title': linkData['title'],
+        'url': linkData['url'],
+        'platform': linkData['platform'] ?? 'direct',
+        'createdAt': FieldValue.serverTimestamp(),
+      };
+
       await _firestore
           .collection('cards')
           .doc(cardId)
           .collection('card_link')
-          .add({
-        ...linkData,
-        'createdAt': FieldValue.serverTimestamp(),
-      });
+          .add(dataToSave);
     } catch (e) {
       print('링크 저장 오류: $e');
       rethrow;
@@ -342,10 +346,35 @@ class EditCardService implements IEditCardService {
           'id': doc.id,
           'title': data['title'] as String,
           'url': data['url'] as String,
+          'platform': data['platform'] as String? ?? 'direct',
         };
       }).toList();
     } catch (e) {
       print('링크 불러오기 오류: $e');
+      return [];
+    }
+  }
+
+  Future<List<Map<String, String>>> fetchLinksByCardId(String cardId) async {
+    try {
+      final snapshot = await _firestore
+          .collection('cards')
+          .doc(cardId)
+          .collection('card_link')
+          .orderBy('createdAt', descending: false)
+          .get();
+
+      return snapshot.docs.map((doc) {
+        final data = doc.data();
+        return {
+          'id': doc.id,
+          'title': data['title'] as String,
+          'url': data['url'] as String,
+          'platform': data['platform'] as String? ?? 'direct',
+        };
+      }).toList();
+    } catch (e) {
+      print('타인 링크 불러오기 오류: $e');
       return [];
     }
   }
@@ -366,6 +395,30 @@ class EditCardService implements IEditCardService {
           .delete();
     } catch (e) {
       print('링크 삭제 오류: $e');
+      rethrow;
+    }
+  }
+
+  @override
+  Future<void> updateBlock(String blockId, Map<String, dynamic> blockData) async {
+    final uid = _auth.currentUser?.uid;
+    if (uid == null) return;
+    final cardId = await getCardId(uid);
+    if (cardId == null) return;
+
+    try {
+      // 새로운 Map을 생성하여 원본 데이터 보존
+      final dataToSave = Map<String, dynamic>.from(blockData);
+      dataToSave['updatedAt'] = FieldValue.serverTimestamp();
+      
+      await _firestore
+          .collection('cards')
+          .doc(cardId)
+          .collection('card_block')
+          .doc(blockId)
+          .update(dataToSave);
+    } catch (e) {
+      print('블록 수정 오류: $e');
       rethrow;
     }
   }

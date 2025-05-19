@@ -4,6 +4,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../services/i_namecard_service.dart';
 import '../services/namecard_service.dart';
 import '../widgets/profile_section.dart';
+import '../utils/platform_icon_utils.dart';
 
 class CardWebScreen extends StatelessWidget {
   final String cardId;
@@ -12,6 +13,15 @@ class CardWebScreen extends StatelessWidget {
     super.key,
     required this.cardId,
   });
+
+  Future<void> _launchUrl(String url) async {
+    final uri = Uri.parse(url);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri);
+    } else {
+      Get.snackbar('오류', '링크를 열 수 없습니다.');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -201,6 +211,62 @@ class CardWebScreen extends StatelessWidget {
                   ),
                 ),
               ],
+
+              // 링크 정보
+              if (cardData['links'] != null && (cardData['links'] as List).isNotEmpty) ...[
+                const Divider(height: 1),
+                Padding(
+                  padding: const EdgeInsets.all(32),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        '링크',
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+                      ...(cardData['links'] as List).map((link) {
+                        final title = link['title'] ?? '';
+                        final url = link['url'] ?? '';
+                        
+                        return Container(
+                          margin: const EdgeInsets.only(bottom: 16),
+                          child: InkWell(
+                            onTap: () => _launchUrl(url),
+                            child: Container(
+                              padding: const EdgeInsets.all(24),
+                              decoration: BoxDecoration(
+                                color: Colors.grey[50],
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(color: Colors.grey[200]!),
+                              ),
+                              child: Row(
+                                children: [
+                                  _getPlatformIcon(link['platform'] ?? 'direct'),
+                                  const SizedBox(width: 16),
+                                  Expanded(
+                                    child: Text(
+                                      title,
+                                      style: const TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ),
+                                  const Icon(Icons.open_in_new, color: Colors.deepPurple),
+                                ],
+                              ),
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                    ],
+                  ),
+                ),
+              ],
             ],
           ),
         );
@@ -227,13 +293,7 @@ class CardWebScreen extends StatelessWidget {
     }
   }
 
-  Future<void> _launchUrl(String url) async {
-    if (!await launchUrl(Uri.parse(url))) {
-      Get.snackbar(
-        '오류',
-        'URL을 열 수 없습니다.',
-        snackPosition: SnackPosition.BOTTOM,
-      );
-    }
+  Widget _getPlatformIcon(String platform) {
+    return PlatformIconUtils.getPlatformIcon(platform, size: 32);
   }
 } 

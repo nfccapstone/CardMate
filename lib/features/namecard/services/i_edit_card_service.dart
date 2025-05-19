@@ -16,5 +16,9 @@ abstract class IEditCardService {
   // 링크 관련 메서드 추가
   Future<void> addLink(Map<String, String> linkData);
   Future<List<Map<String, String>>> fetchLinks();
+  Future<List<Map<String, String>>> fetchLinksByCardId(String cardId);
   Future<void> deleteLink(String linkId);
+
+  // 블록 수정 메서드 추가
+  Future<void> updateBlock(String blockId, Map<String, dynamic> blockData);
 }

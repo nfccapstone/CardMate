@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:cardmate/features/namecard/controllers/edit_card_controller.dart';
+import 'package:cardmate/features/namecard/utils/platform_icon_utils.dart';
 
 class LinkSection extends StatelessWidget {
   const LinkSection({Key? key}) : super(key: key);
+
+  Widget _getPlatformIcon(String platform) {
+    return PlatformIconUtils.getPlatformIcon(platform);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -44,41 +49,16 @@ class LinkSection extends StatelessWidget {
                 ),
                 child: Row(
                   children: [
-                    const Icon(Icons.link, color: Colors.deepPurple),
+                    _getPlatformIcon(link['platform'] ?? 'direct'),
                     const SizedBox(width: 12),
                     Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            link['title'] ?? '',
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            link['url'] ?? '',
-                            style: const TextStyle(
-                              fontSize: 14,
-                              color: Colors.grey,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ],
+                      child: Text(
+                        link['title'] ?? '',
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.open_in_new, color: Colors.deepPurple),
-                      onPressed: () {
-                        final url = link['url'] ?? '';
-                        if (url.isNotEmpty) {
-                          // TODO: URL 실행 로직 구현
-                          print('Open URL: $url');
-                        }
-                      },
                     ),
                     IconButton(
                       icon: const Icon(Icons.delete, color: Colors.red),

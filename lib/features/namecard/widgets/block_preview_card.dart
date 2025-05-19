@@ -86,9 +86,26 @@ class _BlockPreviewCardState extends State<BlockPreviewCard> {
                   style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                 ),
               ),
-              IconButton(
-                icon: const Icon(Icons.delete_outline, color: Colors.red),
-                onPressed: _deleteBlock,
+              Row(
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.edit_outlined, color: Colors.blue),
+                    onPressed: () {
+                      Get.toNamed(
+                        '/blockCreate',
+                        arguments: {
+                          'type': type,
+                          'isEdit': true,
+                          'blockData': widget.block,
+                        },
+                      );
+                    },
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.delete_outline, color: Colors.red),
+                    onPressed: _deleteBlock,
+                  ),
+                ],
               ),
             ],
           ),

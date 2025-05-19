@@ -25,15 +25,45 @@ class _BlockCreateScreenState extends State<BlockCreateScreen> {
   final List<String> _imageNames = [];
   final _editController = Get.find<EditCardController>();
   final _pageController = PageController();
-  final quill.QuillController _quillController = quill.QuillController.basic();
+  late quill.QuillController _quillController;
   final FocusNode _editorFocusNode = FocusNode();
   final ScrollController _editorScrollController = ScrollController();
   bool _showToolbar = false;
+  bool _isEdit = false;
+  String? _blockId;
+  List<String> _imageUrls = [];
 
   @override
   void initState() {
     super.initState();
-    blockType = Get.arguments['type'] ?? 'text';
+    _quillController = quill.QuillController.basic();
+    
+    final args = Get.arguments;
+    blockType = args['type'] ?? 'text';
+    _isEdit = args['isEdit'] ?? false;
+    
+    if (_isEdit) {
+      final blockData = args['blockData'];
+      _blockId = blockData['id'];
+      _titleController.text = blockData['title'] ?? '';
+      
+      if (blockType == 'text' && blockData['content'] != null) {
+        try {
+          final quillDoc = quill.Document.fromJson(jsonDecode(blockData['content']));
+          _quillController = quill.QuillController(
+            document: quillDoc,
+            selection: const TextSelection.collapsed(offset: 0),
+          );
+        } catch (e) {
+          print('텍스트 블록 데이터 파싱 오류: $e');
+        }
+      } else if (blockType == 'photo' && blockData['content'] is List) {
+        // 사진 블록의 경우 기존 이미지 URL들을 표시
+        setState(() {
+          _imageUrls = List<String>.from(blockData['content']);
+        });
+      }
+    }
   }
 
   @override
@@ -103,62 +133,81 @@ class _BlockCreateScreenState extends State<BlockCreateScreen> {
     return imageUrls;
   }
 
+  Future<void> _saveBlock() async {
+    if (blockType == 'photo' && _imageBytes.isEmpty && _imageUrls.isEmpty) {
+      Get.snackbar('오류', '사진을 선택해주세요.');
+      return;
+    }
+
+    if (blockType == 'photo') {
+      // 로딩 다이얼로그 표시
+      Get.dialog(
+        const Center(
+          child: CircularProgressIndicator(),
+        ),
+        barrierDismissible: false,
+      );
+
+      List<String> finalImageUrls = [];
+      
+      // 새로 추가된 이미지 업로드
+      if (_imageBytes.isNotEmpty) {
+        final newImageUrls = await _uploadImages();
+        finalImageUrls.addAll(newImageUrls);
+      }
+      
+      // 기존 이미지 URL 유지
+      finalImageUrls.addAll(_imageUrls);
+
+      // 로딩 다이얼로그 닫기
+      Get.back();
+
+      if (finalImageUrls.isEmpty) {
+        Get.snackbar('오류', '이미지 업로드에 실패했습니다.');
+        return;
+      }
+
+      final blockData = {
+        'type': blockType,
+        'title': _titleController.text,
+        'content': finalImageUrls,
+      };
+
+      if (_isEdit && _blockId != null) {
+        await _editController.updateBlock(_blockId!, blockData);
+      } else {
+        await _editController.addBlock(blockData);
+      }
+    } else {
+      final blockData = {
+        'type': blockType,
+        'title': _titleController.text,
+        'content': jsonEncode(_quillController.document.toDelta().toJson()),
+      };
+
+      if (_isEdit && _blockId != null) {
+        await _editController.updateBlock(_blockId!, blockData);
+      } else {
+        await _editController.addBlock(blockData);
+      }
+    }
+
+    Get.offAllNamed('/home');
+    Get.toNamed('/editCard', arguments: {'cardId': _editController.basicInfo['cardId']});
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text(blockType == 'text' 
-            ? '텍스트 블록' 
-            : '사진 블록'),
+        title: Text(_isEdit 
+            ? '${blockType == 'text' ? '텍스트' : '사진'} 블록 수정' 
+            : '${blockType == 'text' ? '텍스트' : '사진'} 블록'),
         actions: [
           IconButton(
             icon: const Icon(Icons.check),
-            onPressed: () async {
-              if (blockType == 'photo' && _imageFiles.isEmpty) {
-                Get.snackbar('오류', '사진을 선택해주세요.');
-                return;
-              }
-
-              if (blockType == 'photo') {
-                // 로딩 다이얼로그 표시
-                Get.dialog(
-                  const Center(
-                    child: CircularProgressIndicator(),
-                  ),
-                  barrierDismissible: false,
-                );
-
-                final imageUrls = await _uploadImages();
-                
-                // 로딩 다이얼로그 닫기
-                Get.back();
-
-                if (imageUrls.isEmpty) {
-                  Get.snackbar('오류', '이미지 업로드에 실패했습니다.');
-                  return;
-                }
-
-                final blockData = {
-                  'type': blockType,
-                  'title': _titleController.text,
-                  'content': imageUrls,
-                };
-                
-                await _editController.addBlock(blockData);
-                Get.offAllNamed('/home');
-                Get.toNamed('/editCard', arguments: {'cardId': _editController.basicInfo['cardId']});
-              } else {
-                final blockData = {
-                  'type': blockType,
-                  'title': _titleController.text,
-                  'content': jsonEncode(_quillController.document.toDelta().toJson()),
-                };
-                await _editController.addBlock(blockData);
-                Get.offAllNamed('/home');
-                Get.toNamed('/editCard', arguments: {'cardId': _editController.basicInfo['cardId']});
-              }
-            },
+            onPressed: _saveBlock,
           ),
         ],
       ),

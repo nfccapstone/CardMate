@@ -159,4 +159,16 @@ class EditCardController extends GetxController {
       Get.snackbar('오류', '링크 삭제에 실패했습니다.');
     }
   }
+
+  Future<void> updateBlock(String blockId, Map<String, dynamic> blockData) async {
+    try {
+      await _service.updateBlock(blockId, blockData);
+      // Firebase에서 최신 블록 목록을 다시 가져옴
+      final blocksData = await _service.fetchBlocks();
+      blocks.assignAll(blocksData);
+      Get.snackbar('성공', '블록이 수정되었습니다.');
+    } catch (e) {
+      Get.snackbar('오류', '블록 수정에 실패했습니다.');
+    }
+  }
 }
