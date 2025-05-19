@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:nfc_manager/nfc_manager.dart';
+import 'package:flutter_nfc_kit/flutter_nfc_kit.dart';
 
 class AddCardByNFCScreen extends StatefulWidget {
   @override
@@ -10,36 +10,23 @@ class _AddCardByNFCScreenState extends State<AddCardByNFCScreen> {
   String tagData = '';
 
   void _startNfcSession() async {
-    bool isAvailable = await NfcManager.instance.isAvailable();
-    if (!isAvailable) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text("NFC 사용 불가")));
-      return;
+    try {
+      // NFC 태그를 기다림
+      NFCTag tag = await FlutterNfcKit.poll();
+
+      // 태그 정보 출력
+      setState(() {
+        tagData = 'ID: ${tag.id}\nType: ${tag.type}\nStandard: ${tag.standard}';
+      });
+
+      // 읽기 완료 후 세션 종료
+      await FlutterNfcKit.finish();
+    } catch (e) {
+      setState(() {
+        tagData = '에러 발생: $e';
+      });
+      await FlutterNfcKit.finish(); // 오류 발생해도 세션은 종료해야 함
     }
-
-    // NfcManager.instance.startSession(
-    //   onDiscovered: (NfcTag tag) async {
-    //     // 태그 읽기 처리
-    //     setState(() {
-    //       tagData = tag.data.toString();
-    //     });
-
-    //     // 세션 종료
-    //     NfcManager.instance.stopSession();
-    //   },
-    // );
-
-    NfcManager.instance.startSession(onDiscovered: (NfcTag tag) async {
-      var id = tag.data['nfca']?['identifier'];
-      print("Raw ID: $id");
-      NfcManager.instance.stopSession();
-    });
-  }
-
-  @override
-  void dispose() {
-    NfcManager.instance.stopSession(); // 앱 종료 시 세션도 종료
-    super.dispose();
   }
 
   @override
