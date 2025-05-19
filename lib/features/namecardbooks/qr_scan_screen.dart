@@ -13,6 +13,42 @@ class QRScanScreen extends StatefulWidget {
 class _QRScanScreenState extends State<QRScanScreen> {
   final CardController cardController = Get.find<CardController>();
   MobileScannerController controller = MobileScannerController();
+  bool isProcessing = false;
+
+  Future<void> _processQRCode(String code) async {
+    if (isProcessing) return;
+    isProcessing = true;
+
+    try {
+      // URL에서 cardId 추출
+      final uri = Uri.parse(code);
+      final cardId = uri.pathSegments.last;
+      
+      // 명함 추가
+      await cardController.addCardById(cardId);
+      
+      // 스캔 중지
+      await controller.stop();
+      
+      // 성공 메시지 표시
+      Get.snackbar(
+        '성공',
+        '명함이 추가되었습니다.',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+
+      // 명함첩 화면으로 돌아가기
+      Get.until((route) => route.settings.name == '/home');
+    } catch (e) {
+      Get.snackbar(
+        '오류',
+        '명함 추가 중 오류가 발생했습니다.',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    } finally {
+      isProcessing = false;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -26,36 +62,12 @@ class _QRScanScreenState extends State<QRScanScreen> {
             flex: 5,
             child: MobileScanner(
               controller: controller,
-              onDetect: (capture) async {
+              onDetect: (capture) {
                 final List<Barcode> barcodes = capture.barcodes;
                 for (final barcode in barcodes) {
                   if (barcode.rawValue != null) {
-                    try {
-                      // URL에서 cardId 추출
-                      final uri = Uri.parse(barcode.rawValue!);
-                      final cardId = uri.pathSegments.last;
-                      
-                      // 명함 추가
-                      await cardController.addCardById(cardId);
-                      
-                      // 스캔 중지
-                      controller.stop();
-                      
-                      // 성공 메시지 표시 후 이전 화면으로 이동
-                      Get.snackbar(
-                        '성공',
-                        '명함이 추가되었습니다.',
-                        snackPosition: SnackPosition.BOTTOM,
-                      );
-                      Get.back();
-                      break;
-                    } catch (e) {
-                      Get.snackbar(
-                        '오류',
-                        '명함 추가 중 오류가 발생했습니다.',
-                        snackPosition: SnackPosition.BOTTOM,
-                      );
-                    }
+                    _processQRCode(barcode.rawValue!);
+                    return;
                   }
                 }
               },

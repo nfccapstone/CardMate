@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:nfc_manager/nfc_manager.dart';
+import 'package:get/get.dart';
+import 'package:cardmate/features/namecardbooks/card_controller.dart';
 
 class AddCardByNFCScreen extends StatefulWidget {
   @override
@@ -8,6 +10,7 @@ class AddCardByNFCScreen extends StatefulWidget {
 
 class _AddCardByNFCScreenState extends State<AddCardByNFCScreen> {
   String tagData = '';
+  final CardController cardController = Get.find<CardController>();
 
   void _startNfcSession() async {
     bool isAvailable = await NfcManager.instance.isAvailable();
@@ -17,22 +20,33 @@ class _AddCardByNFCScreenState extends State<AddCardByNFCScreen> {
       return;
     }
 
-    // NfcManager.instance.startSession(
-    //   onDiscovered: (NfcTag tag) async {
-    //     // 태그 읽기 처리
-    //     setState(() {
-    //       tagData = tag.data.toString();
-    //     });
-
-    //     // 세션 종료
-    //     NfcManager.instance.stopSession();
-    //   },
-    // );
-
     NfcManager.instance.startSession(onDiscovered: (NfcTag tag) async {
-      var id = tag.data['nfca']?['identifier'];
-      print("Raw ID: $id");
-      NfcManager.instance.stopSession();
+      try {
+        var id = tag.data['nfca']?['identifier'];
+        if (id != null) {
+          // 명함 추가
+          await cardController.addCardById(id.toString());
+          
+          // 성공 메시지 표시
+          Get.snackbar(
+            '성공',
+            '명함이 추가되었습니다.',
+            snackPosition: SnackPosition.BOTTOM,
+          );
+          
+          // 세션 종료
+          NfcManager.instance.stopSession();
+          
+          // 명함첩 화면으로 돌아가기
+          Get.back();
+        }
+      } catch (e) {
+        Get.snackbar(
+          '오류',
+          '명함 추가 중 오류가 발생했습니다.',
+          snackPosition: SnackPosition.BOTTOM,
+        );
+      }
     });
   }
 
