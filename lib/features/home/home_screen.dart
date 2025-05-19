@@ -6,6 +6,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'home_controller.dart';
 import 'package:cardmate/features/namecardbooks/namecardbooks_screen.dart';
+import 'package:cardmate/features/more/more_screen.dart';
+import 'package:cardmate/features/more/more_service.dart';
+import 'package:cardmate/features/more/more_controller.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -35,44 +38,7 @@ class _HomeScreenState extends State<HomeScreen> {
       const Center(child: Text('Net')),
       _buildHomeBody(controller),
       const Center(child: Text('AI 기능')),
-      Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          const Padding(
-            padding: EdgeInsets.all(16.0),
-            child: Text(
-              '더보기',
-              style: TextStyle(fontSize: 20, color: Colors.white),
-            ),
-          ),
-          const Divider(color: Colors.white24),
-          ListTile(
-              leading: const Icon(Icons.logout, color: Colors.white),
-              title: const Text('로그아웃', style: TextStyle(color: Colors.white)),
-              onTap: () {
-                // 로그아웃 처리
-                // 예시: Get.offAllNamed('/login');
-                Get.defaultDialog(
-                  title: "로그아웃",
-                  middleText: "정말 로그아웃 하시겠습니까?",
-                  textConfirm: "예",
-                  textCancel: "아니오",
-                  confirmTextColor: Colors.white,
-                  onConfirm: () async {
-                    // 로그아웃 로직 (예: 인증 해제 및 로그인 화면 이동)
-
-                    // SharedPreferences에서 자동 로그인 정보 삭제
-                    final prefs = await SharedPreferences.getInstance();
-                    await prefs.remove('email');
-                    await prefs.remove('password');
-
-                    // 로그인 화면으로 이동
-                    Get.offAllNamed('/login');
-                  },
-                );
-              }),
-        ],
-      )
+      const MoreScreen(),
     ];
 
     return Obx(() => Scaffold(

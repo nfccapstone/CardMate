@@ -105,16 +105,15 @@ class NamecardbooksScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 24),
                 _buildOptionButton(context, Icons.nfc, 'NFC 명함 태그', () {
-                  Get.to(() => AddCardByNFCScreen());
+                  Get.toNamed('/add-card-nfc');
                 }),
                 const SizedBox(height: 12),
-                _buildOptionButton(context, Icons.qr_code_scanner, 'QR 코드 찍기',
-                    () {
-                  Get.to(() => const QRScanScreen());
+                _buildOptionButton(context, Icons.qr_code_scanner, 'QR 코드 찍기', () {
+                  Get.toNamed('/qr-scan');
                 }),
                 const SizedBox(height: 12),
                 _buildOptionButton(context, Icons.edit, '아이디로 명함 등록', () {
-                  Get.to(() => AddCardByIdScreen());
+                  Get.toNamed('/add-card-id');
                 }),
               ],
             ),

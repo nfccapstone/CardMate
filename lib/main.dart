@@ -1,6 +1,7 @@
 import 'package:cardmate/features/card_id/card_id_binding.dart';
 import 'package:cardmate/features/card_id/card_id_screen.dart';
 import 'package:cardmate/features/home/home_binding.dart';
+import 'package:cardmate/features/more/more_binding.dart';
 import 'package:cardmate/features/namecard/screens/block_create_screen.dart';
 import 'package:cardmate/features/namecardbooks/edit_othercard_screen.dart';
 import 'package:cardmate/features/register/register_binding.dart';
@@ -26,6 +27,9 @@ import 'package:flutter/foundation.dart';
 import 'package:url_strategy/url_strategy.dart';
 import 'features/namecard/bindings/contact_bindings.dart';
 import 'features/namecardbooks/qr_scan_screen.dart';
+import 'features/more/more_screen.dart';
+import 'features/namecardbooks/add_card_byNFC_screen.dart';
+import 'features/namecardbooks/add_card_byId_screen.dart';
 
 void main() async {
   setPathUrlStrategy(); // 웹에서 # 없는 URL 사용
@@ -108,6 +112,19 @@ class CardMateApp extends StatelessWidget {
         GetPage(
           name: '/qr-scan',
           page: () => const QRScanScreen(),
+        ),
+        GetPage(
+          name: '/add-card-nfc',
+          page: () => AddCardByNFCScreen(),
+        ),
+        GetPage(
+          name: '/add-card-id',
+          page: () => AddCardByIdScreen(),
+        ),
+        GetPage(
+          name: '/more',
+          page: () => const MoreScreen(),
+          binding: MoreBinding(),
         ),
       ],
     );

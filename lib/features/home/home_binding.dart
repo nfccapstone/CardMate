@@ -3,6 +3,8 @@ import 'package:get/get.dart';
 import 'home_controller.dart';
 import 'home_service.dart';
 import 'services/i_home_service.dart';
+import 'package:cardmate/features/more/more_service.dart';
+import 'package:cardmate/features/more/more_controller.dart';
 
 class HomeBinding extends Bindings {
   @override
@@ -14,5 +16,8 @@ class HomeBinding extends Bindings {
       () => HomeController(homeService: Get.find<IHomeService>()),
     );
     Get.put(CardController());
+    // MoreService와 MoreController 등록
+    Get.lazyPut<MoreService>(() => MoreService());
+    Get.lazyPut<MoreController>(() => MoreController(moreService: Get.find<MoreService>()));
   }
 }

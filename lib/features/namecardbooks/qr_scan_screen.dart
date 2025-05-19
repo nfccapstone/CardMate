@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:cardmate/features/namecardbooks/card_controller.dart';
+import 'package:cardmate/features/home/home_controller.dart';
 
 class QRScanScreen extends StatefulWidget {
   const QRScanScreen({Key? key}) : super(key: key);
@@ -36,7 +37,6 @@ class _QRScanScreenState extends State<QRScanScreen> {
         '명함이 추가되었습니다.',
         snackPosition: SnackPosition.BOTTOM,
       );
-
       // 명함첩 화면으로 돌아가기
       Get.until((route) => route.settings.name == '/home');
     } catch (e) {
