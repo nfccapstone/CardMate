@@ -23,8 +23,13 @@ class NameCardListScreen extends StatelessWidget {
 
             return ListTile(
               leading: CircleAvatar(
-                backgroundImage: NetworkImage(card.profileUrl ?? ''),
+                backgroundImage: (card.profileUrl != null && card.profileUrl!.isNotEmpty)
+                    ? NetworkImage(card.profileUrl!)
+                    : null,
                 backgroundColor: Colors.grey[200],
+                child: (card.profileUrl == null || card.profileUrl!.isEmpty)
+                    ? const Icon(Icons.person, color: Colors.grey, size: 32)
+                    : null,
               ),
               title: Text(card.name ?? '이름 없음'),
               onTap: () async {
