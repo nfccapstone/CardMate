@@ -68,6 +68,45 @@ class NameCardListScreen extends StatelessWidget {
                   }
                 }
               },
+              onLongPress: () {
+                Get.dialog(
+                  AlertDialog(
+                    title: const Text('명함 삭제'),
+                    content: Text('${card.name ?? '이름 없는 명함'}을(를) 삭제하시겠습니까?'),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Get.back(),
+                        child: const Text('취소'),
+                      ),
+                      TextButton(
+                        onPressed: () async {
+                          try {
+                            await cardController.deleteCard(card.id);
+                            Get.back();
+                            Get.snackbar(
+                              '성공',
+                              '명함이 삭제되었습니다.',
+                              snackPosition: SnackPosition.BOTTOM,
+                              backgroundColor: Colors.black87,
+                              colorText: Colors.white,
+                            );
+                          } catch (e) {
+                            Get.back();
+                            Get.snackbar(
+                              '오류',
+                              '명함 삭제에 실패했습니다.',
+                              snackPosition: SnackPosition.BOTTOM,
+                              backgroundColor: Colors.black87,
+                              colorText: Colors.white,
+                            );
+                          }
+                        },
+                        child: const Text('삭제'),
+                      ),
+                    ],
+                  ),
+                );
+              },
             );
           },
         );
