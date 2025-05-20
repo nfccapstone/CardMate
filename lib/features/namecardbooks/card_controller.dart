@@ -8,12 +8,18 @@ class NameCard {
   final String? name;
   final String? profileUrl;
   final String? webLink;
+  final String? department;
+  final String? position;
+  final String? company;
 
   NameCard({
-    required this.id, 
-    this.name, 
+    required this.id,
+    this.name,
     this.profileUrl,
     this.webLink,
+    this.department,
+    this.position,
+    this.company,
   });
 
   factory NameCard.fromMap(String id, Map<String, dynamic> data) {
@@ -22,6 +28,9 @@ class NameCard {
       name: data['name'],
       profileUrl: data['profileImageUrl'],
       webLink: 'https://cardmate-37be3.web.app/card/myNameCard/$id',
+      department: data['department'],
+      position: data['position'],
+      company: data['company'],
     );
   }
 }
