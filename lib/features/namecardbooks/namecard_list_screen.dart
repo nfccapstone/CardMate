@@ -1,8 +1,7 @@
-import 'package:cardmate/features/namecard/namecard_bindings.dart';
 import 'package:cardmate/features/namecardbooks/card_controller.dart';
-import 'package:cardmate/features/namecardbooks/edit_othercard_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class NameCardListScreen extends StatelessWidget {
   const NameCardListScreen({super.key});
@@ -28,10 +27,21 @@ class NameCardListScreen extends StatelessWidget {
                 backgroundColor: Colors.grey[200],
               ),
               title: Text(card.name ?? '이름 없음'),
-              onTap: () {
-                Get.to(() => EditOtherCardScreen(cardId: card.id),
-                    binding: NameCardBindings());
-                //Get.toNamed('/editOtherCard');
+              onTap: () async {
+                if (card.webLink != null) {
+                  final Uri url = Uri.parse(card.webLink!);
+                  if (await canLaunchUrl(url)) {
+                    await launchUrl(url);
+                  } else {
+                    Get.snackbar(
+                      '오류',
+                      '링크를 열 수 없습니다.',
+                      snackPosition: SnackPosition.BOTTOM,
+                      backgroundColor: Colors.black87,
+                      colorText: Colors.white,
+                    );
+                  }
+                }
               },
             );
           },
