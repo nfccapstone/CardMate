@@ -16,12 +16,17 @@ class _AddCardByNFCScreenState extends State<AddCardByNFCScreen> {
   final CardController cardController = Get.find<CardController>();
 
   void _startNfcSession() async {
-    setState(() { isScanning = true; tagData = ''; });
+    setState(() {
+      isScanning = true;
+      tagData = '';
+    });
     bool isAvailable = await NfcManager.instance.isAvailable();
     if (!isAvailable) {
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text("NFC 사용 불가")));
-      setState(() { isScanning = false; });
+      setState(() {
+        isScanning = false;
+      });
       return;
     }
 
@@ -30,7 +35,8 @@ class _AddCardByNFCScreenState extends State<AddCardByNFCScreen> {
         final ndef = Ndef.from(tag);
         if (ndef == null) throw Exception('NDEF 지원 불가 태그');
         final cachedMessage = ndef.cachedMessage;
-        if (cachedMessage == null || cachedMessage.records.isEmpty) throw Exception('NDEF 메시지 없음');
+        if (cachedMessage == null || cachedMessage.records.isEmpty)
+          throw Exception('NDEF 메시지 없음');
 
         final payload = cachedMessage.records.first.payload;
         // URI 레코드의 첫 바이트는 prefix, 이후가 실제 URI
@@ -48,7 +54,9 @@ class _AddCardByNFCScreenState extends State<AddCardByNFCScreen> {
           snackPosition: SnackPosition.BOTTOM,
         );
         await NfcManager.instance.stopSession();
-        setState(() { isScanning = false; });
+        setState(() {
+          isScanning = false;
+        });
         Get.until((route) => route.settings.name == '/home');
       } catch (e) {
         Get.snackbar(
@@ -57,7 +65,9 @@ class _AddCardByNFCScreenState extends State<AddCardByNFCScreen> {
           snackPosition: SnackPosition.BOTTOM,
         );
         await NfcManager.instance.stopSession();
-        setState(() { isScanning = false; });
+        setState(() {
+          isScanning = false;
+        });
       }
     });
   }
@@ -134,7 +144,8 @@ class _AddCardByNFCScreenState extends State<AddCardByNFCScreen> {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.deepPurple,
                   foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
                   textStyle: const TextStyle(fontSize: 18),
                 ),
                 onPressed: _startNfcSession,
