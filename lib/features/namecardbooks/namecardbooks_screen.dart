@@ -1,5 +1,4 @@
 import 'package:cardmate/features/namecardbooks/add_card_byId_screen.dart';
-import 'package:cardmate/features/namecardbooks/add_card_byNFC_screen.dart';
 import 'package:cardmate/features/namecardbooks/card_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -105,7 +104,7 @@ class NamecardbooksScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 24),
                 _buildOptionButton(context, Icons.nfc, 'NFC 명함 태그', () {
-                  Get.to(() => AddCardByNFCScreen());
+                  //Get.to(() => AddCardByNFCScreen());
                 }),
                 const SizedBox(height: 12),
                 _buildOptionButton(context, Icons.qr_code_scanner, 'QR 코드 찍기',
