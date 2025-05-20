@@ -24,13 +24,13 @@ class _QRScanScreenState extends State<QRScanScreen> {
       // URL에서 cardId 추출
       final uri = Uri.parse(code);
       final cardId = uri.pathSegments.last;
-      
+
       // 명함 추가
       await cardController.addCardById(cardId);
-      
+
       // 스캔 중지
       await controller.stop();
-      
+
       // 성공 메시지 표시
       Get.snackbar(
         '성공',
@@ -204,16 +204,18 @@ class ScannerOverlayPainter extends CustomPainter {
     // 오른쪽 하단 모서리
     canvas.drawLine(
       Offset(scanAreaLeft + scanAreaSize, scanAreaTop + scanAreaSize),
-      Offset(scanAreaLeft + scanAreaSize - cornerLength, scanAreaTop + scanAreaSize),
+      Offset(scanAreaLeft + scanAreaSize - cornerLength,
+          scanAreaTop + scanAreaSize),
       cornerPaint,
     );
     canvas.drawLine(
       Offset(scanAreaLeft + scanAreaSize, scanAreaTop + scanAreaSize),
-      Offset(scanAreaLeft + scanAreaSize, scanAreaTop + scanAreaSize - cornerLength),
+      Offset(scanAreaLeft + scanAreaSize,
+          scanAreaTop + scanAreaSize - cornerLength),
       cornerPaint,
     );
   }
 
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
-} 
+}
