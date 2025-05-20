@@ -21,29 +21,26 @@ class _QRScanScreenState extends State<QRScanScreen> {
     isProcessing = true;
 
     try {
-      // URL에서 cardId 추출
       final uri = Uri.parse(code);
       final cardId = uri.pathSegments.last;
-
-      // 명함 추가
       await cardController.addCardById(cardId);
-
-      // 스캔 중지
       await controller.stop();
 
-      // 성공 메시지 표시
       Get.snackbar(
         '성공',
         '명함이 추가되었습니다.',
         snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.black87,
+        colorText: Colors.white,
       );
-      // 명함첩 화면으로 돌아가기
       Get.until((route) => route.settings.name == '/home');
     } catch (e) {
       Get.snackbar(
         '오류',
         '명함 추가 중 오류가 발생했습니다.',
         snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.black87,
+        colorText: Colors.white,
       );
     } finally {
       isProcessing = false;
@@ -53,81 +50,103 @@ class _QRScanScreenState extends State<QRScanScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.black,
+        backgroundColor: Colors.white,
+        elevation: 0,
         title: const Text(
           'QR 코드 스캔',
-          style: TextStyle(color: Colors.white),
+          style: TextStyle(
+            color: Colors.black87,
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+          ),
         ),
-        iconTheme: const IconThemeData(color: Colors.white),
+        iconTheme: const IconThemeData(color: Colors.black87),
       ),
-      body: Column(
-        children: <Widget>[
-          const SizedBox(height: 20),
-          const Text(
-            'QR 코드를 스캔하여\n명함을 추가하세요',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
+      body: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          children: <Widget>[
+            Container(
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: Colors.grey[50],
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: Colors.grey[200]!),
+              ),
+              child: Column(
+                children: [
+                  const Text(
+                    'QR 코드를 스캔하여\n명함을 추가하세요',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Colors.black87,
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  Container(
+                    width: MediaQuery.of(context).size.width * 0.8,
+                    height: MediaQuery.of(context).size.width * 0.8,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color: Colors.grey[300]!,
+                        width: 2,
+                      ),
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(14),
+                      child: Stack(
+                        children: [
+                          MobileScanner(
+                            controller: controller,
+                            onDetect: (capture) {
+                              final List<Barcode> barcodes = capture.barcodes;
+                              for (final barcode in barcodes) {
+                                if (barcode.rawValue != null) {
+                                  _processQRCode(barcode.rawValue!);
+                                  return;
+                                }
+                              }
+                            },
+                          ),
+                          Positioned.fill(
+                            child: CustomPaint(
+                              painter: ScannerOverlayPainter(),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-          const SizedBox(height: 30),
-          Expanded(
-            child: Center(
-              child: Container(
-                width: MediaQuery.of(context).size.width * 0.8,
-                height: MediaQuery.of(context).size.width * 0.8,
-                decoration: BoxDecoration(
-                  border: Border.all(
-                    color: Colors.white,
-                    width: 2,
-                  ),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(18),
-                  child: Stack(
-                    children: [
-                      MobileScanner(
-                        controller: controller,
-                        onDetect: (capture) {
-                          final List<Barcode> barcodes = capture.barcodes;
-                          for (final barcode in barcodes) {
-                            if (barcode.rawValue != null) {
-                              _processQRCode(barcode.rawValue!);
-                              return;
-                            }
-                          }
-                        },
-                      ),
-                      // 스캔 영역 표시
-                      Positioned.fill(
-                        child: CustomPaint(
-                          painter: ScannerOverlayPainter(),
-                        ),
-                      ),
-                    ],
-                  ),
+            const SizedBox(height: 24),
+            Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 20,
+                vertical: 12,
+              ),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.grey[200]!),
+              ),
+              child: const Text(
+                'QR 코드를 사각형 안에 맞춰주세요',
+                style: TextStyle(
+                  color: Colors.black54,
+                  fontSize: 16,
                 ),
               ),
             ),
-          ),
-          const SizedBox(height: 30),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-            child: const Text(
-              'QR 코드를 사각형 안에 맞춰주세요',
-              style: TextStyle(
-                color: Colors.white70,
-                fontSize: 16,
-              ),
-            ),
-          ),
-          const SizedBox(height: 20),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -143,25 +162,22 @@ class ScannerOverlayPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = Colors.white.withOpacity(0.3)
+      ..color = Colors.black.withOpacity(0.3)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 2;
 
-    // 스캔 영역의 크기
     final scanAreaSize = size.width * 0.7;
     final scanAreaLeft = (size.width - scanAreaSize) / 2;
     final scanAreaTop = (size.height - scanAreaSize) / 2;
 
-    // 스캔 영역 그리기
     canvas.drawRect(
       Rect.fromLTWH(scanAreaLeft, scanAreaTop, scanAreaSize, scanAreaSize),
       paint,
     );
 
-    // 모서리 강조
     final cornerLength = scanAreaSize * 0.1;
     final cornerPaint = Paint()
-      ..color = Colors.white
+      ..color = Colors.black
       ..style = PaintingStyle.stroke
       ..strokeWidth = 4;
 

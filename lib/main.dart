@@ -3,7 +3,6 @@ import 'package:cardmate/features/card_id/card_id_screen.dart';
 import 'package:cardmate/features/home/home_binding.dart';
 import 'package:cardmate/features/more/more_binding.dart';
 import 'package:cardmate/features/namecard/screens/block_create_screen.dart';
-import 'package:cardmate/features/namecardbooks/edit_othercard_screen.dart';
 import 'package:cardmate/features/register/register_binding.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
