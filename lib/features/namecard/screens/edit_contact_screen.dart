@@ -75,6 +75,7 @@ class EditContactScreen extends StatelessWidget {
                 hintText: hint,
                 border: const OutlineInputBorder(),
                 helperText: _buildHelperText(type),
+                hintStyle: const TextStyle(color: Colors.black),
               ),
             ),
           ],

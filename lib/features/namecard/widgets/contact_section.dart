@@ -134,7 +134,10 @@ class ContactSection extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(width: 8),
-                        Text(value),
+                        Text(
+                          value,
+                          style: const TextStyle(color: Colors.black),
+                        ),
                       ],
                     ),
                     IconButton(
