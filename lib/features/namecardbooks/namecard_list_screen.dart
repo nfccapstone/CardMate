@@ -32,8 +32,9 @@ class NameCardListScreen extends StatelessWidget {
                     : null,
               ),
               title: Text(card.name ?? '이름 없음'),
-              subtitle: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              trailing: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Text(
                     (card.department != null && card.position != null)
