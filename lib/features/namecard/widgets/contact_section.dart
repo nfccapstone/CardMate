@@ -107,18 +107,19 @@ class ContactSection extends StatelessWidget {
             return GestureDetector(
               onLongPress: () => _showDeleteDialog(type, value),
               child: Container(
-                margin: const EdgeInsets.only(bottom: 8),
-                padding: const EdgeInsets.all(12),
+                margin: const EdgeInsets.only(bottom: 12),
+                padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(14),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.grey.shade200,
-                      blurRadius: 4,
-                      offset: const Offset(0, 2),
+                      color: Colors.grey.withOpacity(0.10),
+                      blurRadius: 12,
+                      offset: const Offset(0, 4),
                     ),
                   ],
+                  border: Border.all(color: Colors.grey[200]!),
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,

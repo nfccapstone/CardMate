@@ -6,6 +6,7 @@ import '../services/i_namecard_service.dart';
 import '../services/namecard_service.dart';
 import '../widgets/profile_section.dart';
 import '../utils/platform_icon_utils.dart';
+import '../widgets/block_readonly_card.dart';
 
 class CardWebScreen extends StatelessWidget {
   final String cardId;
@@ -96,30 +97,42 @@ class CardWebScreen extends StatelessWidget {
         return SingleChildScrollView(
           child: Column(
             children: [
-              // 프로필 이미지
+              // 프로필 카드
               Container(
-                width: double.infinity,
-                height: 300,
+                margin: const EdgeInsets.only(bottom: 16, top: 16),
+                padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: Colors.grey[200],
-                  image: cardData['profileImageUrl'] != null
-                      ? DecorationImage(
-                          image: NetworkImage(cardData['profileImageUrl']),
-                          fit: BoxFit.cover,
-                        )
-                      : null,
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(14),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.10),
+                      blurRadius: 12,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                  border: Border.all(color: Colors.grey[200]!),
                 ),
-                child: cardData['profileImageUrl'] == null
-                    ? const Icon(Icons.person, size: 120, color: Colors.grey)
-                    : null,
-              ),
-
-              // 기본 정보
-              Padding(
-                padding: const EdgeInsets.all(32),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    Container(
+                      width: double.infinity,
+                      height: 180,
+                      decoration: BoxDecoration(
+                        color: Colors.grey[200],
+                        image: cardData['profileImageUrl'] != null
+                            ? DecorationImage(
+                                image: NetworkImage(cardData['profileImageUrl']),
+                                fit: BoxFit.cover,
+                              )
+                            : null,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: cardData['profileImageUrl'] == null
+                          ? const Icon(Icons.person, size: 80, color: Colors.grey)
+                          : null,
+                    ),
+                    const SizedBox(height: 20),
                     ProfileSection(
                       basicInfo: {
                         'name': cardData['name'],
@@ -132,12 +145,23 @@ class CardWebScreen extends StatelessWidget {
                   ],
                 ),
               ),
-
-              // 연락처 정보
+              // 연락처 카드
               if (cardData['contacts'] != null) ...[
-                const Divider(height: 1),
-                Padding(
-                  padding: const EdgeInsets.all(32),
+                Container(
+                  margin: const EdgeInsets.only(bottom: 16),
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(14),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(0.10),
+                        blurRadius: 12,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                    border: Border.all(color: Colors.grey[200]!),
+                  ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -192,7 +216,7 @@ class CardWebScreen extends StatelessWidget {
 
                             return Container(
                               margin: const EdgeInsets.only(bottom: 16),
-                              padding: const EdgeInsets.all(24),
+                              padding: const EdgeInsets.all(20),
                               decoration: BoxDecoration(
                                 color: Colors.grey[50],
                                 borderRadius: BorderRadius.circular(12),
@@ -237,12 +261,23 @@ class CardWebScreen extends StatelessWidget {
                   ),
                 ),
               ],
-
-              // 링크 정보
+              // 링크 카드
               if (cardData['links'] != null && (cardData['links'] as List).isNotEmpty) ...[
-                const Divider(height: 1),
-                Padding(
-                  padding: const EdgeInsets.all(32),
+                Container(
+                  margin: const EdgeInsets.only(bottom: 16),
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(14),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(0.10),
+                        blurRadius: 12,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                    border: Border.all(color: Colors.grey[200]!),
+                  ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -257,40 +292,62 @@ class CardWebScreen extends StatelessWidget {
                       ...(cardData['links'] as List).map((link) {
                         final title = link['title'] ?? '';
                         final url = link['url'] ?? '';
-                        
                         return Container(
                           margin: const EdgeInsets.only(bottom: 16),
+                          padding: const EdgeInsets.all(20),
+                          decoration: BoxDecoration(
+                            color: Colors.grey[50],
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: Colors.grey[200]!),
+                          ),
                           child: InkWell(
                             onTap: () => _launchUrl(url),
-                            child: Container(
-                              padding: const EdgeInsets.all(24),
-                              decoration: BoxDecoration(
-                                color: Colors.grey[50],
-                                borderRadius: BorderRadius.circular(12),
-                                border: Border.all(color: Colors.grey[200]!),
-                              ),
-                              child: Row(
-                                children: [
-                                  _getPlatformIcon(link['platform'] ?? 'direct'),
-                                  const SizedBox(width: 16),
-                                  Expanded(
-                                    child: Text(
-                                      title,
-                                      style: const TextStyle(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.w500,
-                                        color: Colors.black,
-                                      ),
+                            child: Row(
+                              children: [
+                                _getPlatformIcon(link['platform'] ?? 'direct'),
+                                const SizedBox(width: 16),
+                                Expanded(
+                                  child: Text(
+                                    title,
+                                    style: const TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.w500,
+                                      color: Colors.black,
                                     ),
                                   ),
-                                  const Icon(Icons.open_in_new, color: Colors.deepPurple),
-                                ],
-                              ),
+                                ),
+                                const Icon(Icons.open_in_new, color: Colors.deepPurple),
+                              ],
                             ),
                           ),
                         );
                       }).toList(),
                     ],
+                  ),
+                ),
+              ],
+              // 블록 카드 (BlockReadOnlyCard 재사용)
+              if (cardData['blocks'] != null && (cardData['blocks'] as List).isNotEmpty) ...[
+                Container(
+                  margin: const EdgeInsets.only(bottom: 16),
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(14),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(0.10),
+                        blurRadius: 12,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                    border: Border.all(color: Colors.grey[200]!),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: (cardData['blocks'] as List)
+                        .map((block) => BlockReadOnlyCard(block: block))
+                        .toList(),
                   ),
                 ),
               ],

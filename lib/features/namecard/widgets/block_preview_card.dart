@@ -61,18 +61,19 @@ class _BlockPreviewCardState extends State<BlockPreviewCard> {
     final content = widget.block['content'];
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.all(16),
+      margin: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(14),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.shade200,
-            blurRadius: 4,
-            offset: const Offset(0, 2),
+            color: Colors.grey.withOpacity(0.10),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
           ),
         ],
+        border: Border.all(color: Colors.grey[200]!),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -196,6 +197,14 @@ class _BlockPreviewCardState extends State<BlockPreviewCard> {
                         controller: quillController,
                         sharedConfigurations: const quill.QuillSharedConfigurations(),
                         enableInteractiveSelection: false,
+                        customStyles: quill.DefaultStyles(
+                          paragraph: quill.DefaultTextBlockStyle(
+                            TextStyle(color: Colors.black, fontSize: 14),
+                            const quill.VerticalSpacing(0, 0),
+                            const quill.VerticalSpacing(0, 0),
+                            null,
+                          ),
+                        ),
                       ),
                     );
                   } catch (e) {

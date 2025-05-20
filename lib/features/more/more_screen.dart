@@ -143,10 +143,10 @@ class MoreScreen extends StatelessWidget {
                             color: Colors.black.withOpacity(0.03),
                             borderRadius: BorderRadius.circular(12),
                           ),
-                          child: const Icon(
-                            Icons.nfc,
-                            size: 48,
-                            color: Colors.black87,
+                          child: Image.asset(
+                            'assets/icons/NFCScan.png',
+                            width: 48,
+                            height: 48,
                           ),
                         ),
                         const SizedBox(height: 20),

@@ -42,46 +42,109 @@ class EditCardScreen extends StatelessWidget {
           return const Center(child: CircularProgressIndicator());
         }
         final blocks = editController.blocks;
-        // children 리스트를 만들면서 blockStartIndex를 동적으로 계산
         final List<Widget> children = [];
-        children.add(_NonReorderable(key: const ValueKey('profile'), child: ProfileSection(basicInfo: editController.basicInfo)));
-        children.add(_NonReorderable(key: const ValueKey('profile_space'), child: const SizedBox(height: 20)));
-        children.add(_NonReorderable(key: const ValueKey('contact'), child: ContactSection(controller: contactController)));
-        children.add(_NonReorderable(key: const ValueKey('contact_space'), child: const SizedBox(height: 20)));
-        children.add(_NonReorderable(key: const ValueKey('links'), child: const LinkSection()));
-        children.add(_NonReorderable(key: const ValueKey('links_space'), child: const SizedBox(height: 20)));
-
-        final int blockStartIndex = children.length; // 블록이 시작되는 인덱스
-
+        // 프로필 카드
+        children.add(_NonReorderable(
+          key: const ValueKey('profile'),
+          child: Container(
+            margin: const EdgeInsets.only(bottom: 16),
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(14),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.10),
+                  blurRadius: 12,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+              border: Border.all(color: Colors.grey[200]!),
+            ),
+            child: ProfileSection(basicInfo: editController.basicInfo),
+          ),
+        ));
+        children.add(_NonReorderable(key: const ValueKey('profile_space'), child: const SizedBox(height: 12)));
+        // 연락처 카드
+        children.add(_NonReorderable(
+          key: const ValueKey('contact'),
+          child: Container(
+            margin: const EdgeInsets.only(bottom: 16),
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(14),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.10),
+                  blurRadius: 12,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+              border: Border.all(color: Colors.grey[200]!),
+            ),
+            child: ContactSection(controller: contactController),
+          ),
+        ));
+        children.add(_NonReorderable(key: const ValueKey('contact_space'), child: const SizedBox(height: 12)));
+        // 링크 카드
+        children.add(_NonReorderable(
+          key: const ValueKey('links'),
+          child: Container(
+            margin: const EdgeInsets.only(bottom: 16),
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(14),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.10),
+                  blurRadius: 12,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+              border: Border.all(color: Colors.grey[200]!),
+            ),
+            child: const LinkSection(),
+          ),
+        ));
+        children.add(_NonReorderable(key: const ValueKey('links_space'), child: const SizedBox(height: 12)));
+        final int blockStartIndex = children.length;
+        // 블록 카드
         children.addAll(blocks.map((block) => BlockPreviewCard(
           key: ValueKey(block['id']),
           block: block,
         )));
-
         children.add(_NonReorderable(key: const ValueKey('block_space'), child: const SizedBox(height: 20)));
-        children.add(_NonReorderable(key: const ValueKey('contact_add_btn'), child: _buildContactAddButton(context, contactController)));
+        // 추가 버튼들
+        children.add(_NonReorderable(
+          key: const ValueKey('contact_add_btn'),
+          child: _buildContactAddButton(context, contactController),
+        ));
         children.add(_NonReorderable(key: const ValueKey('contact_add_space'), child: const SizedBox(height: 12)));
-        children.add(_NonReorderable(key: const ValueKey('block_add_btn'), child: _buildBlockAddButton(context, editController)));
+        children.add(_NonReorderable(
+          key: const ValueKey('block_add_btn'),
+          child: _buildBlockAddButton(context, editController),
+        ));
         children.add(_NonReorderable(key: const ValueKey('block_add_space'), child: const SizedBox(height: 12)));
-        children.add(_NonReorderable(key: const ValueKey('link_add_btn'), child: _buildLinkAddButton(context)));
+        children.add(_NonReorderable(
+          key: const ValueKey('link_add_btn'),
+          child: _buildLinkAddButton(context),
+        ));
         children.add(_NonReorderable(key: const ValueKey('bottom_space'), child: const SizedBox(height: 40)));
 
         return ReorderableListView(
           onReorder: (oldIndex, newIndex) {
             final blockStart = blockStartIndex;
             final blockEnd = blockStart + blocks.length - 1;
-
-            // 블록 영역이 아닐 때만 무시 (맨 뒤로 이동도 허용)
             if (oldIndex < blockStart || oldIndex > blockEnd || newIndex < blockStart || newIndex > blockEnd + 1) {
               return;
             }
-
             int blockOldIndex = oldIndex - blockStart;
             int blockNewIndex = newIndex - blockStart;
             if (blockNewIndex > blockOldIndex) blockNewIndex -= 1;
             if (blockNewIndex < 0) blockNewIndex = 0;
             if (blockNewIndex > blocks.length) blockNewIndex = blocks.length;
-
             editController.reorderBlocks(blockOldIndex, blockNewIndex);
           },
           children: children,
@@ -137,42 +200,17 @@ class EditCardScreen extends StatelessWidget {
   }
 
   void _showBlockTypeBottomSheet(EditCardController controller) {
-    Get.bottomSheet(
-      Container(
-        padding: const EdgeInsets.symmetric(vertical: 20),
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(20),
-            topRight: Radius.circular(20),
-          ),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ListTile(
-              leading: const Icon(Icons.text_fields),
-              title: const Text('텍스트 블록'),
-              onTap: () => _navigateToBlockCreateScreen('text', controller),
-            ),
-            ListTile(
-              leading: const Icon(Icons.photo),
-              title: const Text('사진 블록'),
-              onTap: () => _navigateToBlockCreateScreen('photo', controller),
-            ),
-          ],
-        ),
-      ),
-    );
+    Get.toNamed('/blockCreate');
   }
 
   void _navigateToBlockCreateScreen(
       String blockType, EditCardController controller) async {
-    Get.back(); // BottomSheet 닫기
-    await Get.toNamed(
-      '/blockCreate',
-      arguments: {'type': blockType},
-    );
+    // 이 함수는 더 이상 사용하지 않음
+    // Get.back(); // BottomSheet 닫기
+    // await Get.toNamed(
+    //   '/blockCreate',
+    //   arguments: {'type': blockType},
+    // );
   }
 
   Widget _buildLinkAddButton(BuildContext context) {
