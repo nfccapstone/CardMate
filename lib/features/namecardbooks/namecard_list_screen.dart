@@ -18,22 +18,24 @@ class NameCardListScreen extends StatelessWidget {
         }
 
         return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-          child: ListView.builder(
-            itemCount: cardController.cards.length,
-            itemBuilder: (context, index) {
-              final card = cardController.cards[index];
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+            child: ListView.builder(
+              itemCount: cardController.cards.length,
+              itemBuilder: (context, index) {
+                final card = cardController.cards[index];
 
-              return Container(
-                margin: const EdgeInsets.only(bottom: 15),
-                height: 60,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(6),
-                  border: Border.all(color: Colors.grey.shade300),
-                ),
-                child: InkWell(
-                  borderRadius: BorderRadius.circular(12),
+                return ListTile(
+                  leading: CircleAvatar(
+                    backgroundImage:
+                        (card.profileUrl != null && card.profileUrl!.isNotEmpty)
+                            ? NetworkImage(card.profileUrl!)
+                            : null,
+                    backgroundColor: Colors.grey[200],
+                    child: (card.profileUrl == null || card.profileUrl!.isEmpty)
+                        ? const Icon(Icons.person, color: Colors.grey, size: 32)
+                        : null,
+                  ),
+                  title: Text(card.name ?? '이름 없음'),
                   onTap: () async {
                     if (card.webLink != null) {
                       final Uri url = Uri.parse(card.webLink!);
@@ -50,39 +52,9 @@ class NameCardListScreen extends StatelessWidget {
                       }
                     }
                   },
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 12, horizontal: 16),
-                    child: Row(
-                      children: [
-                        CircleAvatar(
-                          radius: 26,
-                          backgroundImage: card.profileUrl != null
-                              ? NetworkImage(card.profileUrl!)
-                              : null,
-                          backgroundColor: Colors.grey[200],
-                        ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: Text(
-                            card.name ?? '이름 없음',
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.black87,
-                            ),
-                          ),
-                        ),
-                        const Icon(Icons.arrow_forward_ios,
-                            size: 16, color: Colors.grey),
-                      ],
-                    ),
-                  ),
-                ),
-              );
-            },
-          ),
-        );
+                );
+              },
+            ));
       }),
     );
   }

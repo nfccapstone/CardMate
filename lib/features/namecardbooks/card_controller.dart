@@ -20,7 +20,7 @@ class NameCard {
     return NameCard(
       id: id,
       name: data['name'],
-      profileUrl: data['profileUrl'],
+      profileUrl: data['profileImageUrl'],
       webLink: 'https://cardmate-37be3.web.app/card/myNameCard/$id',
     );
   }

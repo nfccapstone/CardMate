@@ -222,6 +222,8 @@ class _BlockCreateScreenState extends State<BlockCreateScreen> {
                 decoration: const InputDecoration(
                   labelText: '제목 입력',
                   hintText: '내용 입력',
+                  labelStyle: TextStyle(color: Colors.black),
+                  hintStyle: TextStyle(color: Colors.black),
                 ),
               ),
               const SizedBox(height: 16),
