@@ -89,7 +89,7 @@ class _ContactSectionReadOnly extends StatelessWidget {
           final value = contact['value'];
           IconData icon;
           VoidCallback? onTap;
-          if (type == 'phone') {
+          if (type == 'mobile' || type == 'phone') {
             icon = Icons.phone;
             onTap = () => launchUrl(Uri.parse('tel:$value'));
           } else if (type == 'email') {
@@ -104,7 +104,7 @@ class _ContactSectionReadOnly extends StatelessWidget {
           }
           return ListTile(
             leading: Icon(icon, color: Colors.deepPurple),
-            title: Text(value),
+            title: Text(value, style: const TextStyle(color: Colors.black)),
             onTap: onTap,
           );
         }).toList(),
@@ -170,6 +170,7 @@ class _LinkSectionReadOnly extends StatelessWidget {
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w500,
+                        color: Colors.black,
                       ),
                     ),
                   ),

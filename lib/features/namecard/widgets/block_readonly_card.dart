@@ -44,7 +44,7 @@ class _BlockReadOnlyCardState extends State<BlockReadOnlyCard> {
         children: [
           Text(
             '[${type.toUpperCase()}] $title',
-            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.black),
           ),
           const SizedBox(height: 8),
           if (type == 'photo' && content is List) ...[

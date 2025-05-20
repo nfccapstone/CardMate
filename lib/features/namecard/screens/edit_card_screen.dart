@@ -245,7 +245,7 @@ class EditCardScreen extends StatelessWidget {
                     decoration: const InputDecoration(
                       hintText: '예: 회사 홈페이지',
                       border: OutlineInputBorder(),
-                      hintStyle: TextStyle(color: Colors.black),
+                      hintStyle: TextStyle(color: Colors.grey),
                     ),
                   ),
                   const SizedBox(height: 20),
@@ -276,7 +276,7 @@ class EditCardScreen extends StatelessWidget {
                     decoration: InputDecoration(
                       hintText: getHintText(),
                       border: const OutlineInputBorder(),
-                      hintStyle: const TextStyle(color: Colors.black),
+                      hintStyle: const TextStyle(color: Colors.grey),
                     ),
                     keyboardType: TextInputType.text,
                   ),

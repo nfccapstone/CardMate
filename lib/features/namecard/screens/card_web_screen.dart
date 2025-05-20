@@ -188,7 +188,7 @@ class CardWebScreen extends StatelessWidget {
                                       _getContactTypeLabel(type),
                                       style: const TextStyle(
                                         fontSize: 16,
-                                        color: Colors.grey,
+                                        color: Colors.black,
                                       ),
                                     ),
                                     const SizedBox(height: 4),
@@ -197,6 +197,7 @@ class CardWebScreen extends StatelessWidget {
                                       style: const TextStyle(
                                         fontSize: 20,
                                         fontWeight: FontWeight.w500,
+                                        color: Colors.black,
                                       ),
                                     ),
                                   ],
@@ -253,6 +254,7 @@ class CardWebScreen extends StatelessWidget {
                                       style: const TextStyle(
                                         fontSize: 20,
                                         fontWeight: FontWeight.w500,
+                                        color: Colors.black,
                                       ),
                                     ),
                                   ),
