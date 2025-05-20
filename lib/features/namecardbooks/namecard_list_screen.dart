@@ -36,6 +36,27 @@ class NameCardListScreen extends StatelessWidget {
                         : null,
                   ),
                   title: Text(card.name ?? '이름 없음'),
+                  subtitle: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        (card.department != null && card.position != null)
+                            ? '${card.department}/${card.position}'
+                            : (card.department ?? card.position ?? ''),
+                        style:
+                            const TextStyle(fontSize: 12, color: Colors.white),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      Text(
+                        card.company ?? '',
+                        style:
+                            const TextStyle(fontSize: 12, color: Colors.white),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
                   onTap: () async {
                     if (card.webLink != null) {
                       final Uri url = Uri.parse(card.webLink!);
