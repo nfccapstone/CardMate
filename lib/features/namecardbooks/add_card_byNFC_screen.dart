@@ -10,10 +10,28 @@ class AddCardByNFCScreen extends StatefulWidget {
   _AddCardByNFCScreenState createState() => _AddCardByNFCScreenState();
 }
 
-class _AddCardByNFCScreenState extends State<AddCardByNFCScreen> {
+class _AddCardByNFCScreenState extends State<AddCardByNFCScreen> with SingleTickerProviderStateMixin {
   String tagData = '';
   bool isScanning = false;
   final CardController cardController = Get.find<CardController>();
+  late AnimationController _pulseController;
+  late Animation<double> _pulseAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _pulseController = AnimationController(
+      duration: const Duration(milliseconds: 1500),
+      vsync: this,
+    )..repeat(reverse: true);
+    
+    _pulseAnimation = Tween<double>(begin: 1.0, end: 1.3).animate(
+      CurvedAnimation(
+        parent: _pulseController,
+        curve: Curves.easeInOut,
+      ),
+    );
+  }
 
   void _startNfcSession() async {
     setState(() {
@@ -81,6 +99,7 @@ class _AddCardByNFCScreenState extends State<AddCardByNFCScreen> {
 
   @override
   void dispose() {
+    _pulseController.dispose();
     NfcManager.instance.stopSession();
     super.dispose();
   }
@@ -103,104 +122,131 @@ class _AddCardByNFCScreenState extends State<AddCardByNFCScreen> {
         centerTitle: true,
         iconTheme: const IconThemeData(color: Colors.black87),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(24),
-              decoration: BoxDecoration(
-                color: Colors.grey[50],
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: Colors.grey[200]!),
-              ),
-              child: Column(
-                children: [
-                  const Text(
-                    "NFC 명함 태그를\n스마트폰에 가까이 대세요",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: Colors.black87,
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
+      body: Center(
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                width: 320,
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 28),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(18),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.18),
+                      blurRadius: 18,
+                      offset: const Offset(0, 8),
                     ),
-                  ),
-                  const SizedBox(height: 32),
-                  AnimatedContainer(
-                    duration: const Duration(milliseconds: 500),
-                    width: isScanning ? 140 : 120,
-                    height: isScanning ? 140 : 120,
-                    decoration: BoxDecoration(
-                      color: Colors.black.withOpacity(0.03),
-                      borderRadius: BorderRadius.circular(16),
-                      boxShadow: isScanning
-                          ? [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.1),
-                                blurRadius: 30,
-                                spreadRadius: 8,
-                              ),
-                            ]
-                          : [],
-                    ),
-                    child: Center(
-                      child: Icon(
-                        Icons.nfc,
-                        size: 64,
-                        color: Colors.black.withOpacity(0.5),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 32),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 20,
-                      vertical: 12,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: Colors.grey[200]!),
-                    ),
-                    child: Text(
-                      isScanning
-                          ? (tagData.isEmpty
-                              ? "NFC 태그를 기다리는 중..."
-                              : "명함 링크 인식 완료!")
-                          : (tagData.isEmpty ? "스캔을 시작하세요" : tagData),
-                      style: TextStyle(
-                        color: tagData.isEmpty
-                            ? Colors.black54
-                            : Colors.green,
-                        fontSize: 16,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 40),
-            if (!isScanning)
-              ElevatedButton.icon(
-                icon: const Icon(Icons.play_arrow),
-                label: const Text("스캔 시작"),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.black,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 32,
-                    vertical: 16,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  elevation: 0,
+                  ],
+                  border: Border.all(color: Colors.grey[200]!),
                 ),
-                onPressed: _startNfcSession,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Text(
+                      "NFC 명함 태그를\n스마트폰에 가까이 대세요",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: Colors.black87,
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        if (isScanning)
+                          AnimatedBuilder(
+                            animation: _pulseAnimation,
+                            builder: (context, child) {
+                              return Transform.scale(
+                                scale: _pulseAnimation.value,
+                                child: Container(
+                                  width: 120,
+                                  height: 120,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: Colors.blue.withOpacity(0.15),
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        Container(
+                          width: 88,
+                          height: 88,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Colors.white,
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.04),
+                                blurRadius: 8,
+                                spreadRadius: 1,
+                              ),
+                            ],
+                          ),
+                          child: Center(
+                            child: Image.asset(
+                              'assets/icons/NFCScan.png',
+                              width: 56,
+                              height: 56,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 24),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 10,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(color: Colors.grey[200]!),
+                      ),
+                      child: Text(
+                        isScanning
+                            ? (tagData.isEmpty
+                                ? "NFC 태그를 기다리는 중..."
+                                : "명함 링크 인식 완료!")
+                            : (tagData.isEmpty ? "스캔을 시작하세요" : tagData),
+                        style: TextStyle(
+                          color: tagData.isEmpty ? Colors.black54 : Colors.green,
+                          fontSize: 15,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ],
+                ),
               ),
-          ],
+              const SizedBox(height: 32),
+              if (!isScanning)
+                ElevatedButton.icon(
+                  icon: const Icon(Icons.play_arrow),
+                  label: const Text("스캔 시작"),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.black,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 32,
+                      vertical: 16,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    elevation: 0,
+                  ),
+                  onPressed: _startNfcSession,
+                ),
+            ],
+          ),
         ),
       ),
     );
