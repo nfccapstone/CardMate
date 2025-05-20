@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'dart:collection';
 import '../services/i_namecard_service.dart';
 import '../services/namecard_service.dart';
 import '../widgets/profile_section.dart';
@@ -36,6 +37,24 @@ class CardWebScreen extends StatelessWidget {
         isLoading.value = true;
         final data = await nameCardService.getCardForWeb(cardId);
         if (data != null) {
+          // 연락처 순서 정렬
+          if (data['contacts'] != null) {
+            final contacts = data['contacts'] as Map<String, dynamic>;
+            final sortedEntries = contacts.entries.toList()
+              ..sort((a, b) {
+                final typeOrder = {
+                  'mobile': 0,
+                  'phone': 1,
+                  'email': 2,
+                  'website': 3,
+                };
+                final aOrder = typeOrder[a.key] ?? 999;
+                final bOrder = typeOrder[b.key] ?? 999;
+                return aOrder.compareTo(bOrder);
+              });
+            
+            data['contacts'] = LinkedHashMap.fromEntries(sortedEntries);
+          }
           cardData.value = data;
         } else {
           error.value = '명함을 찾을 수 없습니다.';
@@ -130,84 +149,90 @@ class CardWebScreen extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 24),
-                      ...(cardData['contacts'] as Map<String, dynamic>).entries.map((entry) {
-                        final type = entry.key;
-                        final value = entry.value;
-                        IconData icon;
-                        List<Widget> actions = [];
+                      ...(cardData['contacts'] as Map<String, dynamic>)
+                          .entries
+                          .toList()
+                          .map((entry) {
+                            final type = entry.key;
+                            final value = entry.value;
+                            IconData icon;
+                            List<Widget> actions = [];
 
-                        if (type == 'mobile' || type == 'phone') {
-                          icon = Icons.phone;
-                          actions = [
-                            IconButton(
-                              icon: const Icon(Icons.call, color: Colors.black87),
-                              onPressed: () => _launchUrl('tel:$value'),
-                            ),
-                            IconButton(
-                              icon: const Icon(Icons.message, color: Colors.black87),
-                              onPressed: () => _launchUrl('sms:$value'),
-                            ),
-                          ];
-                        } else if (type == 'email') {
-                          icon = Icons.email;
-                          actions = [
-                            IconButton(
-                              icon: const Icon(Icons.email, color: Colors.black87),
-                              onPressed: () => _launchUrl('mailto:$value'),
-                            ),
-                          ];
-                        } else if (type == 'website') {
-                          icon = Icons.language;
-                          actions = [
-                            IconButton(
-                              icon: const Icon(Icons.open_in_browser, color: Colors.black87),
-                              onPressed: () => _launchUrl(value),
-                            ),
-                          ];
-                        } else {
-                          icon = Icons.contact_phone;
-                        }
-
-                        return Container(
-                          margin: const EdgeInsets.only(bottom: 16),
-                          padding: const EdgeInsets.all(24),
-                          decoration: BoxDecoration(
-                            color: Colors.grey[50],
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: Colors.grey[200]!),
-                          ),
-                          child: Row(
-                            children: [
-                              Icon(icon, color: Colors.deepPurple, size: 32),
-                              const SizedBox(width: 16),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      _getContactTypeLabel(type),
-                                      style: const TextStyle(
-                                        fontSize: 16,
-                                        color: Colors.black,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 4),
-                                    Text(
-                                      value,
-                                      style: const TextStyle(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.w500,
-                                        color: Colors.black,
-                                      ),
-                                    ),
-                                  ],
+                            if (type == 'mobile' || type == 'phone') {
+                              icon = Icons.phone;
+                              actions = [
+                                IconButton(
+                                  icon: const Icon(Icons.call, color: Colors.black87),
+                                  onPressed: () => _launchUrl('tel:$value'),
                                 ),
+                                IconButton(
+                                  icon: const Icon(Icons.message, color: Colors.black87),
+                                  onPressed: () => _launchUrl('sms:$value'),
+                                ),
+                              ];
+                            } else if (type == 'email') {
+                              icon = Icons.email;
+                              actions = [
+                                IconButton(
+                                  icon: const Icon(Icons.email, color: Colors.black87),
+                                  onPressed: () => _launchUrl('mailto:$value'),
+                                ),
+                              ];
+                            } else if (type == 'website') {
+                              icon = Icons.language;
+                              actions = [
+                                IconButton(
+                                  icon: const Icon(Icons.open_in_browser, color: Colors.black87),
+                                  onPressed: () => _launchUrl(value),
+                                ),
+                              ];
+                            } else {
+                              icon = Icons.contact_phone;
+                            }
+
+                            return Container(
+                              margin: const EdgeInsets.only(bottom: 16),
+                              padding: const EdgeInsets.all(24),
+                              decoration: BoxDecoration(
+                                color: Colors.grey[50],
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(color: Colors.grey[200]!),
                               ),
-                              ...actions,
-                            ],
-                          ),
-                        );
-                      }).toList(),
+                              child: Row(
+                                children: [
+                                  Icon(icon, color: Colors.deepPurple, size: 32),
+                                  const SizedBox(width: 16),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          _getContactTypeLabel(type),
+                                          style: const TextStyle(
+                                            fontSize: 16,
+                                            color: Colors.black,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 4),
+                                        Text(
+                                          value,
+                                          style: const TextStyle(
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.w500,
+                                            color: Colors.black,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  ...actions,
+                                ],
+                              ),
+                            );
+                          })
+                          .toList()
+                          .reversed
+                          .toList(),
                     ],
                   ),
                 ),

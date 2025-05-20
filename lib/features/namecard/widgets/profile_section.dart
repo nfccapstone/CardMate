@@ -24,29 +24,59 @@ class ProfileSection extends StatelessWidget {
         color: Colors.black,
         borderRadius: BorderRadius.circular(12),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Row(
         children: [
-          Text(
-            data['name'] ?? '이름 없음',
-            style: const TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
+          // 프로필 이미지
+          Container(
+            width: 80,
+            height: 80,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: Colors.grey[800],
+              image: data['profileImageUrl'] != null && data['profileImageUrl'].isNotEmpty
+                  ? DecorationImage(
+                      image: NetworkImage(data['profileImageUrl']),
+                      fit: BoxFit.cover,
+                    )
+                  : null,
             ),
+            child: data['profileImageUrl'] == null || data['profileImageUrl'].isEmpty
+                ? const Icon(
+                    Icons.person,
+                    size: 40,
+                    color: Colors.white70,
+                  )
+                : null,
           ),
-          const SizedBox(height: 6),
-          Text(
-            '${data['department'] ?? ''} / ${data['position'] ?? ''}',
-            style: const TextStyle(
-              fontSize: 14,
-              color: Colors.white70,
+          const SizedBox(width: 20),
+          // 프로필 정보
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  data['name'] ?? '이름 없음',
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  '${data['department'] ?? ''} / ${data['position'] ?? ''}',
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: Colors.white70,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  data['company'] ?? '',
+                  style: const TextStyle(fontSize: 14, color: Colors.white70),
+                ),
+              ],
             ),
-          ),
-          const SizedBox(height: 6),
-          Text(
-            data['company'] ?? '',
-            style: const TextStyle(fontSize: 14, color: Colors.white70),
           ),
         ],
       ),
