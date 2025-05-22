@@ -106,7 +106,8 @@ class NameCardListScreen extends StatelessWidget {
                                   child: OutlinedButton(
                                     onPressed: () => Get.back(),
                                     style: OutlinedButton.styleFrom(
-                                      padding: const EdgeInsets.symmetric(vertical: 12),
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 12),
                                       shape: RoundedRectangleBorder(
                                         borderRadius: BorderRadius.circular(8),
                                       ),
@@ -119,7 +120,8 @@ class NameCardListScreen extends StatelessWidget {
                                   child: ElevatedButton(
                                     onPressed: () async {
                                       try {
-                                        await cardController.deleteCard(card.id);
+                                        await cardController
+                                            .deleteCard(card.id);
                                         Get.back();
                                         Get.snackbar(
                                           '성공',
@@ -142,7 +144,8 @@ class NameCardListScreen extends StatelessWidget {
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: Colors.black,
                                       foregroundColor: Colors.white,
-                                      padding: const EdgeInsets.symmetric(vertical: 12),
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 12),
                                       shape: RoundedRectangleBorder(
                                         borderRadius: BorderRadius.circular(8),
                                       ),
@@ -178,11 +181,14 @@ class NameCardListScreen extends StatelessWidget {
                       CircleAvatar(
                         radius: 28,
                         backgroundColor: Colors.grey[100],
-                        backgroundImage: (card.profileUrl != null && card.profileUrl!.isNotEmpty)
+                        backgroundImage: (card.profileUrl != null &&
+                                card.profileUrl!.isNotEmpty)
                             ? NetworkImage(card.profileUrl!)
                             : null,
-                        child: (card.profileUrl == null || card.profileUrl!.isEmpty)
-                            ? const Icon(Icons.person, color: Colors.grey, size: 32)
+                        child: (card.profileUrl == null ||
+                                card.profileUrl!.isEmpty)
+                            ? const Icon(Icons.person,
+                                color: Colors.grey, size: 32)
                             : null,
                       ),
                       const SizedBox(width: 16),
