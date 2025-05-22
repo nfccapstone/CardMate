@@ -113,10 +113,10 @@ class EditCardController extends GetxController {
     try {
       // 로컬 상태에서 먼저 제거하여 즉시 UI 업데이트
       blocks.removeWhere((block) => block['id'] == blockId);
-      
+
       // Firebase에서 블록 삭제
       await _service.deleteBlock(blockId);
-      
+
       Get.snackbar('성공', '블록이 삭제되었습니다.');
     } catch (e) {
       // 실패 시 다시 블록 목록을 가져와서 상태 복구
@@ -130,15 +130,37 @@ class EditCardController extends GetxController {
     return await _service.uploadImage(imageBytes, fileName);
   }
 
+  Future<void> loadManualCardDataByCardId(String cardId) async {
+    // 이미 같은 카드 ID의 데이터가 로드되어 있다면 다시 로드하지 않음
+    if (_loadedCardId == cardId) return;
+
+    isLoading.value = true;
+    _loadedCardId = cardId; // 먼저 _loadedCardId 설정
+
+    try {
+      final data = await _service.fetchManualCard(cardId);
+
+      if (data != null) {
+        otherBasicInfo.assignAll(data);
+      } else {
+        Get.snackbar('오류', '명함 정보를 불러오지 못했습니다.');
+      }
+    } catch (e) {
+      Get.snackbar('오류', '명함 정보를 불러오는 중 오류가 발생했습니다.');
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
   Future<void> reorderBlocks(int oldIndex, int newIndex) async {
     try {
       // 로컬 상태 먼저 업데이트
       final block = blocks.removeAt(oldIndex);
       blocks.insert(newIndex, block);
-      
+
       // Firebase에 순서 업데이트
       await _service.updateBlockOrder(blocks);
-      
+
       Get.snackbar('성공', '블록 순서가 변경되었습니다.');
     } catch (e) {
       // 실패 시 원래 순서로 복구
@@ -164,10 +186,10 @@ class EditCardController extends GetxController {
     try {
       // 로컬 상태에서 먼저 제거하여 즉시 UI 업데이트
       links.removeWhere((link) => link['id'] == linkId);
-      
+
       // Firebase에서 링크 삭제
       await _service.deleteLink(linkId);
-      
+
       Get.snackbar('성공', '링크가 삭제되었습니다.');
     } catch (e) {
       // 실패 시 다시 링크 목록을 가져와서 상태 복구
@@ -177,7 +199,8 @@ class EditCardController extends GetxController {
     }
   }
 
-  Future<void> updateBlock(String blockId, Map<String, dynamic> blockData) async {
+  Future<void> updateBlock(
+      String blockId, Map<String, dynamic> blockData) async {
     try {
       await _service.updateBlock(blockId, blockData);
       // Firebase에서 최신 블록 목록을 다시 가져옴

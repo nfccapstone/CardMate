@@ -104,4 +104,74 @@ class ContactService implements IContactService {
       rethrow;
     }
   }
+
+  @override
+  Future<void> saveManualCardContact(
+      String type, String value, String? cardId) async {
+    final uid = _auth.currentUser?.uid;
+    if (uid == null) return;
+
+    try {
+      // card_contact 서브컬렉션에 연락처 정보 저장
+      await _firestore
+          .collection('users')
+          .doc(uid)
+          .collection('card_book')
+          .doc(cardId)
+          .collection('card_contact')
+          .doc('contacts')
+          .set({
+        type: value,
+      }, SetOptions(merge: true));
+    } catch (e) {
+      print('연락처 저장 오류: $e');
+      rethrow;
+    }
+  }
+
+  Future<Map<String, String>?> fetchManualCardContacts([String? cardId]) async {
+    final uid = _auth.currentUser?.uid;
+    if (uid == null) return null;
+
+    try {
+      final doc = await _firestore
+          .collection('users')
+          .doc(uid)
+          .collection('card_book')
+          .doc(cardId)
+          .collection('card_contact')
+          .doc('contacts')
+          .get();
+
+      if (doc.exists && doc.data() != null) {
+        return Map<String, String>.from(doc.data()!);
+      }
+      return null;
+    } catch (e) {
+      print('연락처 불러오기 오류: $e');
+      return null;
+    }
+  }
+
+  Future<void> deleteManualCardContact(String type, String? cardId) async {
+    final uid = _auth.currentUser?.uid;
+    if (uid == null) return;
+
+    try {
+      // card_contact 서브컬렉션에서 연락처 정보 삭제
+      await _firestore
+          .collection('users')
+          .doc(uid)
+          .collection('card_book')
+          .doc(cardId)
+          .collection('card_contact')
+          .doc('contacts')
+          .update({
+        type: FieldValue.delete(),
+      });
+    } catch (e) {
+      print('연락처 삭제 오류: $e');
+      rethrow;
+    }
+  }
 }

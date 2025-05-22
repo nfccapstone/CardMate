@@ -3,6 +3,8 @@ import 'package:cardmate/features/card_id/card_id_screen.dart';
 import 'package:cardmate/features/home/home_binding.dart';
 import 'package:cardmate/features/more/more_binding.dart';
 import 'package:cardmate/features/namecard/screens/block_create_screen.dart';
+import 'package:cardmate/features/namecardbooks/add_card_manual_screen.dart';
+import 'package:cardmate/features/namecardbooks/edit_manual_card_screen.dart';
 import 'package:cardmate/features/register/register_binding.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -15,8 +17,6 @@ import 'features/namecard/screens/namecard_info_screen.dart';
 import 'features/namecard/screens/edit_contact_screen.dart';
 import 'features/namecard/bindings/main_namecard_bindings.dart';
 import 'features/login/login_bindings.dart';
-import 'features/namecard/services/namecard_service.dart';
-import 'features/namecard/services/i_namecard_service.dart';
 import 'features/namecard/screens/my_namecard_screen.dart';
 import 'features/namecard/controllers/my_namecard_controller.dart';
 import 'features/namecard/services/edit_card_service.dart';
@@ -27,10 +27,10 @@ import 'package:url_strategy/url_strategy.dart';
 import 'features/namecard/bindings/contact_bindings.dart';
 import 'features/namecardbooks/qr_scan_screen.dart';
 import 'features/more/more_screen.dart';
-import 'features/namecardbooks/add_card_byNFC_screen.dart';
-import 'features/namecardbooks/add_card_byId_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'features/namecardbooks/add_card_by_nfc_screen.dart';
+import 'features/namecardbooks/add_card_by_id_screen.dart';
 
 void main() async {
   setPathUrlStrategy();
@@ -44,8 +44,8 @@ void main() async {
   final auth = FirebaseAuth.instance;
 
   runApp(MyApp(
-    initialRoute: kIsWeb 
-        ? null 
+    initialRoute: kIsWeb
+        ? null
         : (email != null && password != null && auth.currentUser != null)
             ? '/home'
             : '/',
@@ -133,9 +133,22 @@ class MyApp extends StatelessWidget {
           page: () => AddCardByIdScreen(),
         ),
         GetPage(
+          name: '/add-card-manual',
+          page: () => AddCardManualScreen(),
+        ),
+        GetPage(
           name: '/more',
           page: () => const MoreScreen(),
           binding: MoreBinding(),
+        ),
+        GetPage(
+          name: '/edit-manual-card',
+          page: () {
+            final args = Get.arguments as Map<String, dynamic>?;
+            final cardId = args?['cardId'] ?? '';
+            return EditManualCardScreen(cardId: cardId);
+          },
+          binding: MainNameCardBindings(),
         ),
       ],
     );

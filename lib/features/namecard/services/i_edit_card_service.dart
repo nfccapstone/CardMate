@@ -12,7 +12,7 @@ abstract class IEditCardService {
   Future<List<Map<String, dynamic>>> fetchBlocksByCardId(String cardId);
   Future<Map<String, dynamic>?> fetchBasicInfoByCardId(String cardId);
   Future<void> updateBlockOrder(List<Map<String, dynamic>> blocks);
-  
+
   // 링크 관련 메서드 추가
   Future<void> addLink(Map<String, String> linkData);
   Future<List<Map<String, String>>> fetchLinks();
@@ -24,4 +24,6 @@ abstract class IEditCardService {
 
   // 캐시 초기화 메서드 추가
   void clearCache();
+
+  fetchManualCard(String cardId) {}
 }

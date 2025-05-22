@@ -105,7 +105,7 @@ class EditCardService implements IEditCardService {
       // 새로운 Map을 생성하여 원본 데이터 보존
       final dataToSave = Map<String, dynamic>.from(blockData);
       dataToSave['createdAt'] = FieldValue.serverTimestamp();
-      
+
       await _firestore
           .collection('cards')
           .doc(cardId)
@@ -244,6 +244,21 @@ class EditCardService implements IEditCardService {
   Future<Map<String, dynamic>?> fetchBasicInfoByCardId(String cardId) async {
     try {
       final doc = await _firestore.collection('cards').doc(cardId).get();
+      return doc.exists ? doc.data() : null;
+    } catch (e) {
+      print('타인 명함 정보 불러오기 오류: $e');
+      return null;
+    }
+  }
+
+  Future<Map<String, dynamic>?> fetchManualCard(String cardId) async {
+    try {
+      final doc = await _firestore
+          .collection('users')
+          .doc(_auth.currentUser?.uid)
+          .collection('card_book')
+          .doc(cardId)
+          .get();
       return doc.exists ? doc.data() : null;
     } catch (e) {
       print('타인 명함 정보 불러오기 오류: $e');
@@ -474,7 +489,8 @@ class EditCardService implements IEditCardService {
   }
 
   @override
-  Future<void> updateBlock(String blockId, Map<String, dynamic> blockData) async {
+  Future<void> updateBlock(
+      String blockId, Map<String, dynamic> blockData) async {
     final uid = _auth.currentUser?.uid;
     if (uid == null) return;
     final cardId = await getCardId(uid);
@@ -484,7 +500,7 @@ class EditCardService implements IEditCardService {
       // 새로운 Map을 생성하여 원본 데이터 보존
       final dataToSave = Map<String, dynamic>.from(blockData);
       dataToSave['updatedAt'] = FieldValue.serverTimestamp();
-      
+
       await _firestore
           .collection('cards')
           .doc(cardId)
