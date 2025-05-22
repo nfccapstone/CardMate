@@ -30,7 +30,9 @@ class CardUpdateAlertList extends StatelessWidget {
             ),
             title: Text('${alert.cardOwnerName}님이 명함을 수정했습니다.'),
             subtitle: Text(_timeAgo(alert.updatedAt)),
-            onTap: () => controller.markAlertAsRead(myUid, alert.cardId),
+            onTap: () {
+              Get.toNamed('/card/myNameCard/${alert.cardId}');
+            },
           );
         },
       );
