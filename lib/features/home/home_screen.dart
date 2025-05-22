@@ -153,6 +153,14 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildHomeBody(HomeController controller) {
     return Obx(() {
+      if (controller.isLoading.value) {
+        return const Center(
+          child: CircularProgressIndicator(
+            valueColor: AlwaysStoppedAnimation<Color>(Colors.black),
+          ),
+        );
+      }
+
       if (!controller.isCardRegistered.value || controller.cardData.isEmpty) {
         return Center(
           child: GestureDetector(
