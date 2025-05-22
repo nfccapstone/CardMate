@@ -130,30 +130,6 @@ class EditCardController extends GetxController {
     return await _service.uploadImage(imageBytes, fileName);
   }
 
-  Future<void> loadNameCardDataByCardId(String cardId) async {
-    // 이미 같은 카드 ID의 데이터가 로드되어 있다면 다시 로드하지 않음
-    if (_loadedCardId == cardId) return;
-
-    isLoading.value = true;
-    _loadedCardId = cardId; // 먼저 _loadedCardId 설정
-
-    try {
-      final data = await _service.fetchBasicInfoByCardId(cardId);
-      if (data != null) {
-        otherBasicInfo.assignAll(data);
-      } else {
-        Get.snackbar('오류', '명함 정보를 불러오지 못했습니다.');
-      }
-
-      final blocksData = await _service.fetchBlocksByCardId(cardId);
-      otherBlocks.assignAll(blocksData);
-    } catch (e) {
-      Get.snackbar('오류', '명함 정보를 불러오는 중 오류가 발생했습니다.');
-    } finally {
-      isLoading.value = false;
-    }
-  }
-
   Future<void> loadManualCardDataByCardId(String cardId) async {
     // 이미 같은 카드 ID의 데이터가 로드되어 있다면 다시 로드하지 않음
     if (_loadedCardId == cardId) return;
@@ -163,7 +139,6 @@ class EditCardController extends GetxController {
 
     try {
       final data = await _service.fetchManualCard(cardId);
-      print("%%%%%%%%%%%" + data['name']);
 
       if (data != null) {
         otherBasicInfo.assignAll(data);

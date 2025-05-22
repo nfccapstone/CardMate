@@ -62,7 +62,7 @@ class _AddCardManualScreenState extends State<AddCardManualScreen> {
                     ),
                     const SizedBox(height: 16),
                     TextFormField(
-                      //controller: cardController.nameController,
+                      controller: cardController.nameController,
                       decoration: InputDecoration(
                         labelText: '이름',
                         labelStyle: TextStyle(color: Colors.grey[600]),
@@ -94,7 +94,7 @@ class _AddCardManualScreenState extends State<AddCardManualScreen> {
                     ),
                     const SizedBox(height: 16),
                     TextFormField(
-                      //controller: cardController.positionController,
+                      controller: cardController.positionController,
                       decoration: InputDecoration(
                         labelText: '직책',
                         labelStyle: TextStyle(color: Colors.grey[600]),
@@ -126,7 +126,7 @@ class _AddCardManualScreenState extends State<AddCardManualScreen> {
                     ),
                     const SizedBox(height: 16),
                     TextFormField(
-                      //controller: cardController.departmentController,
+                      controller: cardController.departmentController,
                       decoration: InputDecoration(
                         labelText: '부서',
                         labelStyle: TextStyle(color: Colors.grey[600]),
@@ -158,7 +158,7 @@ class _AddCardManualScreenState extends State<AddCardManualScreen> {
                     ),
                     const SizedBox(height: 16),
                     TextFormField(
-                      //controller: cardController.companyController,
+                      controller: cardController.companyController,
                       decoration: InputDecoration(
                         labelText: '회사',
                         labelStyle: TextStyle(color: Colors.grey[600]),
@@ -195,6 +195,7 @@ class _AddCardManualScreenState extends State<AddCardManualScreen> {
               ElevatedButton(
                 onPressed: () {
                   if (_formKey.currentState!.validate()) {
+                    print("버튼 눌러짐");
                     cardController.addCardManual();
                     Get.back();
                   }

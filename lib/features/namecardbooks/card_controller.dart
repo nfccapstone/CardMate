@@ -55,6 +55,13 @@ class CardController extends GetxController {
     fetchNameCards();
   }
 
+  void cleaer() {
+    nameController.clear();
+    positionController.clear();
+    departmentController.clear();
+    companyController.clear();
+  }
+
   Future<void> addCardManual() async {
     if (nameController.text.isEmpty) {
       Get.snackbar('오류', '이름을 입력해주세요.');
@@ -100,6 +107,7 @@ class CardController extends GetxController {
       Get.snackbar('오류', '저장에 실패했습니다.');
     } finally {
       isSaving.value = false;
+      cleaer();
     }
   }
 
