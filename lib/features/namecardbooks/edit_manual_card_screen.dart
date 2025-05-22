@@ -1,3 +1,4 @@
+
 import 'package:cardmate/features/namecardbooks/manual_card_detail_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -275,3 +276,4 @@ class _EditManualCardScreenState extends State<EditManualCardScreen> {
     }
   }
 } 
+

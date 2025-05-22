@@ -1,6 +1,7 @@
 import 'package:cardmate/firebase/firebase_init.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class NameCard {
@@ -66,10 +67,74 @@ class CardController extends GetxController {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
   final cards = <NameCard>[].obs;
 
+  final isSaving = false.obs;
+  final nameController = TextEditingController();
+  final positionController = TextEditingController();
+  final departmentController = TextEditingController();
+  final companyController = TextEditingController();
+
+  int manualCardId = 0;
+
   @override
   void onInit() {
     super.onInit();
     fetchNameCards();
+  }
+
+  void cleaer() {
+    nameController.clear();
+    positionController.clear();
+    departmentController.clear();
+    companyController.clear();
+  }
+
+  Future<void> addCardManual() async {
+    if (nameController.text.isEmpty) {
+      Get.snackbar('오류', '이름을 입력해주세요.');
+      return;
+    }
+
+    isSaving.value = true;
+    try {
+      final userId = _auth.currentUser?.uid;
+      final cardBookSnapshot = await _db
+          .collection('users')
+          .doc(userId)
+          .collection('card_book')
+          .get();
+
+      int maxId = 0;
+      for (var doc in cardBookSnapshot.docs) {
+        try {
+          final id = int.parse(doc.id);
+          if (id > maxId) maxId = id;
+        } catch (e) {
+          continue;
+        }
+      }
+      manualCardId = maxId + 1;
+
+      await _db
+          .collection('users')
+          .doc(userId)
+          .collection('card_book')
+          .doc(manualCardId.toString())
+          .set({
+        'name': nameController.text,
+        'position': positionController.text,
+        'department': departmentController.text,
+        'company': companyController.text,
+      });
+
+      await fetchNameCards();
+
+      Get.back(result: true);
+    } catch (e) {
+      Get.snackbar('오류', '저장에 실패했습니다.');
+    } finally {
+      isSaving.value = false;
+      cleaer();
+    }
   }
 
   Future<void> addCardById(String cardId) async {
@@ -105,6 +170,7 @@ class CardController extends GetxController {
         final cardDoc = await _db.collection('cards').doc(cardId).get();
         if (cardDoc.exists) {
           fetchedCards.add(NameCard.fromMap(cardDoc.id, cardDoc.data()!));
+
         }
       }
 
@@ -142,7 +208,8 @@ class CardController extends GetxController {
         if (data != null) {
           final name = (data['name'] ?? '').toString().toLowerCase();
           final company = (data['company'] ?? '').toString().toLowerCase();
-          final department = (data['department'] ?? '').toString().toLowerCase();
+          final department =
+              (data['department'] ?? '').toString().toLowerCase();
           final position = (data['position'] ?? '').toString().toLowerCase();
 
           // 이름, 회사, 부서, 직책 중 하나라도 검색어를 포함하면 결과에 추가

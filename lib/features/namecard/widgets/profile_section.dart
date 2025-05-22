@@ -6,9 +6,9 @@ import 'package:get/get.dart';
 class ProfileSection extends StatelessWidget {
   final Map<String, dynamic> basicInfo;
   final bool readOnly;
-  
+
   const ProfileSection({
-    Key? key, 
+    Key? key,
     required this.basicInfo,
     this.readOnly = false,
   }) : super(key: key);
@@ -33,14 +33,16 @@ class ProfileSection extends StatelessWidget {
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: Colors.grey[800],
-              image: data['profileImageUrl'] != null && data['profileImageUrl'].isNotEmpty
+              image: data['profileImageUrl'] != null &&
+                      data['profileImageUrl'].isNotEmpty
                   ? DecorationImage(
                       image: NetworkImage(data['profileImageUrl']),
                       fit: BoxFit.cover,
                     )
                   : null,
             ),
-            child: data['profileImageUrl'] == null || data['profileImageUrl'].isEmpty
+            child: data['profileImageUrl'] == null ||
+                    data['profileImageUrl'].isEmpty
                 ? const Icon(
                     Icons.person,
                     size: 40,
@@ -82,13 +84,13 @@ class ProfileSection extends StatelessWidget {
       ),
     );
 
-    return readOnly 
-      ? profileContent
-      : GestureDetector(
-          onTap: () {
-            Get.toNamed('/namecardInfo');
-          },
-          child: profileContent,
-        );
+    return readOnly
+        ? profileContent
+        : GestureDetector(
+            onTap: () {
+              Get.toNamed('/namecardInfo');
+            },
+            child: profileContent,
+          );
   }
 }
