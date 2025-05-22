@@ -89,9 +89,19 @@ class EditCardService implements IEditCardService {
           .doc(cardId)
           .collection('card_block')
           .add(dataToSave);
+
+      // card_data 서브컬렉션의 updatedAt 필드 업데이트
+      await _firestore
+          .collection('cards')
+          .doc(cardId)
+          .collection('card_data')
+          .doc('data')
+          .set({
+        'updatedAt': FieldValue.serverTimestamp(),
+      }, SetOptions(merge: true));
     } catch (e) {
       print('블록 저장 오류: $e');
-      rethrow;  // 에러를 상위로 전파하여 컨트롤러에서 처리할 수 있도록 함
+      rethrow;
     }
   }
 
@@ -175,6 +185,16 @@ class EditCardService implements IEditCardService {
           .collection('card_block')
           .doc(blockId)
           .delete();
+
+      // card_data 서브컬렉션의 updatedAt 필드 업데이트
+      await _firestore
+          .collection('cards')
+          .doc(cardId)
+          .collection('card_data')
+          .doc('data')
+          .set({
+        'updatedAt': FieldValue.serverTimestamp(),
+      }, SetOptions(merge: true));
     } catch (e) {
       print('블록 삭제 오류: $e');
       rethrow;
@@ -293,6 +313,16 @@ class EditCardService implements IEditCardService {
           'order': i,
         });
       }
+
+      // card_data 서브컬렉션의 updatedAt 필드 업데이트
+      await _firestore
+          .collection('cards')
+          .doc(cardId)
+          .collection('card_data')
+          .doc('data')
+          .set({
+        'updatedAt': FieldValue.serverTimestamp(),
+      }, SetOptions(merge: true));
     } catch (e) {
       print('블록 순서 업데이트 오류: $e');
       rethrow;
@@ -319,6 +349,16 @@ class EditCardService implements IEditCardService {
           .doc(cardId)
           .collection('card_link')
           .add(dataToSave);
+
+      // card_data 서브컬렉션의 updatedAt 필드 업데이트
+      await _firestore
+          .collection('cards')
+          .doc(cardId)
+          .collection('card_data')
+          .doc('data')
+          .set({
+        'updatedAt': FieldValue.serverTimestamp(),
+      }, SetOptions(merge: true));
     } catch (e) {
       print('링크 저장 오류: $e');
       rethrow;
@@ -393,6 +433,16 @@ class EditCardService implements IEditCardService {
           .collection('card_link')
           .doc(linkId)
           .delete();
+
+      // card_data 서브컬렉션의 updatedAt 필드 업데이트
+      await _firestore
+          .collection('cards')
+          .doc(cardId)
+          .collection('card_data')
+          .doc('data')
+          .set({
+        'updatedAt': FieldValue.serverTimestamp(),
+      }, SetOptions(merge: true));
     } catch (e) {
       print('링크 삭제 오류: $e');
       rethrow;
@@ -417,6 +467,16 @@ class EditCardService implements IEditCardService {
           .collection('card_block')
           .doc(blockId)
           .update(dataToSave);
+
+      // card_data 서브컬렉션의 updatedAt 필드 업데이트
+      await _firestore
+          .collection('cards')
+          .doc(cardId)
+          .collection('card_data')
+          .doc('data')
+          .set({
+        'updatedAt': FieldValue.serverTimestamp(),
+      }, SetOptions(merge: true));
     } catch (e) {
       print('블록 수정 오류: $e');
       rethrow;
