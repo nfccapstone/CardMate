@@ -7,7 +7,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:cardmate/features/namecard/utils/platform_icon_utils.dart';
 
 class MyNameCardScreen extends StatelessWidget {
-  const MyNameCardScreen({Key? key}) : super(key: key);
+  const MyNameCardScreen({super.key});
 
   Future<void> _launchUrl(String url) async {
     final uri = Uri.parse(url);
@@ -125,7 +125,8 @@ class MyNameCardScreen extends StatelessWidget {
                     ],
                     border: Border.all(color: Colors.grey[200]!),
                   ),
-                  child: BlockSection(blocks: controller.blocks, readOnly: true),
+                  child:
+                      BlockSection(blocks: controller.blocks, readOnly: true),
                 ),
               const SizedBox(height: 40),
             ],
@@ -171,7 +172,7 @@ class _ContactSectionReadOnly extends StatelessWidget {
             onTap = null;
           }
           return ListTile(
-            leading: Icon(icon, color: Colors.deepPurple),
+            leading: Icon(icon, color: Colors.black87),
             title: Text(value, style: const TextStyle(color: Colors.black)),
             onTap: onTap,
           );
@@ -213,40 +214,43 @@ class _LinkSectionReadOnly extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 12),
-        ...links.map<Widget>((link) => Padding(
-          padding: const EdgeInsets.only(bottom: 12),
-          child: InkWell(
-            onTap: () {
-              final url = link['url'] ?? '';
-              if (url.isNotEmpty) {
-                _launchUrl(url);
-              }
-            },
-            child: Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.grey[100],
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Row(
-                children: [
-                  PlatformIconUtils.getPlatformIcon(link['platform'] ?? 'direct'),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Text(
-                      link['title'] ?? '',
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.black,
+        ...links
+            .map<Widget>((link) => Padding(
+                  padding: const EdgeInsets.only(bottom: 12),
+                  child: InkWell(
+                    onTap: () {
+                      final url = link['url'] ?? '';
+                      if (url.isNotEmpty) {
+                        _launchUrl(url);
+                      }
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.grey[100],
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Row(
+                        children: [
+                          PlatformIconUtils.getPlatformIcon(
+                              link['platform'] ?? 'direct'),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              link['title'] ?? '',
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.black,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
-                ],
-              ),
-            ),
-          ),
-        )).toList(),
+                ))
+            .toList(),
       ],
     );
   }

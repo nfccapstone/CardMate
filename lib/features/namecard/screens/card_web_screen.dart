@@ -10,7 +10,7 @@ import '../widgets/block_readonly_card.dart';
 
 class CardWebScreen extends StatelessWidget {
   final String cardId;
-  
+
   const CardWebScreen({
     super.key,
     required this.cardId,
@@ -53,7 +53,7 @@ class CardWebScreen extends StatelessWidget {
                 final bOrder = typeOrder[b.key] ?? 999;
                 return aOrder.compareTo(bOrder);
               });
-            
+
             data['contacts'] = LinkedHashMap.fromEntries(sortedEntries);
           }
           cardData.value = data;
@@ -122,14 +122,16 @@ class CardWebScreen extends StatelessWidget {
                         color: Colors.grey[200],
                         image: cardData['profileImageUrl'] != null
                             ? DecorationImage(
-                                image: NetworkImage(cardData['profileImageUrl']),
+                                image:
+                                    NetworkImage(cardData['profileImageUrl']),
                                 fit: BoxFit.cover,
                               )
                             : null,
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: cardData['profileImageUrl'] == null
-                          ? const Icon(Icons.person, size: 80, color: Colors.grey)
+                          ? const Icon(Icons.person,
+                              size: 80, color: Colors.grey)
                           : null,
                     ),
                     const SizedBox(height: 20),
@@ -186,11 +188,13 @@ class CardWebScreen extends StatelessWidget {
                               icon = Icons.phone;
                               actions = [
                                 IconButton(
-                                  icon: const Icon(Icons.call, color: Colors.black87),
+                                  icon: const Icon(Icons.call,
+                                      color: Colors.black87),
                                   onPressed: () => _launchUrl('tel:$value'),
                                 ),
                                 IconButton(
-                                  icon: const Icon(Icons.message, color: Colors.black87),
+                                  icon: const Icon(Icons.message,
+                                      color: Colors.black87),
                                   onPressed: () => _launchUrl('sms:$value'),
                                 ),
                               ];
@@ -198,7 +202,8 @@ class CardWebScreen extends StatelessWidget {
                               icon = Icons.email;
                               actions = [
                                 IconButton(
-                                  icon: const Icon(Icons.email, color: Colors.black87),
+                                  icon: const Icon(Icons.email,
+                                      color: Colors.black87),
                                   onPressed: () => _launchUrl('mailto:$value'),
                                 ),
                               ];
@@ -206,7 +211,8 @@ class CardWebScreen extends StatelessWidget {
                               icon = Icons.language;
                               actions = [
                                 IconButton(
-                                  icon: const Icon(Icons.open_in_browser, color: Colors.black87),
+                                  icon: const Icon(Icons.open_in_browser,
+                                      color: Colors.black87),
                                   onPressed: () => _launchUrl(value),
                                 ),
                               ];
@@ -224,11 +230,12 @@ class CardWebScreen extends StatelessWidget {
                               ),
                               child: Row(
                                 children: [
-                                  Icon(icon, color: Colors.deepPurple, size: 32),
+                                  Icon(icon, color: Colors.black87, size: 32),
                                   const SizedBox(width: 16),
                                   Expanded(
                                     child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         Text(
                                           _getContactTypeLabel(type),
@@ -255,14 +262,14 @@ class CardWebScreen extends StatelessWidget {
                             );
                           })
                           .toList()
-                          .reversed
-                          .toList(),
+                          .reversed,
                     ],
                   ),
                 ),
               ],
               // 링크 카드
-              if (cardData['links'] != null && (cardData['links'] as List).isNotEmpty) ...[
+              if (cardData['links'] != null &&
+                  (cardData['links'] as List).isNotEmpty) ...[
                 Container(
                   margin: const EdgeInsets.only(bottom: 16),
                   padding: const EdgeInsets.all(20),
@@ -316,18 +323,20 @@ class CardWebScreen extends StatelessWidget {
                                     ),
                                   ),
                                 ),
-                                const Icon(Icons.open_in_new, color: Colors.deepPurple),
+                                const Icon(Icons.open_in_new,
+                                    color: Colors.black87),
                               ],
                             ),
                           ),
                         );
-                      }).toList(),
+                      }),
                     ],
                   ),
                 ),
               ],
               // 블록 카드 (BlockReadOnlyCard 재사용)
-              if (cardData['blocks'] != null && (cardData['blocks'] as List).isNotEmpty) ...[
+              if (cardData['blocks'] != null &&
+                  (cardData['blocks'] as List).isNotEmpty) ...[
                 Container(
                   margin: const EdgeInsets.only(bottom: 16),
                   padding: const EdgeInsets.all(20),
@@ -380,4 +389,4 @@ class CardWebScreen extends StatelessWidget {
   Widget _getPlatformIcon(String platform) {
     return PlatformIconUtils.getPlatformIcon(platform, size: 32);
   }
-} 
+}

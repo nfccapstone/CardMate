@@ -6,7 +6,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 class ContactSection extends StatelessWidget {
   final ContactController controller;
-  const ContactSection({Key? key, required this.controller}) : super(key: key);
+  const ContactSection({super.key, required this.controller});
 
   Future<void> _showDeleteDialog(String type, String value) async {
     final result = await Get.dialog<bool>(
@@ -126,7 +126,7 @@ class ContactSection extends StatelessWidget {
                   children: [
                     Row(
                       children: [
-                        Icon(icon, color: Colors.deepPurple),
+                        Icon(icon, color: Colors.black87, size: 20),
                         const SizedBox(width: 8),
                         Text(
                           contactTitles[type] ?? type,
@@ -149,7 +149,7 @@ class ContactSection extends StatelessWidget {
                 ),
               ),
             );
-          }).toList(),
+          }),
         ],
       );
     });
