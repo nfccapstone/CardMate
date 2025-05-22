@@ -9,6 +9,8 @@ import 'package:cardmate/features/namecardbooks/namecardbooks_screen.dart';
 import 'package:cardmate/features/more/more_screen.dart';
 import 'package:cardmate/features/more/more_service.dart';
 import 'package:cardmate/features/more/more_controller.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cardmate/features/namecardbooks/widgets/card_update_alert_list.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -84,7 +86,24 @@ class _HomeScreenState extends State<HomeScreen> {
             actions: [
               IconButton(
                 icon: const Icon(Icons.person_outline, color: Colors.black87),
-                onPressed: () {},
+                onPressed: () async {
+                  final user = FirebaseAuth.instance.currentUser;
+                  if (user != null) {
+                    showModalBottomSheet(
+                      context: context,
+                      isScrollControlled: true,
+                      shape: const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                      ),
+                      builder: (_) => SizedBox(
+                        height: MediaQuery.of(context).size.height * 0.7,
+                        child: CardUpdateAlertList(myUid: user.uid),
+                      ),
+                    );
+                  } else {
+                    Get.snackbar('오류', '로그인이 필요합니다.');
+                  }
+                },
               )
             ],
           ),
