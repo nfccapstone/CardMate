@@ -11,6 +11,9 @@ class NameCard {
   final String? department;
   final String? position;
   final String? company;
+  final bool isManual;
+  final List<Map<String, dynamic>>? contacts;
+  final Map<String, dynamic>? rawData;
 
   NameCard({
     required this.id,
@@ -20,6 +23,9 @@ class NameCard {
     this.department,
     this.position,
     this.company,
+    this.isManual = false,
+    this.contacts,
+    this.rawData,
   });
 
   factory NameCard.fromMap(String id, Map<String, dynamic> data) {
@@ -31,6 +37,26 @@ class NameCard {
       department: data['department'],
       position: data['position'],
       company: data['company'],
+      isManual: false,
+      contacts: null,
+      rawData: data,
+    );
+  }
+
+  factory NameCard.fromManualMap(String id, Map<String, dynamic> data) {
+    return NameCard(
+      id: id,
+      name: data['name'],
+      profileUrl: null,
+      webLink: null,
+      department: data['department'],
+      position: data['position'],
+      company: data['company'],
+      isManual: true,
+      contacts: data['contacts'] != null
+          ? List<Map<String, dynamic>>.from(data['contacts'])
+          : [],
+      rawData: Map<String, dynamic>.from(data),
     );
   }
 }
@@ -60,25 +86,31 @@ class CardController extends GetxController {
   Future<void> fetchNameCards() async {
     try {
       final userId = _auth.currentUser?.uid;
-      final cardBookSnapshot = await FirebaseFirestore.instance
+      final cardBookSnapshot = await _db
           .collection('users')
           .doc(userId)
           .collection('card_book')
           .get();
+      final makeBookSnapshot = await _db
+          .collection('users')
+          .doc(userId)
+          .collection('make_book')
+          .get();
 
       final cardIds = cardBookSnapshot.docs.map((doc) => doc.id).toList();
-
       final fetchedCards = <NameCard>[];
 
+      // 공유 명함(card_book)
       for (final cardId in cardIds) {
-        final cardDoc = await FirebaseFirestore.instance
-            .collection('cards')
-            .doc(cardId)
-            .get();
-
+        final cardDoc = await _db.collection('cards').doc(cardId).get();
         if (cardDoc.exists) {
           fetchedCards.add(NameCard.fromMap(cardDoc.id, cardDoc.data()!));
         }
+      }
+
+      // 수동 명함(make_book)
+      for (final doc in makeBookSnapshot.docs) {
+        fetchedCards.add(NameCard.fromManualMap(doc.id, doc.data()));
       }
 
       cards.assignAll(fetchedCards);
@@ -127,16 +159,38 @@ class CardController extends GetxController {
     cards.assignAll(searchedCards);
   }
 
-  Future<void> deleteCard(String cardId) async {
+  Future<void> deleteCard(String cardId, {bool? isManual}) async {
     try {
       final userId = _auth.currentUser?.uid;
-      await _db
-          .collection('users')
-          .doc(userId)
-          .collection('card_book')
-          .doc(cardId)
-          .delete();
-      
+      if (isManual == true) {
+        await _db
+            .collection('users')
+            .doc(userId)
+            .collection('make_book')
+            .doc(cardId)
+            .delete();
+      } else if (isManual == false) {
+        await _db
+            .collection('users')
+            .doc(userId)
+            .collection('card_book')
+            .doc(cardId)
+            .delete();
+      } else {
+        // 둘 다 시도 (호환성)
+        await _db
+            .collection('users')
+            .doc(userId)
+            .collection('card_book')
+            .doc(cardId)
+            .delete();
+        await _db
+            .collection('users')
+            .doc(userId)
+            .collection('make_book')
+            .doc(cardId)
+            .delete();
+      }
       await fetchNameCards();
     } catch (e) {
       print('명함 삭제 실패: $e');
