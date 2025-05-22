@@ -90,7 +90,6 @@ class NamecardbooksScreen extends StatelessWidget {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      isScrollControlled: false,
       builder: (context) {
         return Container(
           padding: const EdgeInsets.all(24),
