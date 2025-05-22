@@ -3,7 +3,6 @@ import 'package:cardmate/features/card_id/card_id_screen.dart';
 import 'package:cardmate/features/home/home_binding.dart';
 import 'package:cardmate/features/more/more_binding.dart';
 import 'package:cardmate/features/namecard/screens/block_create_screen.dart';
-import 'package:cardmate/features/namecardbooks/edit_othercard_screen.dart';
 import 'package:cardmate/features/register/register_binding.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -52,8 +51,33 @@ class CardMateApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'CardMate',
       theme: ThemeData(
-        brightness: Brightness.dark, // 기본 다크 모드 테마
+        brightness: Brightness.light,
+        scaffoldBackgroundColor: Colors.white,
+        primaryColor: Colors.black,
+        iconTheme: const IconThemeData(color: Colors.grey), // 아이콘 색
+        textTheme: const TextTheme(
+          bodyLarge: TextStyle(color: Colors.black87), // 일반 텍스트
+          bodyMedium: TextStyle(color: Colors.black87),
+          titleMedium: TextStyle(color: Colors.black87),
+        ),
+        appBarTheme: const AppBarTheme(
+          iconTheme: IconThemeData(color: Colors.black),
+          backgroundColor: Colors.white,
+          titleTextStyle: TextStyle(color: Colors.black, fontSize: 18),
+        ),
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: Colors.black,
+          brightness: Brightness.light,
+        ).copyWith(
+          primary: Colors.black,
+          onPrimary: Colors.white,
+          secondary: Colors.grey,
+          onSecondary: Colors.black87,
+          surface: Colors.white,
+          onSurface: Colors.black87,
+        ),
       ),
+
       initialRoute: kIsWeb ? null : '/', // 웹은 URL 해석, 앱은 로그인화면
       getPages: [
         GetPage(
@@ -92,17 +116,16 @@ class CardMateApp extends StatelessWidget {
         ),
         GetPage(
           name: '/blockCreate',
-          page: () => BlockCreateScreen(),
+          page: () => const BlockCreateScreen(),
         ),
         GetPage(
           name: '/card/myNameCard/:cardId',
-          page: () => MyNameCardScreen(),
+          page: () => const MyNameCardScreen(),
           binding: BindingsBuilder(() {
             Get.put<IEditCardService>(EditCardService());
             final cardId = Get.parameters['cardId'] ?? '';
             Get.put(MyNameCardController(
-                editCardService: Get.find<IEditCardService>(),
-                cardId: cardId));
+                editCardService: Get.find<IEditCardService>(), cardId: cardId));
           }),
         ),
         GetPage(

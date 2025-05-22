@@ -49,16 +49,84 @@ class MyNameCardScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              ProfileSection(
-                basicInfo: controller.basicInfo,
-                readOnly: true,
+              // 프로필 카드
+              Container(
+                margin: const EdgeInsets.only(bottom: 16),
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(14),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.10),
+                      blurRadius: 12,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                  border: Border.all(color: Colors.grey[200]!),
+                ),
+                child: ProfileSection(
+                  basicInfo: controller.basicInfo,
+                  readOnly: true,
+                ),
               ),
-              const SizedBox(height: 20),
-              _ContactSectionReadOnly(controller: controller),
-              const SizedBox(height: 20),
-              _LinkSectionReadOnly(controller: controller),
-              const SizedBox(height: 20),
-              BlockSection(blocks: controller.blocks, readOnly: true),
+              // 연락처 카드
+              if ((controller.basicInfo['contacts'] ?? []).isNotEmpty)
+                Container(
+                  margin: const EdgeInsets.only(bottom: 16),
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(14),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(0.10),
+                        blurRadius: 12,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                    border: Border.all(color: Colors.grey[200]!),
+                  ),
+                  child: _ContactSectionReadOnly(controller: controller),
+                ),
+              // 링크 카드
+              if ((controller.basicInfo['links'] ?? []).isNotEmpty)
+                Container(
+                  margin: const EdgeInsets.only(bottom: 16),
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(14),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(0.10),
+                        blurRadius: 12,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                    border: Border.all(color: Colors.grey[200]!),
+                  ),
+                  child: _LinkSectionReadOnly(controller: controller),
+                ),
+              // 블록 카드
+              if (controller.blocks.isNotEmpty)
+                Container(
+                  margin: const EdgeInsets.only(bottom: 16),
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(14),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(0.10),
+                        blurRadius: 12,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                    border: Border.all(color: Colors.grey[200]!),
+                  ),
+                  child: BlockSection(blocks: controller.blocks, readOnly: true),
+                ),
               const SizedBox(height: 40),
             ],
           ),
@@ -89,7 +157,7 @@ class _ContactSectionReadOnly extends StatelessWidget {
           final value = contact['value'];
           IconData icon;
           VoidCallback? onTap;
-          if (type == 'phone') {
+          if (type == 'mobile' || type == 'phone') {
             icon = Icons.phone;
             onTap = () => launchUrl(Uri.parse('tel:$value'));
           } else if (type == 'email') {
@@ -104,7 +172,7 @@ class _ContactSectionReadOnly extends StatelessWidget {
           }
           return ListTile(
             leading: Icon(icon, color: Colors.deepPurple),
-            title: Text(value),
+            title: Text(value, style: const TextStyle(color: Colors.black)),
             onTap: onTap,
           );
         }).toList(),
@@ -170,6 +238,7 @@ class _LinkSectionReadOnly extends StatelessWidget {
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w500,
+                        color: Colors.black,
                       ),
                     ),
                   ),

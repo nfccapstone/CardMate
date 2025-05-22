@@ -32,13 +32,15 @@ class _BlockCreateScreenState extends State<BlockCreateScreen> {
   bool _isEdit = false;
   String? _blockId;
   List<String> _imageUrls = [];
+  String _selectedType = 'text';
+  final List<File> _selectedImages = [];
 
   @override
   void initState() {
     super.initState();
     _quillController = quill.QuillController.basic();
     
-    final args = Get.arguments;
+    final args = Get.arguments ?? {};
     blockType = args['type'] ?? 'text';
     _isEdit = args['isEdit'] ?? false;
     
@@ -89,10 +91,12 @@ class _BlockCreateScreenState extends State<BlockCreateScreen> {
           _imageFiles.clear();
           _imageBytes.clear();
           _imageNames.clear();
+          _selectedImages.clear();
           for (var file in result.files) {
             if (file.bytes != null) {
               _imageBytes.add(file.bytes!);
               _imageNames.add(file.name);
+              // 웹에서는 File 객체를 만들 수 없으므로 생략
             }
           }
         });
@@ -105,11 +109,13 @@ class _BlockCreateScreenState extends State<BlockCreateScreen> {
           _imageFiles.clear();
           _imageBytes.clear();
           _imageNames.clear();
+          _selectedImages.clear();
           for (var image in images) {
             final file = File(image.path);
             _imageFiles.add(file);
             _imageBytes.add(file.readAsBytesSync());
             _imageNames.add(image.name);
+            _selectedImages.add(file);
           }
         });
       }
@@ -134,12 +140,12 @@ class _BlockCreateScreenState extends State<BlockCreateScreen> {
   }
 
   Future<void> _saveBlock() async {
-    if (blockType == 'photo' && _imageBytes.isEmpty && _imageUrls.isEmpty) {
+    if (_selectedType == 'photo' && _imageBytes.isEmpty && _imageUrls.isEmpty) {
       Get.snackbar('오류', '사진을 선택해주세요.');
       return;
     }
 
-    if (blockType == 'photo') {
+    if (_selectedType == 'photo') {
       // 로딩 다이얼로그 표시
       Get.dialog(
         const Center(
@@ -168,7 +174,7 @@ class _BlockCreateScreenState extends State<BlockCreateScreen> {
       }
 
       final blockData = {
-        'type': blockType,
+        'type': _selectedType,
         'title': _titleController.text,
         'content': finalImageUrls,
       };
@@ -180,7 +186,7 @@ class _BlockCreateScreenState extends State<BlockCreateScreen> {
       }
     } else {
       final blockData = {
-        'type': blockType,
+        'type': _selectedType,
         'title': _titleController.text,
         'content': jsonEncode(_quillController.document.toDelta().toJson()),
       };
@@ -201,145 +207,435 @@ class _BlockCreateScreenState extends State<BlockCreateScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text(_isEdit 
-            ? '${blockType == 'text' ? '텍스트' : '사진'} 블록 수정' 
-            : '${blockType == 'text' ? '텍스트' : '사진'} 블록'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.check),
-            onPressed: _saveBlock,
+        backgroundColor: Colors.white,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.black87),
+          onPressed: () => Get.back(),
+        ),
+        title: Text(
+          '블록 추가',
+          style: TextStyle(
+            color: Colors.black87,
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // 블록 유형 선택 카드
+            Container(
+              padding: const EdgeInsets.all(20),
+              margin: const EdgeInsets.only(bottom: 24),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(14),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.10),
+                    blurRadius: 12,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+                border: Border.all(color: Colors.grey[200]!),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    '블록 유형',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _buildBlockTypeButton(
+                          'text',
+                          '텍스트',
+                          Icons.text_fields,
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: _buildBlockTypeButton(
+                          'photo',
+                          '사진',
+                          Icons.photo,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            if (_selectedType == 'text')
+              Container(
+                margin: const EdgeInsets.only(bottom: 24),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(14),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.10),
+                      blurRadius: 12,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                  border: Border.all(color: Colors.grey[200]!),
+                ),
+                child: _buildTextBlockForm(),
+              )
+            else if (_selectedType == 'photo')
+              Container(
+                margin: const EdgeInsets.only(bottom: 24),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(14),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.10),
+                      blurRadius: 12,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                  border: Border.all(color: Colors.grey[200]!),
+                ),
+                child: _buildPhotoBlockForm(),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBlockTypeButton(String type, String label, IconData icon) {
+    final isSelected = _selectedType == type;
+    return InkWell(
+      onTap: () => setState(() => _selectedType = type),
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 16),
+        decoration: BoxDecoration(
+          color: isSelected ? Colors.black : Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: isSelected ? Colors.black : Colors.grey[300]!,
+          ),
+        ),
+        child: Column(
+          children: [
+            Icon(
+              icon,
+              color: isSelected ? Colors.white : Colors.black87,
+              size: 24,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              label,
+              style: TextStyle(
+                color: isSelected ? Colors.white : Colors.black87,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTextBlockForm() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.grey[50],
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.grey[200]!),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            '텍스트 내용',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: Colors.black87,
+            ),
+          ),
+          const SizedBox(height: 16),
+          TextField(
+            controller: _titleController,
+            style: const TextStyle(color: Colors.black),
+            decoration: const InputDecoration(
+              labelText: '제목 입력',
+              hintText: '내용 입력',
+              labelStyle: TextStyle(color: Colors.black),
+              hintStyle: TextStyle(color: Colors.black),
+            ),
+          ),
+          const SizedBox(height: 16),
+          Container(
+            height: 200,
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.grey.shade300),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: quill.QuillEditor(
+              focusNode: _editorFocusNode,
+              scrollController: _editorScrollController,
+              configurations: quill.QuillEditorConfigurations(
+                controller: _quillController,
+                sharedConfigurations: const quill.QuillSharedConfigurations(),
+                enableInteractiveSelection: true,
+                customStyles: quill.DefaultStyles(
+                  paragraph: quill.DefaultTextBlockStyle(
+                    TextStyle(color: Colors.black, fontSize: 14),
+                    const quill.VerticalSpacing(0, 0),
+                    const quill.VerticalSpacing(0, 0),
+                    null,
+                  ),
+                ),
+              ),
+            ),
+          ),
+          // 토글 버튼과 툴바를 아래에 배치
+          Row(
+            children: [
+              const Text('서식 도구'),
+              const Spacer(),
+              IconButton(
+                icon: Icon(_showToolbar ? Icons.keyboard_arrow_down : Icons.keyboard_arrow_up),
+                onPressed: () {
+                  setState(() {
+                    _showToolbar = !_showToolbar;
+                  });
+                },
+              ),
+            ],
+          ),
+          if (_showToolbar)
+            quill.QuillToolbar.simple(
+              configurations: quill.QuillSimpleToolbarConfigurations(
+                controller: _quillController,
+              ),
+            ),
+          const SizedBox(height: 8),
+          const SizedBox(height: 24),
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: _saveBlock,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.black,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              child: const Text(
+                '저장',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
           ),
         ],
       ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            children: [
-              // 블록 제목 입력
-              TextField(
-                controller: _titleController,
-                decoration: const InputDecoration(
-                  labelText: '제목 입력',
-                  hintText: '내용 입력',
-                  labelStyle: TextStyle(color: Colors.black),
-                  hintStyle: TextStyle(color: Colors.black),
-                ),
+    );
+  }
+
+  Widget _buildPhotoBlockForm() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.grey[50],
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.grey[200]!),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            '사진 추가',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: Colors.black87,
+            ),
+          ),
+          const SizedBox(height: 16),
+          TextField(
+            controller: _titleController,
+            style: const TextStyle(color: Colors.black),
+            decoration: const InputDecoration(
+              labelText: '제목 입력',
+              labelStyle: TextStyle(color: Colors.black),
+              hintStyle: TextStyle(color: Colors.black),
+            ),
+          ),
+          const SizedBox(height: 16),
+          if (_selectedImages.isNotEmpty)
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.grey[200]!),
               ),
-              const SizedBox(height: 16),
-              // 블록 내용 / 링크 / 사진 URL 입력
-              if (blockType != 'photo') ...[
-                Container(
-                  height: 200,
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey.shade300),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: quill.QuillEditor(
-                    focusNode: _editorFocusNode,
-                    scrollController: _editorScrollController,
-                    configurations: quill.QuillEditorConfigurations(
-                      controller: _quillController,
-                      sharedConfigurations: const quill.QuillSharedConfigurations(),
-                      enableInteractiveSelection: true,
-                      customStyles: quill.DefaultStyles(
-                        paragraph: quill.DefaultTextBlockStyle(
-                          const TextStyle(color: Colors.black, fontSize: 14),
-                          const quill.VerticalSpacing(0, 0),
-                          const quill.VerticalSpacing(0, 0),
-                          null,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        '선택된 사진',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.black87,
                         ),
                       ),
-                    ),
-                  ),
-                ),
-                // 토글 버튼과 툴바를 아래에 배치
-                Row(
-                  children: [
-                    const Text('서식 도구'),
-                    const Spacer(),
-                    IconButton(
-                      icon: Icon(_showToolbar ? Icons.keyboard_arrow_down : Icons.keyboard_arrow_up),
-                      onPressed: () {
-                        setState(() {
-                          _showToolbar = !_showToolbar;
-                        });
-                      },
-                    ),
-                  ],
-                ),
-                if (_showToolbar)
-                  quill.QuillToolbar.simple(
-                    configurations: quill.QuillSimpleToolbarConfigurations(
-                      controller: _quillController,
-                    ),
-                  ),
-                const SizedBox(height: 8),
-              ],
-              if (blockType == 'photo') ...[
-                ElevatedButton(
-                  onPressed: _pickImages,
-                  child: const Text('사진 선택'),
-                ),
-                const SizedBox(height: 16),
-                if (_imageBytes.isNotEmpty) ...[
-                  Expanded(
-                    child: Stack(
-                      children: [
-                        PageView.builder(
-                          controller: _pageController,
-                          itemCount: _imageBytes.length,
-                          itemBuilder: (context, index) {
-                            if (kIsWeb) {
-                              return Image.memory(
-                                _imageBytes[index],
-                                fit: BoxFit.contain,
-                              );
-                            } else {
-                              return Image.file(
-                                _imageFiles[index],
-                                fit: BoxFit.contain,
-                              );
-                            }
-                          },
+                      TextButton.icon(
+                        onPressed: _pickImages,
+                        icon: const Icon(Icons.add_photo_alternate, size: 20),
+                        label: const Text('추가'),
+                        style: TextButton.styleFrom(
+                          foregroundColor: Colors.black87,
                         ),
-                        if (_imageBytes.length > 1)
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  GridView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 3,
+                      crossAxisSpacing: 8,
+                      mainAxisSpacing: 8,
+                    ),
+                    itemCount: _selectedImages.length,
+                    itemBuilder: (context, index) {
+                      return Stack(
+                        children: [
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(8),
+                            child: Image.file(
+                              _selectedImages[index],
+                              fit: BoxFit.cover,
+                              width: double.infinity,
+                              height: double.infinity,
+                            ),
+                          ),
                           Positioned(
-                            bottom: 16,
-                            left: 0,
-                            right: 0,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: List.generate(
-                                _imageBytes.length,
-                                (index) => Container(
-                                  width: 8,
-                                  height: 8,
-                                  margin: const EdgeInsets.symmetric(horizontal: 4),
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: _pageController.hasClients &&
-                                            _pageController.page?.round() == index
-                                        ? Colors.blue
-                                        : Colors.grey,
-                                  ),
+                            top: 4,
+                            right: 4,
+                            child: GestureDetector(
+                              onTap: () => setState(() {
+                                _selectedImages.removeAt(index);
+                              }),
+                              child: Container(
+                                padding: const EdgeInsets.all(4),
+                                decoration: BoxDecoration(
+                                  color: Colors.black.withOpacity(0.5),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: const Icon(
+                                  Icons.close,
+                                  color: Colors.white,
+                                  size: 16,
                                 ),
                               ),
                             ),
                           ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    '${_imageBytes.length}장의 사진이 선택되었습니다.',
-                    style: const TextStyle(color: Colors.grey),
+                        ],
+                      );
+                    },
                   ),
                 ],
-              ],
-            ],
+              ),
+            )
+          else
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(vertical: 32),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.grey[200]!),
+              ),
+              child: Column(
+                children: [
+                  Icon(
+                    Icons.photo_library,
+                    size: 48,
+                    color: Colors.grey[400],
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    '사진을 추가해주세요',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey[600],
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  ElevatedButton.icon(
+                    onPressed: _pickImages,
+                    icon: const Icon(Icons.add_photo_alternate),
+                    label: const Text('사진 선택'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.black,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 24,
+                        vertical: 12,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          const SizedBox(height: 24),
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: _selectedImages.isEmpty ? null : _saveBlock,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.black,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                disabledBackgroundColor: Colors.grey[300],
+                disabledForegroundColor: Colors.grey[600],
+              ),
+              child: const Text(
+                '저장',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
           ),
-        ),
+        ],
       ),
     );
   }

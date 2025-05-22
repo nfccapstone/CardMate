@@ -126,4 +126,21 @@ class CardController extends GetxController {
 
     cards.assignAll(searchedCards);
   }
+
+  Future<void> deleteCard(String cardId) async {
+    try {
+      final userId = _auth.currentUser?.uid;
+      await _db
+          .collection('users')
+          .doc(userId)
+          .collection('card_book')
+          .doc(cardId)
+          .delete();
+      
+      await fetchNameCards();
+    } catch (e) {
+      print('명함 삭제 실패: $e');
+      rethrow;
+    }
+  }
 }
