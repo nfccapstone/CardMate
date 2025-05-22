@@ -6,16 +6,50 @@ import 'services/i_login_service.dart';
 
 class LoginController extends GetxController {
   final ILoginService _loginService;
+  final _prefs = SharedPreferences.getInstance();
 
   LoginController({required ILoginService loginService})
       : _loginService = loginService;
 
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
-  var isAutoLogin = false.obs; // 자동 로그인 체크 여부
+  var isAutoLogin = false.obs;
+  var isLoading = true.obs;
+
+  @override
+  void onInit() {
+    super.onInit();
+    _loadSavedCredentials();
+  }
+
+  Future<void> _loadSavedCredentials() async {
+    try {
+      final prefs = await _prefs;
+      final email = prefs.getString('email');
+      final password = prefs.getString('password');
+      
+      if (email != null && password != null) {
+        emailController.text = email;
+        passwordController.text = password;
+        isAutoLogin.value = true;
+        
+        // 자동 로그인 시도
+        final user = await _loginService.signIn(email, password);
+        if (user != null) {
+          Get.offAllNamed('/home');
+          return;
+        }
+      }
+    } catch (e) {
+      print('자동 로그인 실패: $e');
+    } finally {
+      isLoading.value = false;
+    }
+  }
 
   Future<void> login() async {
     try {
+      isLoading.value = true;
       final email = emailController.text.trim();
       final password = passwordController.text.trim();
 
@@ -23,9 +57,8 @@ class LoginController extends GetxController {
 
       if (user != null) {
         if (isAutoLogin.value) {
-          await _saveCredentials(email, password); // 자동 로그인 정보 저장
+          await _saveCredentials(email, password);
         }
-        Get.snackbar("로그인 성공", "홈 화면으로 이동합니다.");
         Get.offAllNamed('/home');
       } else {
         Get.snackbar(
@@ -37,36 +70,15 @@ class LoginController extends GetxController {
       }
     } catch (e) {
       _handleLoginError(e);
+    } finally {
+      isLoading.value = false;
     }
   }
 
   Future<void> _saveCredentials(String email, String password) async {
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = await _prefs;
     await prefs.setString('email', email);
     await prefs.setString('password', password);
-  }
-
-  Future<void> tryAutoLogin() async {
-    final prefs = await SharedPreferences.getInstance();
-    final email = prefs.getString('email');
-    final password = prefs.getString('password');
-
-    if (email != null && password != null) {
-      try {
-        var user = await _loginService.signIn(email, password);
-        if (user != null) {
-          Get.snackbar("자동 로그인 성공", "$email님 환영합니다.");
-          Get.offAllNamed('/home');
-        }
-      } catch (e) {
-        await prefs.remove('email');
-        await prefs.remove('password');
-      }
-    }
-  }
-
-  Future<void> autoLogin() async {
-    await tryAutoLogin();
   }
 
   Future<void> loginWithGoogle() async {
@@ -116,11 +128,5 @@ class LoginController extends GetxController {
     emailController.dispose();
     passwordController.dispose();
     super.onClose();
-  }
-
-  @override
-  void onInit() {
-    super.onInit();
-    tryAutoLogin(); // 앱 시작 시 자동 로그인 시도
   }
 }

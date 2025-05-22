@@ -11,6 +11,8 @@ class HomeController extends GetxController {
   /// Firestore에서 불러온 명함 데이터 저장용
   var cardData = <String, dynamic>{}.obs;
 
+  var isLoading = true.obs;
+
   final IHomeService _homeService;
 
   // DI를 통해 IHomeService 구현체를 주입받습니다.
@@ -20,7 +22,16 @@ class HomeController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    fetchCardInfo(); // 앱 실행 시 명함 정보 로드
+    _initializeData();
+  }
+
+  Future<void> _initializeData() async {
+    isLoading.value = true;
+    try {
+      await fetchCardInfo();
+    } finally {
+      isLoading.value = false;
+    }
   }
 
   void changeIndex(int index) {
@@ -37,30 +48,40 @@ class HomeController extends GetxController {
 
   /// 명함 정보 및 연락처 정보를 함께 불러옴
   Future<void> fetchCardInfo() async {
-    final basicInfo = await _homeService.fetchCardData();
-    final contactInfo = await _homeService.fetchContactInfo();
+    try {
+      final basicInfo = await _homeService.fetchCardData();
+      final contactInfo = await _homeService.fetchContactInfo();
 
-    if (basicInfo != null) {
-      final combined = {...basicInfo};
+      if (basicInfo != null) {
+        final combined = {...basicInfo};
 
-      if (contactInfo != null) {
-        combined['contact'] = contactInfo;
+        if (contactInfo != null) {
+          combined['contact'] = contactInfo;
+        }
+
+        updateCardData(combined);
+        registerCard();
       }
-
-      updateCardData(combined);
-      registerCard();
+    } catch (e) {
+      print('명함 정보 로딩 오류: $e');
+      Get.snackbar('오류', '명함 정보를 불러오는데 실패했습니다.');
     }
   }
 
   /// 명함 등록 여부 확인 후 화면 전환
   Future<void> handleNamecardNavigation() async {
-    final exists = await _homeService.checkCardExists();
+    try {
+      final exists = await _homeService.checkCardExists();
 
-    if (exists) {
-      Get.toNamed('/editCard');
-    } else {
-      Get.toNamed('/namecardInfo');
+      if (exists) {
+        Get.toNamed('/editCard');
+      } else {
+        Get.toNamed('/namecardInfo');
+      }
+      registerCard();
+    } catch (e) {
+      print('명함 네비게이션 오류: $e');
+      Get.snackbar('오류', '명함 정보를 확인하는데 실패했습니다.');
     }
-    registerCard();
   }
 }

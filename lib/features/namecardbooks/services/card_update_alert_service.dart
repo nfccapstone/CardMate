@@ -15,6 +15,7 @@ class CardUpdateAlertService {
     final futures = myCards.docs.map((doc) async {
       final cardId = doc.id;
       final lastChecked = doc.data().containsKey('lastChecked') ? doc['lastChecked'] : null;
+      
       // card_data/data 문서에서 updatedAt 읽기
       final cardDataDocFuture = _firestore
           .collection('cards')
@@ -22,17 +23,25 @@ class CardUpdateAlertService {
           .collection('card_data')
           .doc('data')
           .get();
+      
       // cards/{cardId} 문서에서 name, profileImageUrl 읽기
       final cardDocFuture = _firestore.collection('cards').doc(cardId).get();
+      
       final results = await Future.wait([cardDataDocFuture, cardDocFuture]);
       final cardDataDoc = results[0] as DocumentSnapshot;
       final cardDoc = results[1] as DocumentSnapshot;
-      final updatedAt = cardDataDoc['updatedAt'];
+      
+      if (!cardDataDoc.exists) return null;
+      
+      final data = cardDataDoc.data() as Map<String, dynamic>?;
+      if (data == null) return null;
+
+      final updatedAt = data['updatedAt'];
       if (updatedAt != null && (lastChecked == null || lastChecked.toDate().isBefore(updatedAt.toDate()))) {
         return CardUpdateAlert(
           cardId: cardId,
-          cardOwnerName: cardDoc['name'],
-          cardOwnerProfileUrl: cardDoc['profileImageUrl'],
+          cardOwnerName: cardDoc['name'] ?? '알 수 없음',
+          cardOwnerProfileUrl: cardDoc['profileImageUrl'] ?? '',
           updatedAt: updatedAt.toDate(),
         );
       }
@@ -40,7 +49,6 @@ class CardUpdateAlertService {
     }).toList();
 
     final results = await Future.wait(futures);
-    // null이 아닌 것만 반환
     return results.whereType<CardUpdateAlert>().toList();
   }
 
