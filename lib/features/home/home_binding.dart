@@ -1,3 +1,6 @@
+import 'package:cardmate/features/namecard/controllers/edit_card_controller.dart';
+import 'package:cardmate/features/namecard/services/edit_card_service.dart';
+import 'package:cardmate/features/namecard/services/i_edit_card_service.dart';
 import 'package:cardmate/features/namecardbooks/card_controller.dart';
 import 'package:get/get.dart';
 import 'home_controller.dart';
@@ -15,9 +18,14 @@ class HomeBinding extends Bindings {
     Get.lazyPut<HomeController>(
       () => HomeController(homeService: Get.find<IHomeService>()),
     );
+    Get.lazyPut<IEditCardService>(() => EditCardService());
     Get.put(CardController());
     // MoreService와 MoreController 등록
     Get.lazyPut<MoreService>(() => MoreService());
-    Get.lazyPut<MoreController>(() => MoreController(moreService: Get.find<MoreService>()));
+    Get.lazyPut<MoreController>(
+        () => MoreController(moreService: Get.find<MoreService>()));
+    Get.lazyPut<EditCardController>(
+      () => EditCardController(editCardService: Get.find<IEditCardService>()),
+    );
   }
 }

@@ -3,6 +3,8 @@ import 'package:cardmate/features/card_id/card_id_screen.dart';
 import 'package:cardmate/features/home/home_binding.dart';
 import 'package:cardmate/features/more/more_binding.dart';
 import 'package:cardmate/features/namecard/screens/block_create_screen.dart';
+import 'package:cardmate/features/namecardbooks/add_card_manual_screen.dart';
+import 'package:cardmate/features/namecardbooks/edit_manual_card_screen.dart';
 import 'package:cardmate/features/register/register_binding.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -27,8 +29,8 @@ import 'package:url_strategy/url_strategy.dart';
 import 'features/namecard/bindings/contact_bindings.dart';
 import 'features/namecardbooks/qr_scan_screen.dart';
 import 'features/more/more_screen.dart';
-import 'features/namecardbooks/add_card_byNFC_screen.dart';
-import 'features/namecardbooks/add_card_byId_screen.dart';
+import 'features/namecardbooks/add_card_by_nfc_screen.dart';
+import 'features/namecardbooks/add_card_by_id_screen.dart';
 
 void main() async {
   setPathUrlStrategy(); // 웹에서 # 없는 URL 사용
@@ -145,9 +147,22 @@ class CardMateApp extends StatelessWidget {
           page: () => AddCardByIdScreen(),
         ),
         GetPage(
+          name: '/add-card-manual',
+          page: () => AddCardManualScreen(),
+        ),
+        GetPage(
           name: '/more',
           page: () => const MoreScreen(),
           binding: MoreBinding(),
+        ),
+        GetPage(
+          name: '/edit-manual-card',
+          page: () {
+            final args = Get.arguments as Map<String, dynamic>?;
+            final cardId = args?['cardId'] ?? '';
+            return EditManualCardScreen(cardId: cardId);
+          },
+          binding: MainNameCardBindings(),
         ),
       ],
     );

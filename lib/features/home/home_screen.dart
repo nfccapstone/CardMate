@@ -97,10 +97,13 @@ class _HomeScreenState extends State<HomeScreen> {
               type: BottomNavigationBarType.fixed,
               items: const [
                 BottomNavigationBarItem(icon: Icon(Icons.folder), label: '명함첩'),
-                BottomNavigationBarItem(icon: Icon(Icons.people_alt), label: 'Net'),
+                BottomNavigationBarItem(
+                    icon: Icon(Icons.people_alt), label: 'Net'),
                 BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-                BottomNavigationBarItem(icon: Icon(Icons.auto_graph), label: 'AI'),
-                BottomNavigationBarItem(icon: Icon(Icons.more_horiz), label: '더보기'),
+                BottomNavigationBarItem(
+                    icon: Icon(Icons.auto_graph), label: 'AI'),
+                BottomNavigationBarItem(
+                    icon: Icon(Icons.more_horiz), label: '더보기'),
               ],
             ),
           ),
@@ -153,7 +156,8 @@ class _HomeScreenState extends State<HomeScreen> {
       final contact = data['contact'] ?? {};
       final nameCardId = data['nameCardId'] ?? '';
       final cardId = data['cardId'] ?? '';
-      final profileLink = 'https://cardmate-37be3.web.app/card/myNameCard/$cardId';
+      final profileLink =
+          'https://cardmate-37be3.web.app/card/myNameCard/$cardId';
 
       return GestureDetector(
         onTap: () async {
@@ -193,7 +197,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           : null,
                       child: (data['profileImageUrl'] == null ||
                               data['profileImageUrl'].toString().isEmpty)
-                          ? const Icon(Icons.person, size: 40, color: Colors.grey)
+                          ? const Icon(Icons.person,
+                              size: 40, color: Colors.grey)
                           : null,
                     ),
                     const SizedBox(width: 20),
@@ -223,10 +228,12 @@ class _HomeScreenState extends State<HomeScreen> {
                                         padding: const EdgeInsets.all(20),
                                         decoration: BoxDecoration(
                                           color: Colors.white,
-                                          borderRadius: BorderRadius.circular(12),
+                                          borderRadius:
+                                              BorderRadius.circular(12),
                                           boxShadow: [
                                             BoxShadow(
-                                              color: Colors.grey.withOpacity(0.25),
+                                              color:
+                                                  Colors.grey.withOpacity(0.25),
                                               blurRadius: 18,
                                               offset: const Offset(0, 8),
                                             ),
@@ -267,9 +274,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                               style: ElevatedButton.styleFrom(
                                                 backgroundColor: Colors.black,
                                                 foregroundColor: Colors.white,
-                                                minimumSize: const Size(double.infinity, 48),
+                                                minimumSize: const Size(
+                                                    double.infinity, 48),
                                                 shape: RoundedRectangleBorder(
-                                                  borderRadius: BorderRadius.circular(6),
+                                                  borderRadius:
+                                                      BorderRadius.circular(6),
                                                 ),
                                               ),
                                               child: const Text('닫기'),
@@ -323,7 +332,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 const SizedBox(height: 20),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                   decoration: BoxDecoration(
                     color: const Color(0xFFF6F6F6),
                     borderRadius: BorderRadius.circular(10),
@@ -342,7 +352,8 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       ),
                       IconButton(
-                        icon: const Icon(Icons.copy, size: 18, color: Colors.black38),
+                        icon: const Icon(Icons.copy,
+                            size: 18, color: Colors.black38),
                         onPressed: () {
                           Clipboard.setData(ClipboardData(text: profileLink));
                           Get.snackbar(
@@ -365,7 +376,8 @@ class _HomeScreenState extends State<HomeScreen> {
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.black,
                           foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 8),
                           textStyle: const TextStyle(fontSize: 14),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(6),
@@ -391,41 +403,44 @@ class _HomeScreenState extends State<HomeScreen> {
                   const SizedBox(height: 12),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: contact.entries.map<Widget>((entry) => Padding(
-                      padding: const EdgeInsets.only(bottom: 12),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                        decoration: BoxDecoration(
-                          color: Color(0xFFF6F6F6),
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border.all(color: Color(0xFFE0E0E0)),
-                        ),
-                        child: Row(
-                          children: [
-                            _getContactIcon(entry.key),
-                            const SizedBox(width: 12),
-                            Text(
-                              '${_getContactLabel(entry.key)}: ',
-                              style: const TextStyle(
-                                color: Colors.black87,
-                                fontWeight: FontWeight.w500,
-                                fontSize: 15,
-                              ),
-                            ),
-                            Expanded(
-                              child: Text(
-                                entry.value,
-                                style: const TextStyle(
-                                  color: Colors.black87,
-                                  fontSize: 15,
+                    children: contact.entries
+                        .map<Widget>((entry) => Padding(
+                              padding: const EdgeInsets.only(bottom: 12),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 16, vertical: 14),
+                                decoration: BoxDecoration(
+                                  color: Color(0xFFF6F6F6),
+                                  borderRadius: BorderRadius.circular(10),
+                                  border: Border.all(color: Color(0xFFE0E0E0)),
                                 ),
-                                overflow: TextOverflow.ellipsis,
+                                child: Row(
+                                  children: [
+                                    _getContactIcon(entry.key),
+                                    const SizedBox(width: 12),
+                                    Text(
+                                      '${_getContactLabel(entry.key)}: ',
+                                      style: const TextStyle(
+                                        color: Colors.black87,
+                                        fontWeight: FontWeight.w500,
+                                        fontSize: 15,
+                                      ),
+                                    ),
+                                    Expanded(
+                                      child: Text(
+                                        entry.value,
+                                        style: const TextStyle(
+                                          color: Colors.black87,
+                                          fontSize: 15,
+                                        ),
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    )).toList(),
+                            ))
+                        .toList(),
                   ),
                 ],
                 const SizedBox(height: 24),

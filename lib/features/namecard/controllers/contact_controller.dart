@@ -4,6 +4,7 @@ import 'package:cardmate/features/namecard/services/i_contact_service.dart';
 
 class ContactController extends GetxController {
   final contacts = <String, String>{}.obs;
+  final manualCardcontacts = <String, String>{}.obs;
   final IContactService _contactService;
   final String? cardId;
 
@@ -14,6 +15,7 @@ class ContactController extends GetxController {
   void onInit() {
     super.onInit();
     loadContacts();
+    loadManualCardContacts();
   }
 
   Future<void> loadContacts() async {
@@ -50,8 +52,43 @@ class ContactController extends GetxController {
     }
   }
 
+  Future<void> loadManualCardContacts() async {
+    try {
+      final data = await _contactService.fetchManualCardContacts(cardId);
+      if (data != null) {
+        manualCardcontacts.assignAll(data);
+      }
+    } catch (e) {
+      print('연락처 불러오기 오류: $e');
+      Get.snackbar('오류', '연락처를 불러오는데 실패했습니다.');
+    }
+  }
+
+  Future<void> addManualCardContact(String type, String value) async {
+    try {
+      await _contactService.saveManualCardContact(type, value, cardId);
+      await loadManualCardContacts();
+      Get.snackbar('성공', '연락처가 저장되었습니다.');
+    } catch (e) {
+      print('연락처 저장 오류: $e');
+      Get.snackbar('오류', '연락처 저장에 실패했습니다.');
+    }
+  }
+
+  Future<void> deleteManualCardContact(String type) async {
+    try {
+      await _contactService.deleteManualCardContact(type, cardId);
+      await loadManualCardContacts(); // 연락처 목록 새로고침
+      Get.snackbar('성공', '연락처가 삭제되었습니다.');
+    } catch (e) {
+      print('연락처 삭제 오류: $e');
+      Get.snackbar('오류', '연락처 삭제에 실패했습니다.');
+    }
+  }
+
   void clearContacts() {
     contacts.clear();
+    manualCardcontacts.clear();
   }
 
   void showContactTypeSelector(BuildContext context) {
@@ -102,7 +139,11 @@ class ContactController extends GetxController {
   Future<void> openContactEditor(BuildContext context, String type) async {
     final result = await Get.toNamed('/editContact', arguments: type);
     if (result != null && result['type'] != null && result['value'] != null) {
-      await addContact(result['type'], result['value']);
+      if (int.tryParse(cardId!) != null) {
+        await addManualCardContact(result['type'], result['value']);
+      } else {
+        await addContact(result['type'], result['value']);
+      }
     }
   }
 }
