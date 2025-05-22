@@ -29,58 +29,48 @@ import 'package:url_strategy/url_strategy.dart';
 import 'features/namecard/bindings/contact_bindings.dart';
 import 'features/namecardbooks/qr_scan_screen.dart';
 import 'features/more/more_screen.dart';
+import 'features/namecardbooks/add_card_byNFC_screen.dart';
+import 'features/namecardbooks/add_card_byId_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'features/namecardbooks/add_card_by_nfc_screen.dart';
 import 'features/namecardbooks/add_card_by_id_screen.dart';
 
 void main() async {
-  setPathUrlStrategy(); // 웹에서 # 없는 URL 사용
+  setPathUrlStrategy();
   WidgetsFlutterBinding.ensureInitialized();
-  await FirebaseInit.instance.initializeFirebase(); // ✅ Firebase 초기화 완료 후 앱 실행
+  await FirebaseInit.instance.initializeFirebase();
 
-  // INameCardService를 GetX에 등록
-  Get.put<INameCardService>(NameCardService());
+  // 자동 로그인 상태 확인
+  final prefs = await SharedPreferences.getInstance();
+  final email = prefs.getString('email');
+  final password = prefs.getString('password');
+  final auth = FirebaseAuth.instance;
 
-  runApp(const CardMateApp());
+  runApp(MyApp(
+    initialRoute: kIsWeb
+        ? null
+        : (email != null && password != null && auth.currentUser != null)
+            ? '/home'
+            : '/',
+  ));
 }
 
-class CardMateApp extends StatelessWidget {
-  const CardMateApp({super.key});
+class MyApp extends StatelessWidget {
+  final String? initialRoute;
+
+  const MyApp({super.key, this.initialRoute});
 
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
-      // ✅ GetX 적용
-      debugShowCheckedModeBanner: false,
       title: 'CardMate',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        brightness: Brightness.light,
+        primarySwatch: Colors.blue,
         scaffoldBackgroundColor: Colors.white,
-        primaryColor: Colors.black,
-        iconTheme: const IconThemeData(color: Colors.grey), // 아이콘 색
-        textTheme: const TextTheme(
-          bodyLarge: TextStyle(color: Colors.black87), // 일반 텍스트
-          bodyMedium: TextStyle(color: Colors.black87),
-          titleMedium: TextStyle(color: Colors.black87),
-        ),
-        appBarTheme: const AppBarTheme(
-          iconTheme: IconThemeData(color: Colors.black),
-          backgroundColor: Colors.white,
-          titleTextStyle: TextStyle(color: Colors.black, fontSize: 18),
-        ),
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: Colors.black,
-          brightness: Brightness.light,
-        ).copyWith(
-          primary: Colors.black,
-          onPrimary: Colors.white,
-          secondary: Colors.grey,
-          onSecondary: Colors.black87,
-          surface: Colors.white,
-          onSurface: Colors.black87,
-        ),
       ),
-
-      initialRoute: kIsWeb ? null : '/', // 웹은 URL 해석, 앱은 로그인화면
+      initialRoute: initialRoute,
       getPages: [
         GetPage(
             name: '/',

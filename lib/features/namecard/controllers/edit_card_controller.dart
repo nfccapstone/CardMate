@@ -11,10 +11,10 @@ class EditCardController extends GetxController {
   final links = <Map<String, String>>[].obs;
   final IEditCardService _service;
   String? _loadedCardId;
+  var _isLoadingData = false;
 
   bool isLoadedFor(String cardId) => _loadedCardId == cardId;
 
-  // DI: IEditCardService 구현체를 생성자 주입
   EditCardController({required IEditCardService editCardService})
       : _service = editCardService;
 
@@ -25,23 +25,64 @@ class EditCardController extends GetxController {
   }
 
   Future<void> loadNameCardData() async {
+    if (_isLoadingData) return;
+    _isLoadingData = true;
     isLoading.value = true;
-    final data = await _service.fetchBasicInfo();
-    if (data != null) {
-      basicInfo.assignAll(data);
-    } else {
-      Get.snackbar('오류', '명함 정보를 불러오지 못했습니다.');
+
+    try {
+      // 모든 데이터를 병렬로 로드
+      final results = await Future.wait([
+        _service.fetchBasicInfo(),
+        _service.fetchBlocks(),
+        _service.fetchLinks(),
+      ]);
+
+      if (results[0] != null) {
+        basicInfo.assignAll(results[0] as Map<String, dynamic>);
+      } else {
+        Get.snackbar('오류', '명함 정보를 불러오지 못했습니다.');
+      }
+
+      blocks.assignAll(results[1] as List<Map<String, dynamic>>);
+      links.assignAll(results[2] as List<Map<String, String>>);
+    } catch (e) {
+      print('데이터 로딩 오류: $e');
+      Get.snackbar('오류', '데이터를 불러오는 중 문제가 발생했습니다.');
+    } finally {
+      isLoading.value = false;
+      _isLoadingData = false;
     }
+  }
 
-    // 블록 데이터 불러오기
-    final blocksData = await _service.fetchBlocks();
-    blocks.assignAll(blocksData);
+  Future<void> loadNameCardDataByCardId(String cardId) async {
+    if (_isLoadingData || _loadedCardId == cardId) return;
+    _isLoadingData = true;
+    isLoading.value = true;
+    _loadedCardId = cardId;
 
-    // 링크 데이터 불러오기
-    final linksData = await _service.fetchLinks();
-    links.assignAll(linksData);
+    try {
+      // 모든 데이터를 병렬로 로드
+      final results = await Future.wait([
+        _service.fetchBasicInfoByCardId(cardId),
+        _service.fetchBlocksByCardId(cardId),
+        _service.fetchLinksByCardId(cardId),
+      ]);
 
-    isLoading.value = false;
+      if (results[0] != null) {
+        otherBasicInfo.assignAll(results[0] as Map<String, dynamic>);
+      } else {
+        Get.snackbar('오류', '명함 정보를 불러오지 못했습니다.');
+      }
+
+      otherBlocks.assignAll(results[1] as List<Map<String, dynamic>>);
+      links.assignAll(results[2] as List<Map<String, String>>);
+    } catch (e) {
+      print('데이터 로딩 오류: $e');
+      Get.snackbar('오류', '데이터를 불러오는 중 문제가 발생했습니다.');
+    } finally {
+      isLoading.value = false;
+      _isLoadingData = false;
+    }
   }
 
   Future<void> saveBasicInfo(Map<String, dynamic> newData) async {
@@ -194,5 +235,11 @@ class EditCardController extends GetxController {
     } catch (e) {
       Get.snackbar('오류', '블록 수정에 실패했습니다.');
     }
+  }
+
+  @override
+  void onClose() {
+    _service.clearCache();
+    super.onClose();
   }
 }

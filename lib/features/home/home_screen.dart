@@ -9,6 +9,8 @@ import 'package:cardmate/features/namecardbooks/namecardbooks_screen.dart';
 import 'package:cardmate/features/more/more_screen.dart';
 import 'package:cardmate/features/more/more_service.dart';
 import 'package:cardmate/features/more/more_controller.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cardmate/features/namecardbooks/widgets/card_update_alert_list.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -18,6 +20,20 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  late final PageController _pageController;
+
+  @override
+  void initState() {
+    super.initState();
+    _pageController = PageController(initialPage: 1);
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     final HomeController controller = Get.find<HomeController>();
@@ -34,9 +50,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
-      const Center(child: Text('Net')),
       _buildHomeBody(controller),
-      const Center(child: Text('AI 기능')),
       const MoreScreen(),
     ];
 
@@ -72,11 +86,36 @@ class _HomeScreenState extends State<HomeScreen> {
             actions: [
               IconButton(
                 icon: const Icon(Icons.person_outline, color: Colors.black87),
-                onPressed: () {},
+                onPressed: () async {
+                  final user = FirebaseAuth.instance.currentUser;
+                  if (user != null) {
+                    showModalBottomSheet(
+                      context: context,
+                      isScrollControlled: true,
+                      shape: const RoundedRectangleBorder(
+                        borderRadius:
+                            BorderRadius.vertical(top: Radius.circular(20)),
+                      ),
+                      builder: (_) => SizedBox(
+                        height: MediaQuery.of(context).size.height * 0.7,
+                        child: CardUpdateAlertList(myUid: user.uid),
+                      ),
+                    );
+                  } else {
+                    Get.snackbar('오류', '로그인이 필요합니다.');
+                  }
+                },
               )
             ],
           ),
-          body: screens[controller.currentIndex.value],
+          // body를 PageView로 변경
+          body: PageView(
+            controller: _pageController,
+            onPageChanged: (index) {
+              controller.changeIndex(index); // currentIndex 변경
+            },
+            children: screens,
+          ),
           bottomNavigationBar: Container(
             decoration: BoxDecoration(
               color: Colors.white,
@@ -90,18 +129,21 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             child: BottomNavigationBar(
               currentIndex: controller.currentIndex.value,
-              onTap: controller.changeIndex,
+              onTap: (index) {
+                controller.changeIndex(index);
+                _pageController.animateToPage(
+                  index,
+                  duration: const Duration(milliseconds: 300),
+                  curve: Curves.easeInOut,
+                );
+              },
               backgroundColor: Colors.white,
               selectedItemColor: Colors.black,
               unselectedItemColor: Colors.grey,
               type: BottomNavigationBarType.fixed,
               items: const [
                 BottomNavigationBarItem(icon: Icon(Icons.folder), label: '명함첩'),
-                BottomNavigationBarItem(
-                    icon: Icon(Icons.people_alt), label: 'Net'),
                 BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-                BottomNavigationBarItem(
-                    icon: Icon(Icons.auto_graph), label: 'AI'),
                 BottomNavigationBarItem(
                     icon: Icon(Icons.more_horiz), label: '더보기'),
               ],
@@ -112,6 +154,14 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildHomeBody(HomeController controller) {
     return Obx(() {
+      if (controller.isLoading.value) {
+        return const Center(
+          child: CircularProgressIndicator(
+            valueColor: AlwaysStoppedAnimation<Color>(Colors.black),
+          ),
+        );
+      }
+
       if (!controller.isCardRegistered.value || controller.cardData.isEmpty) {
         return Center(
           child: GestureDetector(
@@ -410,9 +460,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: 16, vertical: 14),
                                 decoration: BoxDecoration(
-                                  color: Color(0xFFF6F6F6),
+                                  color: const Color(0xFFF6F6F6),
                                   borderRadius: BorderRadius.circular(10),
-                                  border: Border.all(color: Color(0xFFE0E0E0)),
+                                  border: Border.all(
+                                      color: const Color(0xFFE0E0E0)),
                                 ),
                                 child: Row(
                                   children: [

@@ -7,23 +7,62 @@ import 'services/i_home_service.dart';
 class HomeService implements IHomeService {
   final FirebaseFirestore _firestore = FirebaseInit.instance.firestore;
   final FirebaseAuth _auth = FirebaseInit.instance.auth;
+  
+  // 캐시 데이터
+  Map<String, dynamic>? _cachedCardData;
+  Map<String, String>? _cachedContactInfo;
+  String? _cachedCardId;
+  DateTime? _lastFetchTime;
+  static const _cacheDuration = Duration(minutes: 5);
 
   Future<String?> getCardId(String uid) async {
+    if (_cachedCardId != null) return _cachedCardId;
+    
     final doc = await _firestore.collection('users').doc(uid).get();
-    return doc.data()?['cardId'] as String?;
+    _cachedCardId = doc.data()?['cardId'] as String?;
+    return _cachedCardId;
+  }
+
+  bool _isCacheValid() {
+    if (_lastFetchTime == null) return false;
+    return DateTime.now().difference(_lastFetchTime!) < _cacheDuration;
   }
 
   @override
   Future<Map<String, dynamic>?> fetchCardData() async {
+    // 캐시가 유효하면 캐시된 데이터 반환
+    if (_isCacheValid() && _cachedCardData != null) {
+      return _cachedCardData;
+    }
+
     final user = _auth.currentUser;
     if (user == null) return null;
+
     try {
       final cardId = await getCardId(user.uid);
       if (cardId == null) return null;
-      final doc = await _firestore.collection('cards').doc(cardId).get();
-      if (doc.exists && doc.data() != null) {
-        final data = doc.data()!;
+
+      // 기본 정보와 연락처 정보를 병렬로 가져오기
+      final results = await Future.wait([
+        _firestore.collection('cards').doc(cardId).get(),
+        _firestore.collection('cards').doc(cardId).collection('card_contact').doc('contacts').get(),
+      ]);
+
+      final cardDoc = results[0];
+      final contactDoc = results[1];
+
+      if (cardDoc.exists && cardDoc.data() != null) {
+        final data = cardDoc.data()!;
         data['cardId'] = cardId;
+
+        // 연락처 정보가 있으면 추가
+        if (contactDoc.exists && contactDoc.data() != null) {
+          data['contact'] = contactDoc.data();
+        }
+
+        // 캐시 업데이트
+        _cachedCardData = data;
+        _lastFetchTime = DateTime.now();
         return data;
       }
       return null;
@@ -35,29 +74,55 @@ class HomeService implements IHomeService {
 
   @override
   Future<Map<String, String>?> fetchContactInfo() async {
+    // 캐시가 유효하면 캐시된 데이터 반환
+    if (_isCacheValid() && _cachedContactInfo != null) {
+      return _cachedContactInfo;
+    }
+
     final user = _auth.currentUser;
     if (user == null) return null;
+
     try {
       final cardId = await getCardId(user.uid);
       if (cardId == null) return null;
-      final doc = await _firestore.collection('cards').doc(cardId).collection('card_contact').doc('contacts').get();
+
+      final doc = await _firestore
+          .collection('cards')
+          .doc(cardId)
+          .collection('card_contact')
+          .doc('contacts')
+          .get();
+
       if (doc.exists && doc.data() != null) {
-        return Map<String, String>.from(doc.data()!);
+        final data = Map<String, String>.from(doc.data()!);
+        _cachedContactInfo = data;
+        _lastFetchTime = DateTime.now();
+        return data;
       }
+      return null;
     } catch (e) {
       print('연락처 불러오기 오류: $e');
+      return null;
     }
-    return null;
   }
 
   @override
   Future<bool> updateCardData(Map<String, dynamic> data) async {
     final user = _auth.currentUser;
     if (user == null) return false;
+
     try {
       final cardId = await getCardId(user.uid);
       if (cardId == null) return false;
+
+      // 데이터 업데이트
       await _firestore.collection('cards').doc(cardId).update(data);
+      
+      // 캐시 무효화
+      _cachedCardData = null;
+      _cachedContactInfo = null;
+      _lastFetchTime = null;
+      
       return true;
     } catch (e) {
       print('명함 수정 오류: $e');
@@ -69,9 +134,11 @@ class HomeService implements IHomeService {
   Future<bool> checkCardExists() async {
     final user = _auth.currentUser;
     if (user == null) return false;
+
     try {
       final cardId = await getCardId(user.uid);
       if (cardId == null) return false;
+
       final doc = await _firestore.collection('cards').doc(cardId).get();
       return doc.exists;
     } catch (e) {
@@ -84,10 +151,18 @@ class HomeService implements IHomeService {
   Future<List<Map<String, dynamic>>> fetchCardBlocks() async {
     final user = _auth.currentUser;
     if (user == null) return [];
+
     try {
       final cardId = await getCardId(user.uid);
       if (cardId == null) return [];
-      final snapshot = await _firestore.collection('cards').doc(cardId).collection('card_block').get();
+
+      final snapshot = await _firestore
+          .collection('cards')
+          .doc(cardId)
+          .collection('card_block')
+          .orderBy('order', descending: false)
+          .get();
+
       return snapshot.docs.map((doc) {
         final data = doc.data();
         data['id'] = doc.id;
@@ -103,10 +178,18 @@ class HomeService implements IHomeService {
   Future<Map<String, dynamic>?> fetchCardStyle() async {
     final user = _auth.currentUser;
     if (user == null) return null;
+
     try {
       final cardId = await getCardId(user.uid);
       if (cardId == null) return null;
-      final doc = await _firestore.collection('cards').doc(cardId).collection('card_style').doc('style').get();
+
+      final doc = await _firestore
+          .collection('cards')
+          .doc(cardId)
+          .collection('card_style')
+          .doc('style')
+          .get();
+
       return doc.exists ? doc.data() : null;
     } catch (e) {
       print('명함 스타일 불러오기 오류: $e');
@@ -116,6 +199,12 @@ class HomeService implements IHomeService {
 
   @override
   Future<void> logout() async {
+    // 캐시 초기화
+    _cachedCardData = null;
+    _cachedContactInfo = null;
+    _cachedCardId = null;
+    _lastFetchTime = null;
+    
     await _auth.signOut();
   }
 }

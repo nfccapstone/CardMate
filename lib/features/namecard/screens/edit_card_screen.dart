@@ -14,7 +14,7 @@ enum LinkPlatform { direct, instagram, github }
 
 class EditCardScreen extends StatelessWidget {
   final String cardId;
-  const EditCardScreen({Key? key, required this.cardId}) : super(key: key);
+  const EditCardScreen({super.key, required this.cardId});
 
   @override
   Widget build(BuildContext context) {
@@ -64,7 +64,8 @@ class EditCardScreen extends StatelessWidget {
             child: ProfileSection(basicInfo: editController.basicInfo),
           ),
         ));
-        children.add(_NonReorderable(key: const ValueKey('profile_space'), child: const SizedBox(height: 12)));
+        children.add(const _NonReorderable(
+            key: ValueKey('profile_space'), child: SizedBox(height: 12)));
         // 연락처 카드
         children.add(_NonReorderable(
           key: const ValueKey('contact'),
@@ -86,7 +87,8 @@ class EditCardScreen extends StatelessWidget {
             child: ContactSection(controller: contactController),
           ),
         ));
-        children.add(_NonReorderable(key: const ValueKey('contact_space'), child: const SizedBox(height: 12)));
+        children.add(const _NonReorderable(
+            key: ValueKey('contact_space'), child: SizedBox(height: 12)));
         // 링크 카드
         children.add(_NonReorderable(
           key: const ValueKey('links'),
@@ -108,36 +110,44 @@ class EditCardScreen extends StatelessWidget {
             child: const LinkSection(),
           ),
         ));
-        children.add(_NonReorderable(key: const ValueKey('links_space'), child: const SizedBox(height: 12)));
+        children.add(const _NonReorderable(
+            key: ValueKey('links_space'), child: SizedBox(height: 12)));
         final int blockStartIndex = children.length;
         // 블록 카드
         children.addAll(blocks.map((block) => BlockPreviewCard(
-          key: ValueKey(block['id']),
-          block: block,
-        )));
-        children.add(_NonReorderable(key: const ValueKey('block_space'), child: const SizedBox(height: 20)));
+              key: ValueKey(block['id']),
+              block: block,
+            )));
+        children.add(const _NonReorderable(
+            key: ValueKey('block_space'), child: SizedBox(height: 20)));
         // 추가 버튼들
         children.add(_NonReorderable(
           key: const ValueKey('contact_add_btn'),
           child: _buildContactAddButton(context, contactController),
         ));
-        children.add(_NonReorderable(key: const ValueKey('contact_add_space'), child: const SizedBox(height: 12)));
+        children.add(const _NonReorderable(
+            key: ValueKey('contact_add_space'), child: SizedBox(height: 12)));
         children.add(_NonReorderable(
           key: const ValueKey('block_add_btn'),
           child: _buildBlockAddButton(context, editController),
         ));
-        children.add(_NonReorderable(key: const ValueKey('block_add_space'), child: const SizedBox(height: 12)));
+        children.add(const _NonReorderable(
+            key: ValueKey('block_add_space'), child: SizedBox(height: 12)));
         children.add(_NonReorderable(
           key: const ValueKey('link_add_btn'),
           child: _buildLinkAddButton(context),
         ));
-        children.add(_NonReorderable(key: const ValueKey('bottom_space'), child: const SizedBox(height: 40)));
+        children.add(const _NonReorderable(
+            key: ValueKey('bottom_space'), child: SizedBox(height: 40)));
 
         return ReorderableListView(
           onReorder: (oldIndex, newIndex) {
             final blockStart = blockStartIndex;
             final blockEnd = blockStart + blocks.length - 1;
-            if (oldIndex < blockStart || oldIndex > blockEnd || newIndex < blockStart || newIndex > blockEnd + 1) {
+            if (oldIndex < blockStart ||
+                oldIndex > blockEnd ||
+                newIndex < blockStart ||
+                newIndex > blockEnd + 1) {
               return;
             }
             int blockOldIndex = oldIndex - blockStart;
@@ -260,6 +270,7 @@ class EditCardScreen extends StatelessWidget {
                   return 'https://your.site';
               }
             }
+
             return Padding(
               padding: EdgeInsets.only(
                 left: 24,
@@ -276,7 +287,8 @@ class EditCardScreen extends StatelessWidget {
                     style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 24),
-                  const Text('제목', style: TextStyle(fontWeight: FontWeight.bold)),
+                  const Text('제목',
+                      style: TextStyle(fontWeight: FontWeight.bold)),
                   const SizedBox(height: 8),
                   TextField(
                     controller: titleController,
@@ -290,24 +302,33 @@ class EditCardScreen extends StatelessWidget {
                   Row(
                     children: [
                       IconButton(
-                        icon: Icon(Icons.language, color: selectedPlatform == LinkPlatform.direct ? Colors.deepPurple : Colors.grey),
-                        onPressed: () => setState(() => selectedPlatform = LinkPlatform.direct),
+                        icon: Icon(Icons.language,
+                            color: selectedPlatform == LinkPlatform.direct
+                                ? Colors.black87
+                                : Colors.grey),
+                        onPressed: () => setState(
+                            () => selectedPlatform = LinkPlatform.direct),
                         tooltip: '직접 입력',
                       ),
                       IconButton(
-                        icon: PlatformIconUtils.getPlatformIcon('instagram', size: 28),
-                        onPressed: () => setState(() => selectedPlatform = LinkPlatform.instagram),
+                        icon: PlatformIconUtils.getPlatformIcon('instagram',
+                            size: 28),
+                        onPressed: () => setState(
+                            () => selectedPlatform = LinkPlatform.instagram),
                         tooltip: 'Instagram',
                       ),
                       IconButton(
-                        icon: PlatformIconUtils.getPlatformIcon('github', size: 28),
-                        onPressed: () => setState(() => selectedPlatform = LinkPlatform.github),
+                        icon: PlatformIconUtils.getPlatformIcon('github',
+                            size: 28),
+                        onPressed: () => setState(
+                            () => selectedPlatform = LinkPlatform.github),
                         tooltip: 'GitHub',
                       ),
                     ],
                   ),
                   const SizedBox(height: 8),
-                  const Text('링크', style: TextStyle(fontWeight: FontWeight.bold)),
+                  const Text('링크',
+                      style: TextStyle(fontWeight: FontWeight.bold)),
                   const SizedBox(height: 8),
                   TextField(
                     controller: urlController,
@@ -347,7 +368,7 @@ class EditCardScreen extends StatelessWidget {
                         }
                         final title = titleController.text.trim();
                         final link = {
-                          'title': title, 
+                          'title': title,
                           'url': url,
                           'platform': platform
                         };
@@ -369,7 +390,7 @@ class EditCardScreen extends StatelessWidget {
 
 class _NonReorderable extends StatelessWidget {
   final Widget child;
-  const _NonReorderable({Key? key, required this.child}) : super(key: key);
+  const _NonReorderable({super.key, required this.child});
   @override
   Widget build(BuildContext context) => child;
 }

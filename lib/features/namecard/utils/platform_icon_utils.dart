@@ -11,7 +11,7 @@ class PlatformIconUtils {
             height: size,
             errorBuilder: (context, error, stackTrace) {
               debugPrint('Instagram 이미지 로드 실패: $error');
-              return Icon(Icons.camera_alt, color: Colors.deepPurple, size: size);
+              return Icon(Icons.camera_alt, color: Colors.black87, size: size);
             },
           );
         case 'github':
@@ -21,15 +21,15 @@ class PlatformIconUtils {
             height: size,
             errorBuilder: (context, error, stackTrace) {
               debugPrint('GitHub 이미지 로드 실패: $error');
-              return Icon(Icons.code, color: Colors.deepPurple, size: size);
+              return Icon(Icons.code, color: Colors.black87, size: size);
             },
           );
         default:
-          return Icon(Icons.link, color: Colors.deepPurple, size: size);
+          return Icon(Icons.link, color: Colors.black87, size: size);
       }
     } catch (e) {
       debugPrint('아이콘 로드 중 오류 발생: $e');
       return Icon(Icons.error, color: Colors.red, size: size);
     }
   }
-} 
+}
