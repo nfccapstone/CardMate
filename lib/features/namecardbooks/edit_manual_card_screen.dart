@@ -67,7 +67,8 @@ class EditManualCardScreen extends StatelessWidget {
               ],
               border: Border.all(color: Colors.grey[200]!),
             ),
-            child: ProfileSection(basicInfo: editController.otherBasicInfo),
+            child: ProfileSection(
+                basicInfo: editController.otherBasicInfo, readOnly: true),
           ),
         ));
         children.add(_NonReorderable(
