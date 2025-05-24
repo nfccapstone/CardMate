@@ -41,18 +41,18 @@ class CardWebScreen extends StatelessWidget {
           // 연락처 순서 정렬
           if (data['contacts'] != null) {
             final contacts = data['contacts'] as Map<String, dynamic>;
-            final sortedEntries = contacts.entries.toList()
-              ..sort((a, b) {
-                final typeOrder = {
-                  'mobile': 0,
-                  'phone': 1,
-                  'email': 2,
-                  'website': 3,
-                };
-                final aOrder = typeOrder[a.key] ?? 999;
-                final bOrder = typeOrder[b.key] ?? 999;
-                return aOrder.compareTo(bOrder);
-              });
+            final orderedTypes = [
+              'mobile',
+              'phone',
+              'email',
+              'website',
+              'address',
+              'fax',
+            ];
+            
+            final sortedEntries = orderedTypes
+                .where((type) => contacts.containsKey(type))
+                .map((type) => MapEntry(type, contacts[type]));
 
             data['contacts'] = LinkedHashMap.fromEntries(sortedEntries);
           }
@@ -177,7 +177,6 @@ class CardWebScreen extends StatelessWidget {
                       const SizedBox(height: 24),
                       ...(cardData['contacts'] as Map<String, dynamic>)
                           .entries
-                          .toList()
                           .map((entry) {
                             final type = entry.key;
                             final value = entry.value;
@@ -261,8 +260,7 @@ class CardWebScreen extends StatelessWidget {
                               ),
                             );
                           })
-                          .toList()
-                          .reversed,
+                          .toList(),
                     ],
                   ),
                 ),

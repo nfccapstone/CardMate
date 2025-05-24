@@ -196,6 +196,23 @@ class _ManualCardDetailScreenState extends State<ManualCardDetailScreen> {
       return const SizedBox.shrink();
     }
 
+    // 연락처 타입별 순서 정의
+    final typeOrder = {
+      '전화번호': 0,
+      '유선전화': 1,
+      '이메일': 2,
+      '홈페이지': 3,
+      '주소': 4,
+      '팩스': 5,
+    };
+
+    // 연락처를 순서대로 정렬
+    contacts.sort((a, b) {
+      final aOrder = typeOrder[a['type']] ?? 999;
+      final bOrder = typeOrder[b['type']] ?? 999;
+      return aOrder.compareTo(bOrder);
+    });
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -213,14 +230,20 @@ class _ManualCardDetailScreenState extends State<ManualCardDetailScreen> {
           IconData icon;
           VoidCallback? onTap;
 
-          if (type == '전화번호') {
+          if (type == '전화번호' || type == '유선전화') {
             icon = Icons.phone;
             onTap = () => launchUrl(Uri.parse('tel:$value'));
           } else if (type == '이메일') {
             icon = Icons.email;
             onTap = () => launchUrl(Uri.parse('mailto:$value'));
+          } else if (type == '홈페이지') {
+            icon = Icons.language;
+            onTap = () => launchUrl(Uri.parse(value));
           } else if (type == '주소') {
             icon = Icons.location_on;
+            onTap = null;
+          } else if (type == '팩스') {
+            icon = Icons.fax;
             onTap = null;
           } else {
             icon = Icons.contact_phone;

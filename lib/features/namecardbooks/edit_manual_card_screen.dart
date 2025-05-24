@@ -26,7 +26,32 @@ class _EditManualCardScreenState extends State<EditManualCardScreen> {
   @override
   void initState() {
     super.initState();
-    _contacts = List<Map<String, dynamic>>.from(widget.cardData['contacts'] ?? []);
+    _loadContacts();
+  }
+
+  Future<void> _loadContacts() async {
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) return;
+
+      final doc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .collection('make_book')
+          .doc(widget.cardId)
+          .get();
+
+      if (doc.exists) {
+        final data = doc.data();
+        if (data != null && data['contacts'] != null) {
+          setState(() {
+            _contacts = List<Map<String, dynamic>>.from(data['contacts']);
+          });
+        }
+      }
+    } catch (e) {
+      print('연락처 로드 실패: $e');
+    }
   }
 
   Future<void> _saveCard() async {
@@ -64,58 +89,137 @@ class _EditManualCardScreenState extends State<EditManualCardScreen> {
   void _showAddContactDialog() {
     final typeController = TextEditingController();
     final valueController = TextEditingController();
+    String selectedType = '전화번호';
 
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('연락처 추가'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            DropdownButtonFormField<String>(
-              decoration: const InputDecoration(
-                labelText: '연락처 유형',
-                border: OutlineInputBorder(),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(14),
+        ),
+        title: const Text(
+          '연락처 추가',
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+          ),
+          textAlign: TextAlign.center,
+        ),
+        content: Container(
+          width: double.maxFinite,
+          padding: const EdgeInsets.symmetric(horizontal: 8),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.grey[100],
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: DropdownButtonFormField<String>(
+                  value: selectedType,
+                  decoration: InputDecoration(
+                    labelText: '연락처 유형',
+                    labelStyle: TextStyle(color: Colors.grey[600]),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: BorderSide.none,
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  ),
+                  items: const [
+                    DropdownMenuItem(value: '전화번호', child: Text('전화번호')),
+                    DropdownMenuItem(value: '유선전화', child: Text('유선전화')),
+                    DropdownMenuItem(value: '이메일', child: Text('이메일')),
+                    DropdownMenuItem(value: '홈페이지', child: Text('홈페이지')),
+                    DropdownMenuItem(value: '주소', child: Text('주소')),
+                    DropdownMenuItem(value: '팩스', child: Text('팩스')),
+                  ],
+                  onChanged: (value) {
+                    if (value != null) {
+                      selectedType = value;
+                      typeController.text = value;
+                    }
+                  },
+                ),
               ),
-              items: const [
-                DropdownMenuItem(value: '전화번호', child: Text('전화번호')),
-                DropdownMenuItem(value: '이메일', child: Text('이메일')),
-                DropdownMenuItem(value: '주소', child: Text('주소')),
-              ],
-              onChanged: (value) {
-                typeController.text = value ?? '';
-              },
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: valueController,
-              decoration: const InputDecoration(
-                labelText: '연락처',
-                border: OutlineInputBorder(),
+              const SizedBox(height: 16),
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.grey[100],
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: TextField(
+                  controller: valueController,
+                  decoration: InputDecoration(
+                    labelText: '연락처',
+                    labelStyle: TextStyle(color: Colors.grey[600]),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: BorderSide.none,
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  ),
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
         actions: [
-          TextButton(
-            onPressed: () => Get.back(),
-            child: const Text('취소'),
-          ),
-          TextButton(
-            onPressed: () {
-              if (typeController.text.isNotEmpty && valueController.text.isNotEmpty) {
-                setState(() {
-                  _contacts.add({
-                    'type': typeController.text,
-                    'value': valueController.text,
-                  });
-                });
-                Get.back();
-              }
-            },
-            child: const Text('추가'),
+          Row(
+            children: [
+              Expanded(
+                child: TextButton(
+                  onPressed: () => Get.back(),
+                  style: TextButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  child: const Text(
+                    '취소',
+                    style: TextStyle(
+                      color: Colors.grey,
+                      fontSize: 16,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: ElevatedButton(
+                  onPressed: () {
+                    if (typeController.text.isNotEmpty && valueController.text.isNotEmpty) {
+                      setState(() {
+                        _contacts.add({
+                          'type': typeController.text,
+                          'value': valueController.text,
+                        });
+                      });
+                      Get.back();
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.black,
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  child: const Text(
+                    '추가',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
         ],
+        actionsPadding: const EdgeInsets.all(16),
       ),
     );
   }
@@ -286,6 +390,23 @@ class _EditManualCardScreenState extends State<EditManualCardScreen> {
       return const SizedBox.shrink();
     }
 
+    // 연락처 타입별 순서 정의
+    final typeOrder = {
+      '전화번호': 0,
+      '유선전화': 1,
+      '이메일': 2,
+      '홈페이지': 3,
+      '주소': 4,
+      '팩스': 5,
+    };
+
+    // 연락처를 순서대로 정렬
+    _contacts.sort((a, b) {
+      final aOrder = typeOrder[a['type']] ?? 999;
+      final bOrder = typeOrder[b['type']] ?? 999;
+      return aOrder.compareTo(bOrder);
+    });
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -303,14 +424,20 @@ class _EditManualCardScreenState extends State<EditManualCardScreen> {
           IconData icon;
           VoidCallback? onTap;
 
-          if (type == '전화번호') {
+          if (type == '전화번호' || type == '유선전화') {
             icon = Icons.phone;
             onTap = () => launchUrl(Uri.parse('tel:$value'));
           } else if (type == '이메일') {
             icon = Icons.email;
             onTap = () => launchUrl(Uri.parse('mailto:$value'));
+          } else if (type == '홈페이지') {
+            icon = Icons.language;
+            onTap = () => launchUrl(Uri.parse(value));
           } else if (type == '주소') {
             icon = Icons.location_on;
+            onTap = null;
+          } else if (type == '팩스') {
+            icon = Icons.fax;
             onTap = null;
           } else {
             icon = Icons.contact_phone;
