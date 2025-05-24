@@ -53,7 +53,7 @@ class _ManualCardDetailScreenState extends State<ManualCardDetailScreen> {
         backgroundColor: Colors.black,
         iconTheme: const IconThemeData(color: Colors.white),
         title: const Text(
-          '명함 상세',
+          'CardMate',
           style: TextStyle(color: Colors.white),
         ),
         centerTitle: true,
