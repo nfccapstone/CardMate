@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cardmate/features/namecardbooks/manual_card_detail_screen.dart';
+// import 'package:cardmate/features/namecardbooks/manual_card_detail_screen.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class EditManualCardScreen extends StatefulWidget {
   final String cardId;
@@ -38,7 +39,6 @@ class _EditManualCardScreenState extends State<EditManualCardScreen> {
         return;
       }
 
-      // 기존 데이터를 유지하면서 연락처만 업데이트
       final updatedCardData = {
         ...widget.cardData,
         'contacts': _contacts,
@@ -52,7 +52,6 @@ class _EditManualCardScreenState extends State<EditManualCardScreen> {
           .doc(widget.cardId)
           .update(updatedCardData);
 
-      // 명함첩으로 돌아가기
       Get.until((route) => route.isFirst);
       Get.snackbar('성공', '연락처가 수정되었습니다.');
     } catch (e) {
@@ -124,94 +123,81 @@ class _EditManualCardScreenState extends State<EditManualCardScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text('연락처 관리'),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
-        elevation: 0,
+        backgroundColor: Colors.black,
+        iconTheme: const IconThemeData(color: Colors.white),
+        title: const Text(
+          '연락처 관리',
+          style: TextStyle(color: Colors.white),
+        ),
+        centerTitle: true,
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // 개인정보 표시 (읽기 전용)
+            // 프로필 카드
             Container(
-              padding: const EdgeInsets.all(16),
+              margin: const EdgeInsets.only(bottom: 16),
+              padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: Colors.grey[50],
-                borderRadius: BorderRadius.circular(12),
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(14),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.10),
+                    blurRadius: 12,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
                 border: Border.all(color: Colors.grey[200]!),
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    '개인정보',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black87,
-                    ),
+              child: _buildProfileSection(),
+            ),
+            const SizedBox(height: 12),
+            // 연락처 카드
+            Container(
+              margin: const EdgeInsets.only(bottom: 16),
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(14),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.10),
+                    blurRadius: 12,
+                    offset: const Offset(0, 4),
                   ),
-                  const SizedBox(height: 16),
-                  _buildInfoRow('이름', widget.cardData['name'] ?? ''),
-                  const SizedBox(height: 8),
-                  _buildInfoRow('직책', widget.cardData['position'] ?? ''),
-                  const SizedBox(height: 8),
-                  _buildInfoRow('부서', widget.cardData['department'] ?? ''),
-                  const SizedBox(height: 8),
-                  _buildInfoRow('회사', widget.cardData['company'] ?? ''),
                 ],
+                border: Border.all(color: Colors.grey[200]!),
+              ),
+              child: _buildContactsSection(),
+            ),
+            const SizedBox(height: 12),
+            // 연락처 추가 버튼
+            GestureDetector(
+              onTap: _showAddContactDialog,
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: Colors.black,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: const Text(
+                  '+ 연락처 추가',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.white,
+                  ),
+                ),
               ),
             ),
-            const SizedBox(height: 32),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text(
-                  '연락처',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                TextButton.icon(
-                  onPressed: _showAddContactDialog,
-                  icon: const Icon(Icons.add),
-                  label: const Text('연락처 추가'),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            ListView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: _contacts.length,
-              itemBuilder: (context, index) {
-                final contact = _contacts[index];
-                return Card(
-                  margin: const EdgeInsets.only(bottom: 8),
-                  child: ListTile(
-                    leading: Icon(
-                      _getContactIcon(contact['type']),
-                      color: Colors.black,
-                    ),
-                    title: Text(contact['value']),
-                    subtitle: Text(contact['type']),
-                    trailing: IconButton(
-                      icon: const Icon(Icons.delete),
-                      onPressed: () {
-                        setState(() {
-                          _contacts.removeAt(index);
-                        });
-                      },
-                    ),
-                  ),
-                );
-              },
-            ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 12),
+            // 저장 버튼
             ElevatedButton(
               onPressed: _isLoading ? null : _saveCard,
               style: ElevatedButton.styleFrom(
@@ -232,48 +218,156 @@ class _EditManualCardScreenState extends State<EditManualCardScreen> {
                       ),
                     ),
             ),
+            const SizedBox(height: 40),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildInfoRow(String label, String value) {
-    return Row(
-      children: [
-        SizedBox(
-          width: 60,
-          child: Text(
-            label,
-            style: const TextStyle(
-              color: Colors.grey,
-              fontSize: 14,
+  Widget _buildProfileSection() {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.black,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 80,
+            height: 80,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: Colors.grey[800],
+            ),
+            child: const Icon(
+              Icons.person,
+              size: 40,
+              color: Colors.white70,
             ),
           ),
-        ),
-        Expanded(
-          child: Text(
-            value,
-            style: const TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
+          const SizedBox(width: 20),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  widget.cardData['name'] ?? '이름 없음',
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  '${widget.cardData['department'] ?? ''} / ${widget.cardData['position'] ?? ''}',
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: Colors.white70,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  widget.cardData['company'] ?? '',
+                  style: const TextStyle(fontSize: 14, color: Colors.white70),
+                ),
+              ],
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
-  IconData _getContactIcon(String type) {
-    switch (type.toLowerCase()) {
-      case '전화번호':
-        return Icons.phone;
-      case '이메일':
-        return Icons.email;
-      case '주소':
-        return Icons.location_on;
-      default:
-        return Icons.contact_phone;
+  Widget _buildContactsSection() {
+    if (_contacts.isEmpty) {
+      return const SizedBox.shrink();
     }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          '연락처',
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        const SizedBox(height: 12),
+        ..._contacts.map((contact) {
+          final type = contact['type'];
+          final value = contact['value'];
+          IconData icon;
+          VoidCallback? onTap;
+
+          if (type == '전화번호') {
+            icon = Icons.phone;
+            onTap = () => launchUrl(Uri.parse('tel:$value'));
+          } else if (type == '이메일') {
+            icon = Icons.email;
+            onTap = () => launchUrl(Uri.parse('mailto:$value'));
+          } else if (type == '주소') {
+            icon = Icons.location_on;
+            onTap = null;
+          } else {
+            icon = Icons.contact_phone;
+            onTap = null;
+          }
+
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 12),
+            child: InkWell(
+              onTap: onTap,
+              child: Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.grey[100],
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Row(
+                  children: [
+                    Icon(icon, color: Colors.black87),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            value,
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.black,
+                            ),
+                          ),
+                          Text(
+                            type,
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.grey[600],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.delete_outline, color: Colors.red),
+                      onPressed: () {
+                        setState(() {
+                          _contacts.remove(contact);
+                        });
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        }).toList(),
+      ],
+    );
   }
 }

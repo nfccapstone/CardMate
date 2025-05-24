@@ -4,7 +4,7 @@ import 'package:cardmate/features/namecard/controllers/edit_card_controller.dart
 import 'package:cardmate/features/namecard/controllers/contact_controller.dart';
 import 'package:cardmate/features/namecard/widgets/profile_section.dart';
 import 'package:cardmate/features/namecard/widgets/contact_section.dart';
-import 'package:cardmate/features/namecard/widgets/block_section.dart';
+// import 'package:cardmate/features/namecard/widgets/block_section.dart';
 import 'package:cardmate/features/namecard/services/i_contact_service.dart';
 import 'package:cardmate/features/namecard/widgets/block_preview_card.dart';
 import 'package:cardmate/features/namecard/widgets/link_section.dart';
