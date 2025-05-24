@@ -5,8 +5,38 @@ import 'more_controller.dart';
 import 'package:cardmate/features/home/home_controller.dart';
 import 'package:nfc_manager/nfc_manager.dart';
 
-class MoreScreen extends StatelessWidget {
+class MoreScreen extends StatefulWidget {
   const MoreScreen({Key? key}) : super(key: key);
+
+  @override
+  State<MoreScreen> createState() => _MoreScreenState();
+}
+
+class _MoreScreenState extends State<MoreScreen> with SingleTickerProviderStateMixin {
+  late AnimationController _pulseController;
+  late Animation<double> _pulseAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _pulseController = AnimationController(
+      duration: const Duration(milliseconds: 1500),
+      vsync: this,
+    );
+    
+    _pulseAnimation = Tween<double>(begin: 1.0, end: 1.3).animate(
+      CurvedAnimation(
+        parent: _pulseController,
+        curve: Curves.easeInOut,
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _pulseController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -152,29 +182,30 @@ class MoreScreen extends StatelessWidget {
                         Stack(
                           alignment: Alignment.center,
                           children: [
-                            if (isWriting.value)
-                              AnimatedBuilder(
-                                animation: CurvedAnimation(
-                                  parent: AnimationController(
-                                    vsync: Navigator.of(context),
-                                    duration: const Duration(milliseconds: 1500),
-                                  )..repeat(reverse: true),
-                                  curve: Curves.easeInOut,
-                                ),
-                                builder: (context, child) {
-                                  return Transform.scale(
-                                    scale: 1.0 + (0.3 * (isWriting.value ? 1 : 0)),
-                                    child: Container(
-                                      width: 120,
-                                      height: 120,
-                                      decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        color: Colors.blue.withOpacity(0.15),
+                            Obx(() {
+                              if (isWriting.value) {
+                                _pulseController.repeat(reverse: true);
+                                return AnimatedBuilder(
+                                  animation: _pulseAnimation,
+                                  builder: (context, child) {
+                                    return Transform.scale(
+                                      scale: _pulseAnimation.value,
+                                      child: Container(
+                                        width: 120,
+                                        height: 120,
+                                        decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          color: Colors.blue.withOpacity(0.15),
+                                        ),
                                       ),
-                                    ),
-                                  );
-                                },
-                              ),
+                                    );
+                                  },
+                                );
+                              } else {
+                                _pulseController.stop();
+                                return const SizedBox.shrink();
+                              }
+                            }),
                             Container(
                               width: 88,
                               height: 88,
@@ -190,48 +221,38 @@ class MoreScreen extends StatelessWidget {
                                 ],
                               ),
                               child: Center(
-                                child: Image.asset(
-                                  'assets/icons/NFCScan.png',
-                                  width: 56,
-                                  height: 56,
-                                ),
+                                child: Obx(() {
+                                  if (nfcResult.value.contains('성공')) {
+                                    return const Icon(
+                                      Icons.check_circle,
+                                      size: 56,
+                                      color: Colors.green,
+                                    );
+                                  } else if (nfcResult.value.contains('오류') || 
+                                           nfcResult.value.contains('실패') ||
+                                           nfcResult.value.contains('불가')) {
+                                    return const Icon(
+                                      Icons.cancel,
+                                      size: 56,
+                                      color: Colors.red,
+                                    );
+                                  } else {
+                                    return Image.asset(
+                                      'assets/icons/NFCScan.png',
+                                      width: 56,
+                                      height: 56,
+                                    );
+                                  }
+                                }),
                               ),
                             ),
                           ],
                         ),
                         const SizedBox(height: 24),
-                        Obx(() => Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 10,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(10),
-                            border: Border.all(color: Colors.grey[200]!),
-                          ),
-                          child: Text(
-                            isWriting.value
-                                ? "NFC 태그를 기다리는 중..."
-                                : nfcResult.value.isNotEmpty
-                                    ? nfcResult.value
-                                    : "스캔을 시작하세요",
-                            style: TextStyle(
-                              color: nfcResult.value.contains('성공')
-                                  ? Colors.green
-                                  : nfcResult.value.contains('오류')
-                                      ? Colors.red
-                                      : Colors.black54,
-                              fontSize: 15,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        )),
-                        const SizedBox(height: 24),
                         if (!isWriting.value && nfcResult.value.isEmpty)
                           ElevatedButton.icon(
                             icon: const Icon(Icons.save),
-                            label: const Text("NFC에 저장"),
+                            label: const Text("NFC 스캔"),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.black,
                               foregroundColor: Colors.white,
