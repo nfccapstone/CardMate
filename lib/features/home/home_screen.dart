@@ -11,6 +11,7 @@ import 'package:cardmate/features/more/more_service.dart';
 import 'package:cardmate/features/more/more_controller.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cardmate/features/namecardbooks/widgets/card_update_alert_list.dart';
+import 'package:share_plus/share_plus.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -210,7 +211,7 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
           child: Container(
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(12),
@@ -410,7 +411,25 @@ class _HomeScreenState extends State<HomeScreen> {
                       const SizedBox(width: 2),
                       ElevatedButton.icon(
                         onPressed: () {
-                          // 공유 기능 추가 예정
+                          final data = controller.cardData;
+                          final name = data['name'] ?? '';
+                          final company = data['company'] ?? '';
+                          final position = data['position'] ?? '';
+                          final department = data['department'] ?? '';
+                          final cardId = data['cardId'] ?? '';
+                          final profileLink = 'https://cardmate-37be3.web.app/card/myNameCard/$cardId';
+                          
+                          final shareText = '''
+CardMate에서 $name님의 명함을 공유합니다.
+회사: $company
+부서: $department
+직책: $position
+
+[명함 보기]
+$profileLink
+''';
+                          
+                          Share.share(shareText, subject: '$name님의 명함');
                         },
                         icon: const Icon(Icons.share, size: 18),
                         label: const Text("공유"),

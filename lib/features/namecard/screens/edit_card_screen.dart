@@ -4,7 +4,7 @@ import 'package:cardmate/features/namecard/controllers/edit_card_controller.dart
 import 'package:cardmate/features/namecard/controllers/contact_controller.dart';
 import 'package:cardmate/features/namecard/widgets/profile_section.dart';
 import 'package:cardmate/features/namecard/widgets/contact_section.dart';
-// import 'package:cardmate/features/namecard/widgets/block_section.dart';
+import 'package:cardmate/features/namecard/widgets/block_section.dart';
 import 'package:cardmate/features/namecard/services/i_contact_service.dart';
 import 'package:cardmate/features/namecard/widgets/block_preview_card.dart';
 import 'package:cardmate/features/namecard/widgets/link_section.dart';
@@ -273,112 +273,163 @@ class EditCardScreen extends StatelessWidget {
 
             return Padding(
               padding: EdgeInsets.only(
-                left: 24,
-                right: 24,
-                top: 32,
-                bottom: MediaQuery.of(context).viewInsets.bottom + 24,
+                left: 0,
+                right: 0,
+                top: 0,
+                bottom: MediaQuery.of(context).viewInsets.bottom,
               ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    '링크 추가',
-                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 24),
-                  const Text('제목',
-                      style: TextStyle(fontWeight: FontWeight.bold)),
-                  const SizedBox(height: 8),
-                  TextField(
-                    controller: titleController,
-                    decoration: const InputDecoration(
-                      hintText: '예: 회사 홈페이지',
-                      border: OutlineInputBorder(),
-                      hintStyle: TextStyle(color: Colors.grey),
+              child: SingleChildScrollView(
+                child: Center(
+                  child: Container(
+                    margin: const EdgeInsets.symmetric(vertical: 32, horizontal: 24),
+                    padding: const EdgeInsets.all(24),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(18),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.18),
+                          blurRadius: 18,
+                          offset: const Offset(0, 8),
+                        ),
+                      ],
+                      border: Border.all(color: Colors.grey[200]!),
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          '링크 추가',
+                          style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(height: 24),
+                        const Text('제목', style: TextStyle(fontWeight: FontWeight.bold)),
+                        const SizedBox(height: 8),
+                        TextField(
+                          controller: titleController,
+                          decoration: InputDecoration(
+                            hintText: '예: 회사 홈페이지',
+                            filled: true,
+                            fillColor: Colors.grey[50],
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              borderSide: BorderSide(color: Colors.grey[200]!),
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              borderSide: BorderSide(color: Colors.grey[200]!),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              borderSide: const BorderSide(color: Colors.black),
+                            ),
+                            hintStyle: const TextStyle(color: Colors.grey),
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        Row(
+                          children: [
+                            IconButton(
+                              icon: Icon(Icons.language,
+                                  color: selectedPlatform == LinkPlatform.direct
+                                      ? Colors.black87
+                                      : Colors.grey),
+                              onPressed: () => setState(
+                                  () => selectedPlatform = LinkPlatform.direct),
+                              tooltip: '직접 입력',
+                            ),
+                            IconButton(
+                              icon: PlatformIconUtils.getPlatformIcon('instagram', size: 28),
+                              onPressed: () => setState(
+                                  () => selectedPlatform = LinkPlatform.instagram),
+                              tooltip: 'Instagram',
+                            ),
+                            IconButton(
+                              icon: PlatformIconUtils.getPlatformIcon('github', size: 28),
+                              onPressed: () => setState(
+                                  () => selectedPlatform = LinkPlatform.github),
+                              tooltip: 'GitHub',
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        const Text('링크', style: TextStyle(fontWeight: FontWeight.bold)),
+                        const SizedBox(height: 8),
+                        TextField(
+                          controller: urlController,
+                          decoration: InputDecoration(
+                            hintText: getHintText(),
+                            filled: true,
+                            fillColor: Colors.grey[50],
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              borderSide: BorderSide(color: Colors.grey[200]!),
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              borderSide: BorderSide(color: Colors.grey[200]!),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              borderSide: const BorderSide(color: Colors.black),
+                            ),
+                            hintStyle: const TextStyle(color: Colors.grey),
+                          ),
+                          keyboardType: TextInputType.text,
+                        ),
+                        const SizedBox(height: 8),
+                        const Text(
+                          'https:// 포함한 웹사이트 주소를 입력하세요.',
+                          style: TextStyle(fontSize: 12, color: Colors.black54),
+                        ),
+                        const SizedBox(height: 24),
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            onPressed: () {
+                              String input = urlController.text.trim();
+                              String url;
+                              String platform;
+                              switch (selectedPlatform) {
+                                case LinkPlatform.instagram:
+                                  url = 'https://instagram.com/$input';
+                                  platform = 'instagram';
+                                  break;
+                                case LinkPlatform.github:
+                                  url = 'https://github.com/$input';
+                                  platform = 'github';
+                                  break;
+                                case LinkPlatform.direct:
+                                default:
+                                  url = input;
+                                  platform = 'direct';
+                              }
+                              final title = titleController.text.trim();
+                              final link = {
+                                'title': title,
+                                'url': url,
+                                'platform': platform
+                              };
+                              editController.addLink(link);
+                              Navigator.pop(context);
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.black,
+                              foregroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(vertical: 16),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              elevation: 0,
+                            ),
+                            child: const Text('저장', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                  const SizedBox(height: 20),
-                  Row(
-                    children: [
-                      IconButton(
-                        icon: Icon(Icons.language,
-                            color: selectedPlatform == LinkPlatform.direct
-                                ? Colors.black87
-                                : Colors.grey),
-                        onPressed: () => setState(
-                            () => selectedPlatform = LinkPlatform.direct),
-                        tooltip: '직접 입력',
-                      ),
-                      IconButton(
-                        icon: PlatformIconUtils.getPlatformIcon('instagram',
-                            size: 28),
-                        onPressed: () => setState(
-                            () => selectedPlatform = LinkPlatform.instagram),
-                        tooltip: 'Instagram',
-                      ),
-                      IconButton(
-                        icon: PlatformIconUtils.getPlatformIcon('github',
-                            size: 28),
-                        onPressed: () => setState(
-                            () => selectedPlatform = LinkPlatform.github),
-                        tooltip: 'GitHub',
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  const Text('링크',
-                      style: TextStyle(fontWeight: FontWeight.bold)),
-                  const SizedBox(height: 8),
-                  TextField(
-                    controller: urlController,
-                    decoration: InputDecoration(
-                      hintText: getHintText(),
-                      border: const OutlineInputBorder(),
-                      hintStyle: const TextStyle(color: Colors.grey),
-                    ),
-                    keyboardType: TextInputType.text,
-                  ),
-                  const SizedBox(height: 8),
-                  const Text(
-                    'https:// 포함한 웹사이트 주소를 입력하세요.',
-                    style: TextStyle(fontSize: 12, color: Colors.black54),
-                  ),
-                  const SizedBox(height: 24),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        String input = urlController.text.trim();
-                        String url;
-                        String platform;
-                        switch (selectedPlatform) {
-                          case LinkPlatform.instagram:
-                            url = 'https://instagram.com/$input';
-                            platform = 'instagram';
-                            break;
-                          case LinkPlatform.github:
-                            url = 'https://github.com/$input';
-                            platform = 'github';
-                            break;
-                          case LinkPlatform.direct:
-                          default:
-                            url = input;
-                            platform = 'direct';
-                        }
-                        final title = titleController.text.trim();
-                        final link = {
-                          'title': title,
-                          'url': url,
-                          'platform': platform
-                        };
-                        editController.addLink(link);
-                        Navigator.pop(context);
-                      },
-                      child: const Text('저장'),
-                    ),
-                  ),
-                ],
+                ),
               ),
             );
           },
