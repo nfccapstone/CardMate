@@ -35,7 +35,7 @@ class MyNameCardScreen extends StatelessWidget {
         backgroundColor: Colors.black,
         iconTheme: const IconThemeData(color: Colors.white),
         title: const Text(
-          '내 공유명함',
+          'CardMate',
           style: TextStyle(color: Colors.white),
         ),
         centerTitle: true,

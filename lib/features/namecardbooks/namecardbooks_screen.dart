@@ -1,4 +1,7 @@
-import 'package:cardmate/features/namecard/controllers/edit_card_controller.dart';
+
+import 'package:cardmate/features/namecardbooks/add_card_byId_screen.dart';
+import 'package:cardmate/features/namecardbooks/add_card_byNFC_screen.dart';
+import 'package:cardmate/features/namecardbooks/add_manual_card_screen.dart';
 import 'package:cardmate/features/namecardbooks/card_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -91,60 +94,62 @@ class NamecardbooksScreen extends StatelessWidget {
       builder: (context) {
         return Container(
           padding: const EdgeInsets.all(24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                '다른 사람 명함 추가하기',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black87,
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  '다른 사람 명함 추가하기',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 24),
-              _buildOptionButton(
-                context,
-                Icons.nfc,
-                'NFC 명함 태그',
-                Colors.black,
-                () {
-                  Get.toNamed('/add-card-nfc');
-                },
-              ),
-              const SizedBox(height: 12),
-              _buildOptionButton(
-                context,
-                Icons.qr_code_scanner,
-                'QR 코드 찍기',
-                Colors.black,
-                () {
-                  Get.toNamed('/qr-scan');
-                },
-              ),
-              const SizedBox(height: 12),
-              _buildOptionButton(
-                context,
-                Icons.edit,
-                '아이디로 명함 등록',
-                Colors.black,
-                () {
-                  Get.toNamed('/add-card-id');
-                },
-              ),
-              const SizedBox(height: 12),
-              _buildOptionButton(
-                context,
-                Icons.edit,
-                '직접 입력하기',
-                Colors.black,
-                () {
-                  Get.toNamed('/add-card-manual');
-                },
-              ),
-              const SizedBox(height: 24),
-            ],
+                const SizedBox(height: 24),
+                _buildOptionButton(
+                  context,
+                  Icons.edit_note,
+                  '직접 명함 추가',
+                  Colors.black,
+                  () {
+                    Get.to(() => const AddManualCardScreen());
+                  },
+                ),
+                const SizedBox(height: 12),
+                _buildOptionButton(
+                  context,
+                  Icons.nfc,
+                  'NFC 명함 태그',
+                  Colors.black,
+                  () {
+                    Get.toNamed('/add-card-nfc');
+                  },
+                ),
+                const SizedBox(height: 12),
+                _buildOptionButton(
+                  context,
+                  Icons.qr_code_scanner,
+                  'QR 코드 찍기',
+                  Colors.black,
+                  () {
+                    Get.toNamed('/qr-scan');
+                  },
+                ),
+                const SizedBox(height: 12),
+                _buildOptionButton(
+                  context,
+                  Icons.edit,
+                  '아이디로 명함 등록',
+                  Colors.black,
+                  () {
+                    Get.toNamed('/add-card-id');
+                  },
+                ),
+                const SizedBox(height: 24),
+              ],
+            ),
           ),
         );
       },

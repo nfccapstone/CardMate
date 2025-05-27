@@ -5,8 +5,38 @@ import 'more_controller.dart';
 import 'package:cardmate/features/home/home_controller.dart';
 import 'package:nfc_manager/nfc_manager.dart';
 
-class MoreScreen extends StatelessWidget {
+class MoreScreen extends StatefulWidget {
   const MoreScreen({Key? key}) : super(key: key);
+
+  @override
+  State<MoreScreen> createState() => _MoreScreenState();
+}
+
+class _MoreScreenState extends State<MoreScreen> with SingleTickerProviderStateMixin {
+  late AnimationController _pulseController;
+  late Animation<double> _pulseAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _pulseController = AnimationController(
+      duration: const Duration(milliseconds: 1500),
+      vsync: this,
+    );
+    
+    _pulseAnimation = Tween<double>(begin: 1.0, end: 1.3).animate(
+      CurvedAnimation(
+        parent: _pulseController,
+        curve: Curves.easeInOut,
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _pulseController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -122,177 +152,165 @@ class MoreScreen extends StatelessWidget {
                 Dialog(
                   backgroundColor: Colors.transparent,
                   child: Container(
-                    padding: const EdgeInsets.all(24),
+                    width: 320,
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 28),
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      borderRadius: BorderRadius.circular(16),
+                      borderRadius: BorderRadius.circular(18),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.grey.withOpacity(0.25),
+                          color: Colors.grey.withOpacity(0.18),
                           blurRadius: 18,
                           offset: const Offset(0, 8),
                         ),
                       ],
+                      border: Border.all(color: Colors.grey[200]!),
                     ),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Container(
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            color: Colors.black.withOpacity(0.03),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Image.asset(
-                            'assets/icons/NFCScan.png',
-                            width: 48,
-                            height: 48,
-                          ),
-                        ),
-                        const SizedBox(height: 20),
                         const Text(
-                          'NFC에 내 명함 링크 저장',
+                          "NFC 태그에\n내 명함 링크를 저장합니다",
+                          textAlign: TextAlign.center,
                           style: TextStyle(
+                            color: Colors.black87,
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
-                            color: Colors.black87,
                           ),
                         ),
-                        const SizedBox(height: 16),
-                        Obx(() => Column(
-                          mainAxisSize: MainAxisSize.min,
+                        const SizedBox(height: 24),
+                        Stack(
+                          alignment: Alignment.center,
                           children: [
+                            Obx(() {
+                              if (isWriting.value) {
+                                _pulseController.repeat(reverse: true);
+                                return AnimatedBuilder(
+                                  animation: _pulseAnimation,
+                                  builder: (context, child) {
+                                    return Transform.scale(
+                                      scale: _pulseAnimation.value,
+                                      child: Container(
+                                        width: 120,
+                                        height: 120,
+                                        decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          color: Colors.blue.withOpacity(0.15),
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                );
+                              } else {
+                                _pulseController.stop();
+                                return const SizedBox.shrink();
+                              }
+                            }),
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                              width: 88,
+                              height: 88,
                               decoration: BoxDecoration(
-                                color: Colors.black.withOpacity(0.03),
-                                borderRadius: BorderRadius.circular(12),
+                                shape: BoxShape.circle,
+                                color: Colors.white,
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.04),
+                                    blurRadius: 8,
+                                    spreadRadius: 1,
+                                  ),
+                                ],
                               ),
-                              child: const Text(
-                                "NFC 태그에 스마트폰을 가까이 대세요.",
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color: Colors.black54,
-                                ),
+                              child: Center(
+                                child: Obx(() {
+                                  if (nfcResult.value.contains('성공')) {
+                                    return const Icon(
+                                      Icons.check_circle,
+                                      size: 56,
+                                      color: Colors.green,
+                                    );
+                                  } else if (nfcResult.value.contains('오류') || 
+                                           nfcResult.value.contains('실패') ||
+                                           nfcResult.value.contains('불가')) {
+                                    return const Icon(
+                                      Icons.cancel,
+                                      size: 56,
+                                      color: Colors.red,
+                                    );
+                                  } else {
+                                    return Image.asset(
+                                      'assets/icons/NFCScan.png',
+                                      width: 56,
+                                      height: 56,
+                                    );
+                                  }
+                                }),
                               ),
                             ),
-                            const SizedBox(height: 24),
-                            if (isWriting.value) ...[
-                              Container(
-                                padding: const EdgeInsets.all(16),
-                                decoration: BoxDecoration(
-                                  color: Colors.black.withOpacity(0.03),
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                child: Column(
-                                  children: [
-                                    const CircularProgressIndicator(),
-                                    const SizedBox(height: 16),
-                                    const Text(
-                                      'NFC 태그에 기록 중...',
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        color: Colors.black54,
-                                      ),
-                                    ),
-                                  ],
-                                ),
+                          ],
+                        ),
+                        const SizedBox(height: 24),
+                        if (!isWriting.value && nfcResult.value.isEmpty)
+                          ElevatedButton.icon(
+                            icon: const Icon(Icons.save),
+                            label: const Text("NFC 스캔"),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.black,
+                              foregroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 32,
+                                vertical: 16,
                               ),
-                            ] else if (nfcResult.value.isNotEmpty) ...[
-                              Container(
-                                padding: const EdgeInsets.all(16),
-                                decoration: BoxDecoration(
-                                  color: nfcResult.value.contains('성공') 
-                                      ? Colors.green.withOpacity(0.1)
-                                      : Colors.red.withOpacity(0.1),
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                child: Column(
-                                  children: [
-                                    Icon(
-                                      nfcResult.value.contains('성공')
-                                          ? Icons.check_circle
-                                          : Icons.error,
-                                      size: 32,
-                                      color: nfcResult.value.contains('성공')
-                                          ? Colors.green
-                                          : Colors.red,
-                                    ),
-                                    const SizedBox(height: 12),
-                                    Text(
-                                      nfcResult.value,
-                                      style: TextStyle(
-                                        color: nfcResult.value.contains('성공')
-                                            ? Colors.green
-                                            : Colors.red,
-                                        fontSize: 16,
-                                      ),
-                                      textAlign: TextAlign.center,
-                                    ),
-                                  ],
-                                ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
                               ),
-                            ] else ...[
-                              ElevatedButton.icon(
-                                icon: const Icon(Icons.save),
-                                label: const Text('NFC에 저장'),
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.black,
-                                  foregroundColor: Colors.white,
-                                  padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  elevation: 0,
-                                ),
-                                onPressed: () async {
-                                  isWriting.value = true;
-                                  nfcResult.value = '';
+                              elevation: 0,
+                            ),
+                            onPressed: () async {
+                              isWriting.value = true;
+                              nfcResult.value = '';
+                              try {
+                                bool isAvailable = await NfcManager.instance.isAvailable();
+                                if (!isAvailable) {
+                                  nfcResult.value = 'NFC 사용 불가';
+                                  isWriting.value = false;
+                                  return;
+                                }
+                                await NfcManager.instance.startSession(onDiscovered: (NfcTag tag) async {
                                   try {
-                                    bool isAvailable = await NfcManager.instance.isAvailable();
-                                    if (!isAvailable) {
-                                      nfcResult.value = 'NFC 사용 불가';
+                                    final ndef = Ndef.from(tag);
+                                    if (ndef == null || !ndef.isWritable) {
+                                      nfcResult.value = 'NDEF 지원 불가 또는 쓰기 불가 태그';
+                                      await NfcManager.instance.stopSession(errorMessage: nfcResult.value);
                                       isWriting.value = false;
                                       return;
                                     }
-                                    await NfcManager.instance.startSession(onDiscovered: (NfcTag tag) async {
-                                      try {
-                                        final ndef = Ndef.from(tag);
-                                        if (ndef == null || !ndef.isWritable) {
-                                          nfcResult.value = 'NDEF 지원 불가 또는 쓰기 불가 태그';
-                                          await NfcManager.instance.stopSession(errorMessage: nfcResult.value);
-                                          isWriting.value = false;
-                                          return;
-                                        }
-                                        final ndefMessage = NdefMessage([
-                                          NdefRecord.createUri(Uri.parse(cardWebLink)),
-                                        ]);
-                                        await ndef.write(ndefMessage);
-                                        nfcResult.value = 'NFC 태그에 링크 저장 성공!';
-                                        await NfcManager.instance.stopSession();
-                                      } catch (e) {
-                                        nfcResult.value = '저장 실패: \n' + e.toString();
-                                        await NfcManager.instance.stopSession(errorMessage: nfcResult.value);
-                                      } finally {
-                                        isWriting.value = false;
-                                      }
-                                    });
+                                    final ndefMessage = NdefMessage([
+                                      NdefRecord.createUri(Uri.parse(cardWebLink)),
+                                    ]);
+                                    await ndef.write(ndefMessage);
+                                    nfcResult.value = 'NFC 태그에 링크 저장 성공!';
+                                    await NfcManager.instance.stopSession();
                                   } catch (e) {
-                                    nfcResult.value = 'NFC 저장 중 오류 발생';
+                                    nfcResult.value = '저장 실패: \n' + e.toString();
+                                    await NfcManager.instance.stopSession(errorMessage: nfcResult.value);
+                                  } finally {
                                     isWriting.value = false;
                                   }
-                                },
-                              ),
-                            ],
-                          ],
-                        )),
-                        const SizedBox(height: 24),
+                                });
+                              } catch (e) {
+                                nfcResult.value = 'NFC 저장 중 오류 발생';
+                                isWriting.value = false;
+                              }
+                            },
+                          ),
                         if (!isWriting.value)
                           TextButton(
                             onPressed: () => Get.back(),
                             style: TextButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 24,
+                                vertical: 12,
+                              ),
                             ),
                             child: const Text(
                               '닫기',

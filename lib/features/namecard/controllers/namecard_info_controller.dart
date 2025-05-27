@@ -63,9 +63,13 @@ class NameCardInfoController extends GetxController {
     try {
       String? imageUrl = profileImageUrl.value;
       if (profileImage.value != null) {
-        imageUrl =
-            await _profileImageService.uploadProfileImage(profileImage.value!);
-        profileImageUrl.value = imageUrl ?? '';
+        try {
+          imageUrl = await _profileImageService.uploadProfileImage(profileImage.value!);
+          profileImageUrl.value = imageUrl ?? '';
+        } catch (e) {
+          print('프로필 이미지 업로드 에러: $e');
+          rethrow;
+        }
       }
 
       final data = {
@@ -76,15 +80,32 @@ class NameCardInfoController extends GetxController {
         'profileImageUrl': imageUrl,
       };
 
-      await _nameCardService.saveBasicInfo(data);
+      try {
+        await _nameCardService.saveBasicInfo(data);
+      } catch (e) {
+        print('기본 정보 저장 에러: $e');
+        rethrow;
+      }
 
-      final editCardController = Get.find<EditCardController>();
-      await editCardController.loadNameCardData();
-      final homeController = Get.find<HomeController>();
-      await homeController.fetchCardInfo();
+      try {
+        final editCardController = Get.find<EditCardController>();
+        await editCardController.loadNameCardData();
+      } catch (e) {
+        print('명함 데이터 로드 에러: $e');
+        rethrow;
+      }
+
+      try {
+        final homeController = Get.find<HomeController>();
+        await homeController.fetchCardInfo();
+      } catch (e) {
+        print('홈 화면 데이터 갱신 에러: $e');
+        rethrow;
+      }
 
       Get.back(result: true);
     } catch (e) {
+      print('전체 저장 프로세스 에러: $e');
       Get.snackbar('오류', '저장에 실패했습니다.');
     } finally {
       isSaving.value = false;

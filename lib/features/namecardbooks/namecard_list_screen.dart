@@ -2,6 +2,7 @@ import 'dart:ffi';
 
 import 'package:cardmate/features/namecard/controllers/edit_card_controller.dart';
 import 'package:cardmate/features/namecardbooks/card_controller.dart';
+import 'package:cardmate/features/namecardbooks/manual_card_detail_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -52,10 +53,15 @@ class NameCardListScreen extends StatelessWidget {
               color: Colors.transparent,
               child: InkWell(
                 onTap: () async {
-                  if (card.webLink != null) {
-                    if (int.tryParse(card.id) != null) {
-                      Get.toNamed('edit-manual-card',
-                          arguments: {'cardId': card.id});
+                  if (card.isManual) {
+                    Get.to(() => ManualCardDetailScreen(
+                      cardId: card.id,
+                      cardData: card.rawData ?? {},
+                    ));
+                  } else if (card.webLink != null) {
+                    final Uri url = Uri.parse(card.webLink!);
+                    if (await canLaunchUrl(url)) {
+                      await launchUrl(url);
                     } else {
                       final Uri url = Uri.parse(card.webLink!);
                       if (await canLaunchUrl(url)) {
@@ -130,8 +136,7 @@ class NameCardListScreen extends StatelessWidget {
                                   child: ElevatedButton(
                                     onPressed: () async {
                                       try {
-                                        await cardController
-                                            .deleteCard(card.id);
+                                        await cardController.deleteCard(card.id, isManual: card.isManual);
                                         Get.back();
                                         Get.snackbar(
                                           '성공',
