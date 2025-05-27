@@ -94,7 +94,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       context: context,
                       isScrollControlled: true,
                       shape: const RoundedRectangleBorder(
-                        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                        borderRadius:
+                            BorderRadius.vertical(top: Radius.circular(20)),
                       ),
                       builder: (_) => SizedBox(
                         height: MediaQuery.of(context).size.height * 0.7,
@@ -154,6 +155,14 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildHomeBody(HomeController controller) {
     return Obx(() {
+      if (controller.isLoading.value) {
+        return const Center(
+          child: CircularProgressIndicator(
+            valueColor: AlwaysStoppedAnimation<Color>(Colors.black),
+          ),
+        );
+      }
+
       if (!controller.isCardRegistered.value || controller.cardData.isEmpty) {
         return Center(
           child: GestureDetector(

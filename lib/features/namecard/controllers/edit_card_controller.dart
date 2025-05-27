@@ -11,10 +11,10 @@ class EditCardController extends GetxController {
   final links = <Map<String, String>>[].obs;
   final IEditCardService _service;
   String? _loadedCardId;
+  var _isLoadingData = false;
 
   bool isLoadedFor(String cardId) => _loadedCardId == cardId;
 
-  // DI: IEditCardService 구현체를 생성자 주입
   EditCardController({required IEditCardService editCardService})
       : _service = editCardService;
 
@@ -25,23 +25,64 @@ class EditCardController extends GetxController {
   }
 
   Future<void> loadNameCardData() async {
+    if (_isLoadingData) return;
+    _isLoadingData = true;
     isLoading.value = true;
-    final data = await _service.fetchBasicInfo();
-    if (data != null) {
-      basicInfo.assignAll(data);
-    } else {
-      Get.snackbar('오류', '명함 정보를 불러오지 못했습니다.');
+
+    try {
+      // 모든 데이터를 병렬로 로드
+      final results = await Future.wait([
+        _service.fetchBasicInfo(),
+        _service.fetchBlocks(),
+        _service.fetchLinks(),
+      ]);
+
+      if (results[0] != null) {
+        basicInfo.assignAll(results[0] as Map<String, dynamic>);
+      } else {
+        Get.snackbar('오류', '명함 정보를 불러오지 못했습니다.');
+      }
+
+      blocks.assignAll(results[1] as List<Map<String, dynamic>>);
+      links.assignAll(results[2] as List<Map<String, String>>);
+    } catch (e) {
+      print('데이터 로딩 오류: $e');
+      Get.snackbar('오류', '데이터를 불러오는 중 문제가 발생했습니다.');
+    } finally {
+      isLoading.value = false;
+      _isLoadingData = false;
     }
+  }
 
-    // 블록 데이터 불러오기
-    final blocksData = await _service.fetchBlocks();
-    blocks.assignAll(blocksData);
+  Future<void> loadNameCardDataByCardId(String cardId) async {
+    if (_isLoadingData || _loadedCardId == cardId) return;
+    _isLoadingData = true;
+    isLoading.value = true;
+    _loadedCardId = cardId;
 
-    // 링크 데이터 불러오기
-    final linksData = await _service.fetchLinks();
-    links.assignAll(linksData);
+    try {
+      // 모든 데이터를 병렬로 로드
+      final results = await Future.wait([
+        _service.fetchBasicInfoByCardId(cardId),
+        _service.fetchBlocksByCardId(cardId),
+        _service.fetchLinksByCardId(cardId),
+      ]);
 
-    isLoading.value = false;
+      if (results[0] != null) {
+        otherBasicInfo.assignAll(results[0] as Map<String, dynamic>);
+      } else {
+        Get.snackbar('오류', '명함 정보를 불러오지 못했습니다.');
+      }
+
+      otherBlocks.assignAll(results[1] as List<Map<String, dynamic>>);
+      links.assignAll(results[2] as List<Map<String, String>>);
+    } catch (e) {
+      print('데이터 로딩 오류: $e');
+      Get.snackbar('오류', '데이터를 불러오는 중 문제가 발생했습니다.');
+    } finally {
+      isLoading.value = false;
+      _isLoadingData = false;
+    }
   }
 
   Future<void> saveBasicInfo(Map<String, dynamic> newData) async {
@@ -72,10 +113,10 @@ class EditCardController extends GetxController {
     try {
       // 로컬 상태에서 먼저 제거하여 즉시 UI 업데이트
       blocks.removeWhere((block) => block['id'] == blockId);
-      
+
       // Firebase에서 블록 삭제
       await _service.deleteBlock(blockId);
-      
+
       Get.snackbar('성공', '블록이 삭제되었습니다.');
     } catch (e) {
       // 실패 시 다시 블록 목록을 가져와서 상태 복구
@@ -89,7 +130,7 @@ class EditCardController extends GetxController {
     return await _service.uploadImage(imageBytes, fileName);
   }
 
-  Future<void> loadNameCardDataByCardId(String cardId) async {
+  Future<void> loadManualCardDataByCardId(String cardId) async {
     // 이미 같은 카드 ID의 데이터가 로드되어 있다면 다시 로드하지 않음
     if (_loadedCardId == cardId) return;
 
@@ -97,15 +138,13 @@ class EditCardController extends GetxController {
     _loadedCardId = cardId; // 먼저 _loadedCardId 설정
 
     try {
-      final data = await _service.fetchBasicInfoByCardId(cardId);
+      final data = await _service.fetchManualCard(cardId);
+
       if (data != null) {
         otherBasicInfo.assignAll(data);
       } else {
         Get.snackbar('오류', '명함 정보를 불러오지 못했습니다.');
       }
-
-      final blocksData = await _service.fetchBlocksByCardId(cardId);
-      otherBlocks.assignAll(blocksData);
     } catch (e) {
       Get.snackbar('오류', '명함 정보를 불러오는 중 오류가 발생했습니다.');
     } finally {
@@ -118,10 +157,10 @@ class EditCardController extends GetxController {
       // 로컬 상태 먼저 업데이트
       final block = blocks.removeAt(oldIndex);
       blocks.insert(newIndex, block);
-      
+
       // Firebase에 순서 업데이트
       await _service.updateBlockOrder(blocks);
-      
+
       Get.snackbar('성공', '블록 순서가 변경되었습니다.');
     } catch (e) {
       // 실패 시 원래 순서로 복구
@@ -147,10 +186,10 @@ class EditCardController extends GetxController {
     try {
       // 로컬 상태에서 먼저 제거하여 즉시 UI 업데이트
       links.removeWhere((link) => link['id'] == linkId);
-      
+
       // Firebase에서 링크 삭제
       await _service.deleteLink(linkId);
-      
+
       Get.snackbar('성공', '링크가 삭제되었습니다.');
     } catch (e) {
       // 실패 시 다시 링크 목록을 가져와서 상태 복구
@@ -160,7 +199,8 @@ class EditCardController extends GetxController {
     }
   }
 
-  Future<void> updateBlock(String blockId, Map<String, dynamic> blockData) async {
+  Future<void> updateBlock(
+      String blockId, Map<String, dynamic> blockData) async {
     try {
       await _service.updateBlock(blockId, blockData);
       // Firebase에서 최신 블록 목록을 다시 가져옴
@@ -170,5 +210,11 @@ class EditCardController extends GetxController {
     } catch (e) {
       Get.snackbar('오류', '블록 수정에 실패했습니다.');
     }
+  }
+
+  @override
+  void onClose() {
+    _service.clearCache();
+    super.onClose();
   }
 }

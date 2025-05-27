@@ -8,6 +8,19 @@ class EditCardService implements IEditCardService {
   final _firestore = FirebaseInit.instance.firestore;
   final _storage = FirebaseInit.instance.storage;
 
+  // 캐시 데이터
+  Map<String, dynamic>? _cachedBasicInfo;
+  List<Map<String, dynamic>>? _cachedBlocks;
+  Map<String, String>? _cachedContacts;
+  List<Map<String, String>>? _cachedLinks;
+  DateTime? _lastFetchTime;
+  static const _cacheDuration = Duration(minutes: 5);
+
+  bool _isCacheValid() {
+    if (_lastFetchTime == null) return false;
+    return DateTime.now().difference(_lastFetchTime!) < _cacheDuration;
+  }
+
   Future<String?> getCardId(String uid) async {
     final doc = await _firestore.collection('users').doc(uid).get();
     return doc.data()?['cardId'] as String?;
@@ -15,13 +28,22 @@ class EditCardService implements IEditCardService {
 
   @override
   Future<Map<String, dynamic>?> fetchBasicInfo() async {
+    if (_isCacheValid() && _cachedBasicInfo != null) {
+      return _cachedBasicInfo;
+    }
+
     final uid = _auth.currentUser?.uid;
     if (uid == null) return null;
     final cardId = await getCardId(uid);
     if (cardId == null) return null;
     try {
       final doc = await _firestore.collection('cards').doc(cardId).get();
-      return doc.exists ? doc.data() : null;
+      if (doc.exists) {
+        _cachedBasicInfo = doc.data();
+        _lastFetchTime = DateTime.now();
+        return _cachedBasicInfo;
+      }
+      return null;
     } catch (e) {
       print('명함 정보 불러오기 오류: $e');
       return null;
@@ -83,7 +105,7 @@ class EditCardService implements IEditCardService {
       // 새로운 Map을 생성하여 원본 데이터 보존
       final dataToSave = Map<String, dynamic>.from(blockData);
       dataToSave['createdAt'] = FieldValue.serverTimestamp();
-      
+
       await _firestore
           .collection('cards')
           .doc(cardId)
@@ -107,12 +129,15 @@ class EditCardService implements IEditCardService {
 
   @override
   Future<List<Map<String, dynamic>>> fetchBlocks() async {
+    if (_isCacheValid() && _cachedBlocks != null) {
+      return _cachedBlocks!;
+    }
+
     final uid = _auth.currentUser?.uid;
     if (uid == null) return [];
     final cardId = await getCardId(uid);
     if (cardId == null) return [];
     try {
-      // 먼저 createdAt으로 정렬하여 가져옴
       final snapshot = await _firestore
           .collection('cards')
           .doc(cardId)
@@ -126,23 +151,8 @@ class EditCardService implements IEditCardService {
         return data;
       }).toList();
 
-      // order 필드가 없는 블록이 있다면 초기화
-      bool needsUpdate = false;
-      for (int i = 0; i < blocks.length; i++) {
-        if (!blocks[i].containsKey('order')) {
-          needsUpdate = true;
-          await _firestore
-              .collection('cards')
-              .doc(cardId)
-              .collection('card_block')
-              .doc(blocks[i]['id'])
-              .update({'order': i});
-          blocks[i]['order'] = i;
-        }
-      }
-
-      // order 필드로 다시 정렬
-      blocks.sort((a, b) => (a['order'] ?? 0).compareTo(b['order'] ?? 0));
+      _cachedBlocks = blocks;
+      _lastFetchTime = DateTime.now();
       return blocks;
     } catch (e) {
       print('블록 불러오기 오류: $e');
@@ -203,6 +213,10 @@ class EditCardService implements IEditCardService {
 
   @override
   Future<Map<String, String>?> fetchContactsFromSubcollection() async {
+    if (_isCacheValid() && _cachedContacts != null) {
+      return _cachedContacts;
+    }
+
     final uid = _auth.currentUser?.uid;
     if (uid == null) return null;
     final cardId = await getCardId(uid);
@@ -215,7 +229,9 @@ class EditCardService implements IEditCardService {
           .doc('contacts')
           .get();
       if (doc.exists && doc.data() != null) {
-        return Map<String, String>.from(doc.data()!);
+        _cachedContacts = Map<String, String>.from(doc.data()!);
+        _lastFetchTime = DateTime.now();
+        return _cachedContacts;
       }
       return null;
     } catch (e) {
@@ -228,6 +244,21 @@ class EditCardService implements IEditCardService {
   Future<Map<String, dynamic>?> fetchBasicInfoByCardId(String cardId) async {
     try {
       final doc = await _firestore.collection('cards').doc(cardId).get();
+      return doc.exists ? doc.data() : null;
+    } catch (e) {
+      print('타인 명함 정보 불러오기 오류: $e');
+      return null;
+    }
+  }
+
+  Future<Map<String, dynamic>?> fetchManualCard(String cardId) async {
+    try {
+      final doc = await _firestore
+          .collection('users')
+          .doc(_auth.currentUser?.uid)
+          .collection('card_book')
+          .doc(cardId)
+          .get();
       return doc.exists ? doc.data() : null;
     } catch (e) {
       print('타인 명함 정보 불러오기 오류: $e');
@@ -367,6 +398,10 @@ class EditCardService implements IEditCardService {
 
   @override
   Future<List<Map<String, String>>> fetchLinks() async {
+    if (_isCacheValid() && _cachedLinks != null) {
+      return _cachedLinks!;
+    }
+
     final uid = _auth.currentUser?.uid;
     if (uid == null) return [];
     final cardId = await getCardId(uid);
@@ -380,7 +415,7 @@ class EditCardService implements IEditCardService {
           .orderBy('createdAt', descending: false)
           .get();
 
-      return snapshot.docs.map((doc) {
+      final links = snapshot.docs.map((doc) {
         final data = doc.data();
         return {
           'id': doc.id,
@@ -389,6 +424,10 @@ class EditCardService implements IEditCardService {
           'platform': data['platform'] as String? ?? 'direct',
         };
       }).toList();
+
+      _cachedLinks = links;
+      _lastFetchTime = DateTime.now();
+      return links;
     } catch (e) {
       print('링크 불러오기 오류: $e');
       return [];
@@ -450,7 +489,8 @@ class EditCardService implements IEditCardService {
   }
 
   @override
-  Future<void> updateBlock(String blockId, Map<String, dynamic> blockData) async {
+  Future<void> updateBlock(
+      String blockId, Map<String, dynamic> blockData) async {
     final uid = _auth.currentUser?.uid;
     if (uid == null) return;
     final cardId = await getCardId(uid);
@@ -460,7 +500,7 @@ class EditCardService implements IEditCardService {
       // 새로운 Map을 생성하여 원본 데이터 보존
       final dataToSave = Map<String, dynamic>.from(blockData);
       dataToSave['updatedAt'] = FieldValue.serverTimestamp();
-      
+
       await _firestore
           .collection('cards')
           .doc(cardId)
@@ -481,5 +521,14 @@ class EditCardService implements IEditCardService {
       print('블록 수정 오류: $e');
       rethrow;
     }
+  }
+
+  // 캐시 초기화 메서드 추가
+  void clearCache() {
+    _cachedBasicInfo = null;
+    _cachedBlocks = null;
+    _cachedContacts = null;
+    _cachedLinks = null;
+    _lastFetchTime = null;
   }
 }

@@ -1,3 +1,6 @@
+import 'dart:ffi';
+
+import 'package:cardmate/features/namecard/controllers/edit_card_controller.dart';
 import 'package:cardmate/features/namecardbooks/card_controller.dart';
 import 'package:cardmate/features/namecardbooks/manual_card_detail_screen.dart';
 import 'package:flutter/material.dart';
@@ -10,6 +13,8 @@ class NameCardListScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final CardController cardController = Get.find<CardController>();
+    final EditCardController editCardController =
+        Get.find<EditCardController>();
 
     return Obx(() {
       if (cardController.cards.isEmpty) {
@@ -58,13 +63,18 @@ class NameCardListScreen extends StatelessWidget {
                     if (await canLaunchUrl(url)) {
                       await launchUrl(url);
                     } else {
-                      Get.snackbar(
-                        '오류',
-                        '링크를 열 수 없습니다.',
-                        snackPosition: SnackPosition.BOTTOM,
-                        backgroundColor: Colors.black87,
-                        colorText: Colors.white,
-                      );
+                      final Uri url = Uri.parse(card.webLink!);
+                      if (await canLaunchUrl(url)) {
+                        await launchUrl(url);
+                      } else {
+                        Get.snackbar(
+                          '오류',
+                          '링크를 열 수 없습니다.',
+                          snackPosition: SnackPosition.BOTTOM,
+                          backgroundColor: Colors.black87,
+                          colorText: Colors.white,
+                        );
+                      }
                     }
                   }
                 },

@@ -10,6 +10,7 @@ class FirebaseInit {
   late FirebaseAuth auth;
   late FirebaseStorage storage;
   bool _isInitialized = false;
+  User? _cachedUser;
 
   static FirebaseInit get instance => _instance;
 
@@ -52,10 +53,21 @@ class FirebaseInit {
 
     // 3) Firebase Auth 인스턴스
     auth = FirebaseAuth.instance;
+    auth.setPersistence(Persistence.LOCAL);
+    
+    // 현재 사용자 캐싱
+    _cachedUser = auth.currentUser;
+    
+    // 사용자 상태 변경 리스너
+    auth.authStateChanges().listen((User? user) {
+      _cachedUser = user;
+    });
 
     // 4) Firebase Storage 인스턴스
     storage = FirebaseStorage.instance;
     
     _isInitialized = true;
   }
+
+  User? get currentUser => _cachedUser;
 }
