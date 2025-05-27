@@ -2,16 +2,51 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/card_update_alert_controller.dart';
 
-class CardUpdateAlertList extends StatelessWidget {
+class CardUpdateAlertList extends StatefulWidget {
   final String myUid;
   const CardUpdateAlertList({required this.myUid, super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final controller = Get.put(CardUpdateAlertController());
-    controller.loadAlerts(myUid);
+  State<CardUpdateAlertList> createState() => _CardUpdateAlertListState();
+}
 
+class _CardUpdateAlertListState extends State<CardUpdateAlertList> {
+  late final CardUpdateAlertController controller;
+
+  @override
+  void initState() {
+    super.initState();
+    controller = Get.put(CardUpdateAlertController());
+    controller.loadAlerts(widget.myUid);
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Obx(() {
+      if (controller.isLoading.value) {
+        return const Center(child: CircularProgressIndicator());
+      }
+
+      if (controller.error.value != null) {
+        return Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                controller.error.value!,
+                style: const TextStyle(color: Colors.red),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: () => controller.loadAlerts(widget.myUid),
+                child: const Text('다시 시도'),
+              ),
+            ],
+          ),
+        );
+      }
+
       if (controller.alerts.isEmpty) {
         return const Center(
           child: Text(
@@ -20,6 +55,7 @@ class CardUpdateAlertList extends StatelessWidget {
           ),
         );
       }
+
       return ListView.builder(
         itemCount: controller.alerts.length,
         itemBuilder: (context, index) {
@@ -31,6 +67,7 @@ class CardUpdateAlertList extends StatelessWidget {
             title: Text('${alert.cardOwnerName}님이 명함을 수정했습니다.'),
             subtitle: Text(_timeAgo(alert.updatedAt)),
             onTap: () {
+              controller.markAlertAsRead(widget.myUid, alert.cardId);
               Get.toNamed('/card/myNameCard/${alert.cardId}');
             },
           );
@@ -45,4 +82,4 @@ class CardUpdateAlertList extends StatelessWidget {
     if (diff.inHours < 24) return '${diff.inHours}시간 전';
     return '${diff.inDays}일 전';
   }
-} 
+}

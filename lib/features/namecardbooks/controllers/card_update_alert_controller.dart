@@ -5,13 +5,37 @@ import '../services/card_update_alert_service.dart';
 class CardUpdateAlertController extends GetxController {
   final CardUpdateAlertService _service = CardUpdateAlertService();
   var alerts = <CardUpdateAlert>[].obs;
+  var isLoading = false.obs;
+  var error = RxnString();
+
+  @override
+  void onInit() {
+    super.onInit();
+    ever(isLoading, (_) => update());
+  }
 
   Future<void> loadAlerts(String myUid) async {
-    alerts.value = await _service.fetchChangedCards(myUid);
+    try {
+      isLoading.value = true;
+      error.value = null;
+      alerts.value = await _service.fetchChangedCards(myUid);
+    } catch (e) {
+      error.value = '알림을 불러오는 중 오류가 발생했습니다: $e';
+    } finally {
+      isLoading.value = false;
+    }
   }
 
   Future<void> markAlertAsRead(String myUid, String cardId) async {
-    await _service.markAsChecked(myUid, cardId);
-    await loadAlerts(myUid);
+    try {
+      isLoading.value = true;
+      error.value = null;
+      await _service.markAsChecked(myUid, cardId);
+      await loadAlerts(myUid);
+    } catch (e) {
+      error.value = '알림을 읽음 처리하는 중 오류가 발생했습니다: $e';
+    } finally {
+      isLoading.value = false;
+    }
   }
-} 
+}

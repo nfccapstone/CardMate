@@ -2,6 +2,7 @@ import 'package:cardmate/firebase/firebase_init.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
+import 'models/card_memo.dart';
 
 class NameCard {
   final String id;
@@ -65,11 +66,13 @@ class CardController extends GetxController {
   final FirebaseAuth _auth = FirebaseInit.instance.auth;
   final FirebaseFirestore _db = FirebaseFirestore.instance;
   final cards = <NameCard>[].obs;
+  final cardMemos = <String, CardMemo>{}.obs;
 
   @override
   void onInit() {
     super.onInit();
     fetchNameCards();
+    fetchCardMemos();
   }
 
   Future<void> addCardById(String cardId) async {
@@ -194,6 +197,69 @@ class CardController extends GetxController {
       await fetchNameCards();
     } catch (e) {
       print('명함 삭제 실패: $e');
+      rethrow;
+    }
+  }
+
+  Future<void> fetchCardMemos() async {
+    try {
+      final userId = _auth.currentUser?.uid;
+      final memosSnapshot = await _db
+          .collection('users')
+          .doc(userId)
+          .collection('card_memos')
+          .get();
+
+      final memos = <String, CardMemo>{};
+      for (var doc in memosSnapshot.docs) {
+        final memo = CardMemo.fromMap(doc.data());
+        memos[memo.cardId] = memo;
+      }
+      cardMemos.assignAll(memos);
+    } catch (e) {
+      print('메모 불러오기 실패: $e');
+    }
+  }
+
+  Future<void> saveCardMemo(String cardId, String memo) async {
+    try {
+      final userId = _auth.currentUser?.uid;
+      final now = DateTime.now();
+      
+      final cardMemo = CardMemo(
+        cardId: cardId,
+        memo: memo,
+        createdAt: now,
+        updatedAt: now,
+      );
+
+      await _db
+          .collection('users')
+          .doc(userId)
+          .collection('card_memos')
+          .doc(cardId)
+          .set(cardMemo.toMap());
+
+      cardMemos[cardId] = cardMemo;
+    } catch (e) {
+      print('메모 저장 실패: $e');
+      rethrow;
+    }
+  }
+
+  Future<void> deleteCardMemo(String cardId) async {
+    try {
+      final userId = _auth.currentUser?.uid;
+      await _db
+          .collection('users')
+          .doc(userId)
+          .collection('card_memos')
+          .doc(cardId)
+          .delete();
+
+      cardMemos.remove(cardId);
+    } catch (e) {
+      print('메모 삭제 실패: $e');
       rethrow;
     }
   }
