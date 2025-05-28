@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cardmate/features/namecardbooks/card_controller.dart';
 
 class AddManualCardScreen extends StatefulWidget {
   const AddManualCardScreen({super.key});
@@ -54,6 +55,9 @@ class _AddManualCardScreenState extends State<AddManualCardScreen> {
           .doc(user.uid)
           .collection('make_book')
           .add(cardData);
+
+      // 명함첩 새로고침
+      Get.find<CardController>().fetchNameCards();
 
       Get.back();
       Get.snackbar('성공', '명함이 추가되었습니다.');

@@ -62,11 +62,15 @@ class NameCard {
   }
 }
 
+enum CardSortType { addedAt, name, company }
+
 class CardController extends GetxController {
   final FirebaseAuth _auth = FirebaseInit.instance.auth;
   final FirebaseFirestore _db = FirebaseFirestore.instance;
   final cards = <NameCard>[].obs;
   final cardMemos = <String, CardMemo>{}.obs;
+  final isAscending = true.obs; // 정렬 방향 상태 (true: 오래된순, false: 최신순)
+  final sortType = CardSortType.addedAt.obs; // 정렬 기준 상태
 
   @override
   void onInit() {
@@ -75,13 +79,52 @@ class CardController extends GetxController {
     fetchCardMemos();
   }
 
+  void changeSortType(CardSortType type) {
+    sortType.value = type;
+    _sortCards();
+  }
+
+  void toggleSortOrder() {
+    isAscending.value = !isAscending.value;
+    _sortCards();
+  }
+
+  void _sortCards() {
+    cards.sort((a, b) {
+      int cmp;
+      switch (sortType.value) {
+        case CardSortType.name:
+          cmp = (a.name ?? '').compareTo(b.name ?? '');
+          break;
+        case CardSortType.company:
+          cmp = (a.company ?? '').compareTo(b.company ?? '');
+          break;
+        case CardSortType.addedAt:
+        default:
+          final aTime = a.rawData?['addedAt'] as Timestamp? ?? a.rawData?['createdAt'] as Timestamp?;
+          final bTime = b.rawData?['addedAt'] as Timestamp? ?? b.rawData?['createdAt'] as Timestamp?;
+          if (aTime == null && bTime == null) return 0;
+          if (aTime == null) return isAscending.value ? 1 : -1;
+          if (bTime == null) return isAscending.value ? -1 : 1;
+          cmp = aTime.compareTo(bTime);
+      }
+      return isAscending.value ? cmp : -cmp;
+    });
+  }
+
   Future<void> addCardById(String cardId) async {
+    final userId = _auth.currentUser?.uid;
+    final now = DateTime.now();
+
+    // card_book 컬렉션에 추가
     await _db
         .collection('users')
-        .doc(_auth.currentUser?.uid)
+        .doc(userId)
         .collection('card_book')
         .doc(cardId)
-        .set({});
+        .set({
+          'addedAt': Timestamp.fromDate(now),
+        });
 
     await fetchNameCards();
   }
@@ -104,10 +147,13 @@ class CardController extends GetxController {
       final fetchedCards = <NameCard>[];
 
       // 공유 명함(card_book)
-      for (final cardId in cardIds) {
+      for (final doc in cardBookSnapshot.docs) {
+        final cardId = doc.id;
         final cardDoc = await _db.collection('cards').doc(cardId).get();
         if (cardDoc.exists) {
-          fetchedCards.add(NameCard.fromMap(cardDoc.id, cardDoc.data()!));
+          final data = cardDoc.data()!;
+          data['addedAt'] = doc.data()['addedAt']; // 추가 시간 정보 포함
+          fetchedCards.add(NameCard.fromMap(cardId, data));
         }
       }
 
@@ -117,6 +163,7 @@ class CardController extends GetxController {
       }
 
       cards.assignAll(fetchedCards);
+      _sortCards();
     } catch (e, stack) {
       print('명함 불러오기 실패: $e');
       print(stack);
@@ -132,10 +179,13 @@ class CardController extends GetxController {
     final uid = _auth.currentUser?.uid;
     final cardIdSnapshots =
         await _db.collection('users').doc(uid).collection('card_book').get();
+    final makeBookSnapshot =
+        await _db.collection('users').doc(uid).collection('make_book').get();
 
     final searchedCards = <NameCard>[];
     final searchInput = input.toLowerCase(); // 검색어를 소문자로 변환
 
+    // 공유 명함(card_book) 검색
     await Future.wait(
       cardIdSnapshots.docs.map((doc) async {
         final cardId = doc.id;
@@ -148,7 +198,6 @@ class CardController extends GetxController {
           final department = (data['department'] ?? '').toString().toLowerCase();
           final position = (data['position'] ?? '').toString().toLowerCase();
 
-          // 이름, 회사, 부서, 직책 중 하나라도 검색어를 포함하면 결과에 추가
           if (name.contains(searchInput) ||
               company.contains(searchInput) ||
               department.contains(searchInput) ||
@@ -158,6 +207,22 @@ class CardController extends GetxController {
         }
       }),
     );
+
+    // 수동 명함(make_book) 검색
+    for (final doc in makeBookSnapshot.docs) {
+      final data = doc.data();
+      final name = (data['name'] ?? '').toString().toLowerCase();
+      final company = (data['company'] ?? '').toString().toLowerCase();
+      final department = (data['department'] ?? '').toString().toLowerCase();
+      final position = (data['position'] ?? '').toString().toLowerCase();
+
+      if (name.contains(searchInput) ||
+          company.contains(searchInput) ||
+          department.contains(searchInput) ||
+          position.contains(searchInput)) {
+        searchedCards.add(NameCard.fromManualMap(doc.id, data));
+      }
+    }
 
     cards.assignAll(searchedCards);
   }

@@ -40,17 +40,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final HomeController controller = Get.find<HomeController>();
 
     final screens = [
-      const Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          NamecardbooksScreen(),
-          Expanded(
-            child: Center(
-              child: NameCardListScreen(),
-            ),
-          ),
-        ],
-      ),
+      const NamecardbooksScreen(),
       _buildHomeBody(controller),
       const MoreScreen(),
     ];

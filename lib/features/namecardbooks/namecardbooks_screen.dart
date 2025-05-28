@@ -3,6 +3,7 @@ import 'package:cardmate/features/namecardbooks/add_card_byNFC_screen.dart';
 import 'package:cardmate/features/namecardbooks/add_manual_card_screen.dart';
 import 'package:cardmate/features/namecardbooks/card_controller.dart';
 import 'package:cardmate/features/namecardbooks/qr_scan_screen.dart';
+import 'package:cardmate/features/namecardbooks/namecard_list_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -14,73 +15,116 @@ class NamecardbooksScreen extends StatelessWidget {
     final CardController cardController = Get.put(CardController());
     final TextEditingController _searchController = TextEditingController();
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-      child: Row(
-        children: [
-          Expanded(
-            child: Container(
-              height: 48,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.withOpacity(0.1),
-                    blurRadius: 12,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: Row(
-                children: [
-                  const SizedBox(width: 16),
-                  const Icon(Icons.search, color: Colors.black54),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: TextField(
-                      style: const TextStyle(color: Colors.black87),
-                      controller: _searchController,
-                      decoration: const InputDecoration(
-                        hintText: '이름이나 회사명으로 검색',
-                        hintStyle: TextStyle(color: Colors.black38),
-                        border: InputBorder.none,
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+          child: Row(
+            children: [
+              Expanded(
+                child: Container(
+                  height: 48,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(0.1),
+                        blurRadius: 12,
+                        offset: const Offset(0, 4),
                       ),
-                      onChanged: (value) {
-                        value.isEmpty
-                            ? cardController.fetchNameCards()
-                            : cardController.searchCard(value);
-                      },
-                    ),
+                    ],
                   ),
-                ],
-              ),
-            ),
-          ),
-          const SizedBox(width: 12),
-          Container(
-            height: 48,
-            width: 48,
-            decoration: BoxDecoration(
-              color: Colors.black,
-              borderRadius: BorderRadius.circular(12),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.grey.withOpacity(0.1),
-                  blurRadius: 12,
-                  offset: const Offset(0, 4),
+                  child: Row(
+                    children: [
+                      const SizedBox(width: 16),
+                      const Icon(Icons.search, color: Colors.black54),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: TextField(
+                          style: const TextStyle(color: Colors.black87),
+                          controller: _searchController,
+                          decoration: const InputDecoration(
+                            hintText: '이름이나 회사명으로 검색',
+                            hintStyle: TextStyle(color: Colors.black38),
+                            border: InputBorder.none,
+                          ),
+                          onChanged: (value) {
+                            value.isEmpty
+                                ? cardController.fetchNameCards()
+                                : cardController.searchCard(value);
+                          },
+                        ),
+                      ),
+                      Obx(() => DropdownButton<CardSortType>(
+                        value: cardController.sortType.value,
+                        items: const [
+                          DropdownMenuItem(
+                            value: CardSortType.addedAt,
+                            child: Text('추가순'),
+                          ),
+                          DropdownMenuItem(
+                            value: CardSortType.name,
+                            child: Text('이름순'),
+                          ),
+                          DropdownMenuItem(
+                            value: CardSortType.company,
+                            child: Text('회사순'),
+                          ),
+                        ],
+                        onChanged: (type) {
+                          if (type != null) cardController.changeSortType(type);
+                        },
+                        underline: SizedBox(),
+                        style: const TextStyle(color: Colors.black, fontSize: 14),
+                        icon: const Icon(Icons.sort, color: Colors.black54),
+                        dropdownColor: Colors.white,
+                      )),
+                      IconButton(
+                        icon: Obx(() => Icon(
+                          cardController.isAscending.value
+                              ? Icons.arrow_upward
+                              : Icons.arrow_downward,
+                          color: Colors.black54,
+                        )),
+                        onPressed: () {
+                          cardController.toggleSortOrder();
+                        },
+                        tooltip: cardController.isAscending.value
+                            ? '오래된 순으로 정렬'
+                            : '최신 순으로 정렬',
+                      ),
+                    ],
+                  ),
                 ),
-              ],
-            ),
-            child: IconButton(
-              icon: const Icon(Icons.add, color: Colors.white),
-              onPressed: () {
-                _showAddCardOptions(context);
-              },
-            ),
+              ),
+              const SizedBox(width: 12),
+              Container(
+                height: 48,
+                width: 48,
+                decoration: BoxDecoration(
+                  color: Colors.black,
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.1),
+                      blurRadius: 12,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: IconButton(
+                  icon: const Icon(Icons.add, color: Colors.white),
+                  onPressed: () {
+                    _showAddCardOptions(context);
+                  },
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
+        ),
+        const Expanded(child: NameCardListScreen()),
+      ],
     );
   }
 
