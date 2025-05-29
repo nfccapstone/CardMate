@@ -3,10 +3,12 @@ import 'package:cardmate/firebase/firebase_init.dart';
 import 'i_login_service.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:get/get.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class LoginService implements ILoginService {
   final FirebaseAuth _auth = FirebaseInit.instance.auth;
   final GoogleSignIn _googleSignIn = GoogleSignIn();
+  final FirebaseFirestore _firestore = FirebaseInit.instance.firestore;
 
   @override
   Future<User?> signIn(String email, String password) async {
@@ -49,9 +51,20 @@ class LoginService implements ILoginService {
       final UserCredential userCredential =
           await _auth.signInWithCredential(credential);
 
-      // 구글 로그인 성공 후 CardId 화면으로 이동
+      // 구글 로그인 성공 후 사용자 정보 확인
       if (userCredential.user != null) {
-        Get.offAllNamed('/cardId', arguments: {'userId': userCredential.user!.uid});
+        final userDoc = await _firestore
+            .collection('users')
+            .doc(userCredential.user!.uid)
+            .get();
+
+        if (!userDoc.exists) {
+          // 새로운 사용자인 경우 CardId 화면으로 이동
+          Get.offAllNamed('/cardId', arguments: {'userId': userCredential.user!.uid});
+        } else {
+          // 기존 사용자인 경우 홈 화면으로 이동
+          Get.offAllNamed('/home');
+        }
       }
 
       return userCredential.user;
