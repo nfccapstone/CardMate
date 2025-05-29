@@ -57,8 +57,6 @@
 ---
 
 ## 📸 결과물 (스크린샷 추가 추천)
-<h3 align="center">📷 이미지 5x2 그리드</h3>
-
 <table align="center">
   <tr>
     <td><img src="https://github.com/user-attachments/assets/655f0a2a-55d9-4299-b65d-20e5881c3ed7" width="120"/></td>
