@@ -20,7 +20,7 @@
 ---
 
 ## 🏗️ 프로젝트 구조
-[![Image](https://github.com/user-attachments/assets/235622f1-a9ed-4337-b219-0a23b80f7795)](https://github.com/nfccapstone/CardMate/issues/76#issue-3099693526)
+![Image](https://github.com/user-attachments/assets/67aae6f2-ec15-45c4-80e3-068ccf1c28b6)
 ## 🛠️ 개발 환경 및 기술 스택
 
 | 항목 | 내용 |
