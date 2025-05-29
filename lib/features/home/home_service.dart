@@ -42,7 +42,27 @@ class HomeService implements IHomeService {
       if (cardId == null) return null;
       final doc = await _firestore.collection('cards').doc(cardId).collection('card_contact').doc('contacts').get();
       if (doc.exists && doc.data() != null) {
-        return Map<String, String>.from(doc.data()!);
+        final data = doc.data()!;
+        final Map<String, String> result = {};
+        
+        // 고정된 순서 정의
+        final orderedTypes = [
+          'mobile',    // 휴대전화
+          'phone',     // 유선전화
+          'email',     // 이메일
+          'website',   // 홈페이지
+          'address',   // 주소
+          'fax',       // 팩스
+        ];
+
+        // 고정된 순서대로 연락처 추가
+        for (var type in orderedTypes) {
+          if (data.containsKey(type)) {
+            result[type] = data[type] as String;
+          }
+        }
+
+        return result;
       }
     } catch (e) {
       print('연락처 불러오기 오류: $e');

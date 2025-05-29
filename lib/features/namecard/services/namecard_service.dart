@@ -158,7 +158,27 @@ class NameCardService implements INameCardService {
           .get();
       
       if (contactsDoc.exists) {
-        cardData['contacts'] = contactsDoc.data();
+        final contacts = contactsDoc.data()!;
+        final Map<String, dynamic> orderedContacts = {};
+        
+        // 고정된 순서 정의
+        final orderedTypes = [
+          'mobile',    // 휴대전화
+          'phone',     // 유선전화
+          'email',     // 이메일
+          'website',   // 홈페이지
+          'address',   // 주소
+          'fax',       // 팩스
+        ];
+
+        // 고정된 순서대로 연락처 추가
+        for (var type in orderedTypes) {
+          if (contacts.containsKey(type)) {
+            orderedContacts[type] = contacts[type];
+          }
+        }
+
+        cardData['contacts'] = orderedContacts;
       }
 
       // 블록 정보 가져오기

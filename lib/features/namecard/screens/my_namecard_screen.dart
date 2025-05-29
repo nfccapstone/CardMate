@@ -148,35 +148,74 @@ class _ContactSectionReadOnly extends StatelessWidget {
     if (contacts.isEmpty) {
       return const SizedBox.shrink();
     }
+
+    // 연락처를 Map으로 변환 (타입 안전하게)
+    Map<String, String> contactsMap;
+    if (contacts is List<Map<String, String>>) {
+      contactsMap = Map<String, String>.fromEntries(
+        contacts
+          .where((contact) => contact['type'] != null && contact['value'] != null)
+          .map((contact) => MapEntry(
+            contact['type']!.toString(),
+            contact['value']!.toString(),
+          )),
+      );
+    } else if (contacts is List<MapEntry<String, String>>) {
+      contactsMap = Map<String, String>.fromEntries(contacts);
+    } else if (contacts is List) {
+      // 혹시 Map<String, dynamic> 형태로 들어오는 경우
+      contactsMap = Map<String, String>.fromEntries(
+        contacts
+          .where((contact) => contact is Map && contact['type'] != null && contact['value'] != null)
+          .map((contact) => MapEntry(
+            contact['type'].toString(),
+            contact['value'].toString(),
+          )),
+      );
+    } else {
+      contactsMap = {};
+    }
+
+    // 연락처 타입별 정렬 순서 정의
+    final orderedTypes = [
+      'mobile',    // 휴대전화
+      'phone',     // 유선전화
+      'email',     // 이메일
+      'website',   // 홈페이지
+      'address',   // 주소
+      'fax',       // 팩스
+    ];
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text('연락처',
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-        ...contacts.map<Widget>((contact) {
-          final type = contact['type'];
-          final value = contact['value'];
-          IconData icon;
-          VoidCallback? onTap;
-          if (type == 'mobile' || type == 'phone') {
-            icon = Icons.phone;
-            onTap = () => launchUrl(Uri.parse('tel:$value'));
-          } else if (type == 'email') {
-            icon = Icons.email;
-            onTap = () => launchUrl(Uri.parse('mailto:$value'));
-          } else if (type == 'url') {
-            icon = Icons.link;
-            onTap = () => launchUrl(Uri.parse(value));
-          } else {
-            icon = Icons.contact_page;
-            onTap = null;
-          }
-          return ListTile(
-            leading: Icon(icon, color: Colors.black87),
-            title: Text(value, style: const TextStyle(color: Colors.black)),
-            onTap: onTap,
-          );
-        }).toList(),
+        ...orderedTypes
+            .where((type) => contactsMap.containsKey(type))
+            .map<Widget>((type) {
+              final value = contactsMap[type] ?? '';
+              IconData icon;
+              VoidCallback? onTap;
+              if (type == 'mobile' || type == 'phone') {
+                icon = Icons.phone;
+                onTap = () => launchUrl(Uri.parse('tel:$value'));
+              } else if (type == 'email') {
+                icon = Icons.email;
+                onTap = () => launchUrl(Uri.parse('mailto:$value'));
+              } else if (type == 'website') {
+                icon = Icons.language;
+                onTap = () => launchUrl(Uri.parse(value));
+              } else {
+                icon = Icons.contact_phone;
+                onTap = null;
+              }
+              return ListTile(
+                leading: Icon(icon, color: Colors.black87),
+                title: Text(value, style: const TextStyle(color: Colors.black)),
+                onTap: onTap,
+              );
+            }).toList(),
       ],
     );
   }

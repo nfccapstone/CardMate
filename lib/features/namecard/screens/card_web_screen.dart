@@ -175,92 +175,105 @@ class CardWebScreen extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 24),
-                      ...(cardData['contacts'] as Map<String, dynamic>)
-                          .entries
-                          .map((entry) {
-                            final type = entry.key;
-                            final value = entry.value;
-                            IconData icon;
-                            List<Widget> actions = [];
+                      // 연락처를 고정된 순서의 리스트로 변환
+                      ...(() {
+                        final orderedTypes = [
+                          'mobile',
+                          'phone',
+                          'email',
+                          'website',
+                          'address',
+                          'fax',
+                        ];
+                        final contacts = cardData['contacts'] as Map<String, dynamic>? ?? {};
+                        final contactList = orderedTypes
+                            .where((type) => contacts.containsKey(type))
+                            .map((type) => MapEntry(type, contacts[type]))
+                            .toList();
+                        return contactList.map((entry) {
+                          final type = entry.key;
+                          final value = entry.value;
+                          IconData icon;
+                          List<Widget> actions = [];
 
-                            if (type == 'mobile' || type == 'phone') {
-                              icon = Icons.phone;
-                              actions = [
-                                IconButton(
-                                  icon: const Icon(Icons.call,
-                                      color: Colors.black87),
-                                  onPressed: () => _launchUrl('tel:$value'),
-                                ),
-                                IconButton(
-                                  icon: const Icon(Icons.message,
-                                      color: Colors.black87),
-                                  onPressed: () => _launchUrl('sms:$value'),
-                                ),
-                              ];
-                            } else if (type == 'email') {
-                              icon = Icons.email;
-                              actions = [
-                                IconButton(
-                                  icon: const Icon(Icons.email,
-                                      color: Colors.black87),
-                                  onPressed: () => _launchUrl('mailto:$value'),
-                                ),
-                              ];
-                            } else if (type == 'website') {
-                              icon = Icons.language;
-                              actions = [
-                                IconButton(
-                                  icon: const Icon(Icons.open_in_browser,
-                                      color: Colors.black87),
-                                  onPressed: () => _launchUrl(value),
-                                ),
-                              ];
-                            } else {
-                              icon = Icons.contact_phone;
-                            }
-
-                            return Container(
-                              margin: const EdgeInsets.only(bottom: 16),
-                              padding: const EdgeInsets.all(20),
-                              decoration: BoxDecoration(
-                                color: Colors.grey[50],
-                                borderRadius: BorderRadius.circular(12),
-                                border: Border.all(color: Colors.grey[200]!),
+                          if (type == 'mobile' || type == 'phone') {
+                            icon = Icons.phone;
+                            actions = [
+                              IconButton(
+                                icon: const Icon(Icons.call,
+                                    color: Colors.black87),
+                                onPressed: () => _launchUrl('tel:$value'),
                               ),
-                              child: Row(
-                                children: [
-                                  Icon(icon, color: Colors.black87, size: 32),
-                                  const SizedBox(width: 16),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          _getContactTypeLabel(type),
-                                          style: const TextStyle(
-                                            fontSize: 16,
-                                            color: Colors.black,
-                                          ),
+                              IconButton(
+                                icon: const Icon(Icons.message,
+                                    color: Colors.black87),
+                                onPressed: () => _launchUrl('sms:$value'),
+                              ),
+                            ];
+                          } else if (type == 'email') {
+                            icon = Icons.email;
+                            actions = [
+                              IconButton(
+                                icon: const Icon(Icons.email,
+                                    color: Colors.black87),
+                                onPressed: () => _launchUrl('mailto:$value'),
+                              ),
+                            ];
+                          } else if (type == 'website') {
+                            icon = Icons.language;
+                            actions = [
+                              IconButton(
+                                icon: const Icon(Icons.open_in_browser,
+                                    color: Colors.black87),
+                                onPressed: () => _launchUrl(value),
+                              ),
+                            ];
+                          } else {
+                            icon = Icons.contact_phone;
+                          }
+
+                          return Container(
+                            margin: const EdgeInsets.only(bottom: 16),
+                            padding: const EdgeInsets.all(20),
+                            decoration: BoxDecoration(
+                              color: Colors.grey[50],
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(color: Colors.grey[200]!),
+                            ),
+                            child: Row(
+                              children: [
+                                Icon(icon, color: Colors.black87, size: 32),
+                                const SizedBox(width: 16),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        _getContactTypeLabel(type),
+                                        style: const TextStyle(
+                                          fontSize: 16,
+                                          color: Colors.black,
                                         ),
-                                        const SizedBox(height: 4),
-                                        Text(
-                                          value,
-                                          style: const TextStyle(
-                                            fontSize: 20,
-                                            fontWeight: FontWeight.w500,
-                                            color: Colors.black,
-                                          ),
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        value,
+                                        style: const TextStyle(
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.w500,
+                                          color: Colors.black,
                                         ),
-                                      ],
-                                    ),
+                                      ),
+                                    ],
                                   ),
-                                  ...actions,
-                                ],
-                              ),
-                            );
-                          })
-                          .toList(),
+                                ),
+                                ...actions,
+                              ],
+                            ),
+                          );
+                        }).toList();
+                      })(),
                     ],
                   ),
                 ),

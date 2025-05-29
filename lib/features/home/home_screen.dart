@@ -12,6 +12,7 @@ import 'package:cardmate/features/more/more_controller.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cardmate/features/namecardbooks/widgets/card_update_alert_list.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:cardmate/main.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -20,7 +21,7 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends State<HomeScreen> with RouteAware {
   late final PageController _pageController;
 
   @override
@@ -30,9 +31,26 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final route = ModalRoute.of(context);
+    if (route is PageRoute) {
+      routeObserver.subscribe(this, route);
+    }
+  }
+
+  @override
   void dispose() {
+    routeObserver.unsubscribe(this);
     _pageController.dispose();
     super.dispose();
+  }
+
+  @override
+  void didPopNext() {
+    // 이 화면으로 다시 돌아올 때마다 새로고침
+    final HomeController controller = Get.find<HomeController>();
+    controller.fetchCardInfo();
   }
 
   @override
@@ -454,6 +472,7 @@ $profileLink
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: contact.entries
+                        .where((entry) => ['mobile', 'email', 'address'].contains(entry.key))
                         .map<Widget>((entry) => Padding(
                               padding: const EdgeInsets.only(bottom: 12),
                               child: Container(

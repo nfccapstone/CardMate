@@ -32,6 +32,8 @@ import 'features/namecardbooks/add_card_byId_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+final RouteObserver<PageRoute> routeObserver = RouteObserver<PageRoute>();
+
 void main() async {
   setPathUrlStrategy();
   WidgetsFlutterBinding.ensureInitialized();
@@ -67,6 +69,7 @@ class MyApp extends StatelessWidget {
         scaffoldBackgroundColor: Colors.white,
       ),
       initialRoute: initialRoute,
+      navigatorObservers: [routeObserver],
       getPages: [
         GetPage(
             name: '/',
