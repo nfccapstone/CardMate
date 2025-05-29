@@ -89,8 +89,8 @@
       <p>명함첩</p>
     </td>
     <td align="center">
-      <img src="https://github.com/user-attachments/assets/6d1e8da1-c6f7-4b78-b844-04b1d1de02b3" width="200"/><br/>
-      <p>명함 알림</p>
+      <img src="https://github.com/user-attachments/assets/9f0d8d1a-bfb2-426e-b18e-902c1ad82894" width="200"/><br/>
+      <p>명함첩 추가</p>
     </td>
     <td align="center">
       <img src="https://github.com/user-attachments/assets/7fb1933b-3d59-4ee7-89d4-f5bcc65e5f71" width="200"/><br/>
@@ -101,8 +101,8 @@
       <p>QR코드 추가</p>
     </td>
     <td align="center">
-      <img src="https://github.com/user-attachments/assets/9f0d8d1a-bfb2-426e-b18e-902c1ad82894" width="200"/><br/>
-      <p>명함첩 추가</p>
+      <img src="https://github.com/user-attachments/assets/6d1e8da1-c6f7-4b78-b844-04b1d1de02b3" width="200"/><br/>
+      <p>명함 알림</p>
     </td>
   </tr>
 </table>
