@@ -145,15 +145,11 @@ class _BlockCreateScreenState extends State<BlockCreateScreen> {
       return;
     }
 
-    if (_selectedType == 'photo') {
-      // 로딩 다이얼로그 표시
-      Get.dialog(
-        const Center(
-          child: CircularProgressIndicator(),
-        ),
-        barrierDismissible: false,
-      );
+    // 먼저 화면을 닫고 결과를 반환
+    Navigator.of(context).pop(true);
 
+    // 백그라운드에서 데이터 저장 작업 수행
+    if (_selectedType == 'photo') {
       List<String> finalImageUrls = [];
       
       // 새로 추가된 이미지 업로드
@@ -164,9 +160,6 @@ class _BlockCreateScreenState extends State<BlockCreateScreen> {
       
       // 기존 이미지 URL 유지
       finalImageUrls.addAll(_imageUrls);
-
-      // 로딩 다이얼로그 닫기
-      Get.back();
 
       if (finalImageUrls.isEmpty) {
         Get.snackbar('오류', '이미지 업로드에 실패했습니다.');
@@ -197,9 +190,6 @@ class _BlockCreateScreenState extends State<BlockCreateScreen> {
         await _editController.addBlock(blockData);
       }
     }
-
-    // 화면 전환 로직 수정
-    Navigator.of(context).pop(true); // Get.back() 대신 Navigator.pop() 사용
   }
 
   @override
