@@ -18,7 +18,13 @@ class CardUpdateAlertController extends GetxController {
     try {
       isLoading.value = true;
       error.value = null;
-      alerts.value = await _service.fetchChangedCards(myUid);
+      var fetched = await _service.fetchChangedCards(myUid);
+
+      // 최신순 정렬 (updatedAt 내림차순)
+      fetched.sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
+
+      // 10개만 남기기
+      alerts.value = fetched.take(10).toList();
     } catch (e) {
       error.value = '알림을 불러오는 중 오류가 발생했습니다: $e';
     } finally {

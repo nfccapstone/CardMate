@@ -219,7 +219,7 @@ class NameCardListScreen extends StatelessWidget {
                 controller: memoController,
                 maxLines: 5,
                 decoration: InputDecoration(
-                  hintText: '이 사람에 대한 메모를 입력하세요...',
+                  hintText: '이 사람에 대한 특징 혹은 만난 장소와 목적을 입력하세요.',
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),

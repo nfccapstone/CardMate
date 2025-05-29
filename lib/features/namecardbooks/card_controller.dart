@@ -69,7 +69,7 @@ class CardController extends GetxController {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
   final cards = <NameCard>[].obs;
   final cardMemos = <String, CardMemo>{}.obs;
-  final isAscending = true.obs; // 정렬 방향 상태 (true: 오래된순, false: 최신순)
+  final isAscending = false.obs; // 정렬 방향 상태 (false: 최신순이 기본)
   final sortType = CardSortType.addedAt.obs; // 정렬 기준 상태
 
   @override
@@ -95,10 +95,10 @@ class CardController extends GetxController {
       switch (sortType.value) {
         case CardSortType.name:
           cmp = (a.name ?? '').compareTo(b.name ?? '');
-          break;
+          return isAscending.value ? -cmp : cmp;
         case CardSortType.company:
           cmp = (a.company ?? '').compareTo(b.company ?? '');
-          break;
+          return isAscending.value ? -cmp : cmp;
         case CardSortType.addedAt:
         default:
           final aTime = a.rawData?['addedAt'] as Timestamp? ?? a.rawData?['createdAt'] as Timestamp?;
@@ -107,8 +107,8 @@ class CardController extends GetxController {
           if (aTime == null) return isAscending.value ? 1 : -1;
           if (bTime == null) return isAscending.value ? -1 : 1;
           cmp = aTime.compareTo(bTime);
+          return isAscending.value ? cmp : -cmp;
       }
-      return isAscending.value ? cmp : -cmp;
     });
   }
 
