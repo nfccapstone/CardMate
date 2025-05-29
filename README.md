@@ -57,11 +57,4 @@
 ---
 
 ## 📸 결과물 (스크린샷 추가 추천)
-  ![Image](https://github.com/user-attachments/assets/f3f22548-0f85-42f6-ae62-cc7d16de5a56)
-![Image](https://github.com/user-attachments/assets/102a72cd-50ee-4223-9a48-0b3437a994fb)
-![Image](https://github.com/user-attachments/assets/a720188e-382b-4a68-b529-d346dbbb1959)
-![Image](https://github.com/user-attachments/assets/0581aa54-046c-410e-bd0e-45239349d36c)
-![Image](https://github.com/user-attachments/assets/071e98b8-9aae-4189-aacb-decccffdcb5c)
-![Image](https://github.com/user-attachments/assets/8df0e34b-f8d7-4dc4-8f12-d63bf4ed4346)
-![Image](https://github.com/user-attachments/assets/323f9128-034f-4627-87cb-ce06a3cbfdbe)
-![Image](https://github.com/user-attachments/assets/90221164-60d9-4415-9dfb-5652f5e8a36f)
+
