@@ -32,7 +32,6 @@ class ContactController extends GetxController {
     try {
       await _contactService.saveContact(type, value);
       await loadContacts(); // 연락처 목록 새로고침
-      Get.snackbar('성공', '연락처가 저장되었습니다.');
     } catch (e) {
       print('연락처 저장 오류: $e');
       Get.snackbar('오류', '연락처 저장에 실패했습니다.');
@@ -43,7 +42,6 @@ class ContactController extends GetxController {
     try {
       await _contactService.deleteContact(type);
       await loadContacts(); // 연락처 목록 새로고침
-      Get.snackbar('성공', '연락처가 삭제되었습니다.');
     } catch (e) {
       print('연락처 삭제 오류: $e');
       Get.snackbar('오류', '연락처 삭제에 실패했습니다.');
@@ -76,7 +74,6 @@ class ContactController extends GetxController {
               _buildContactTypeItem(context, '유선전화', 'phone'),
               _buildContactTypeItem(context, '휴대전화', 'mobile'),
               _buildContactTypeItem(context, '이메일', 'email'),
-              _buildContactTypeItem(context, '홈페이지', 'website'),
               _buildContactTypeItem(context, '주소', 'address'),
               _buildContactTypeItem(context, '팩스', 'fax'),
               const SizedBox(height: 10),

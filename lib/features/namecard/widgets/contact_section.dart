@@ -40,7 +40,6 @@ class ContactSection extends StatelessWidget {
       'mobile': '휴대전화',
       'phone': '유선전화',
       'email': '이메일',
-      'website': '홈페이지',
       'address': '주소',
       'fax': '팩스',
     };
@@ -59,7 +58,7 @@ class ContactSection extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 8),
-          ...['mobile', 'phone', 'email', 'website', 'address', 'fax']
+          ...['mobile', 'phone', 'email', 'address', 'fax']
               .where((type) => controller.contacts.containsKey(type))
               .map((type) {
                 final value = controller.contacts[type] ?? '';
@@ -91,17 +90,6 @@ class ContactSection extends StatelessWidget {
                       },
                     ),
                   ];
-                } else if (type == 'website') {
-                  icon = Icons.language;
-                  actions = [
-                    IconButton(
-                      icon:
-                          const Icon(Icons.open_in_browser, color: Colors.black87),
-                      onPressed: () {
-                        launchUrl(Uri.parse(value));
-                      },
-                    ),
-                  ];
                 } else {
                   icon = Icons.contact_phone;
                 }
@@ -125,22 +113,20 @@ class ContactSection extends StatelessWidget {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Row(
-                          children: [
-                            Icon(icon, color: Colors.black87, size: 20),
-                            const SizedBox(width: 8),
-                            Text(
-                              contactTitles[type] ?? type,
-                              style: const TextStyle(
-                                fontWeight: FontWeight.w500,
+                        Expanded(
+                          child: Row(
+                            children: [
+                              Icon(icon, color: Colors.black87, size: 20),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  value,
+                                  style: const TextStyle(color: Colors.black),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
                               ),
-                            ),
-                            const SizedBox(width: 8),
-                            Text(
-                              value,
-                              style: const TextStyle(color: Colors.black),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                         IconButton(
                           icon: const Icon(Icons.delete_outline, color: Colors.red),

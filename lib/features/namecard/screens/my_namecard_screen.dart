@@ -181,7 +181,6 @@ class _ContactSectionReadOnly extends StatelessWidget {
       'mobile',    // 휴대전화
       'phone',     // 유선전화
       'email',     // 이메일
-      'website',   // 홈페이지
       'address',   // 주소
       'fax',       // 팩스
     ];
@@ -203,9 +202,6 @@ class _ContactSectionReadOnly extends StatelessWidget {
               } else if (type == 'email') {
                 icon = Icons.email;
                 onTap = () => launchUrl(Uri.parse('mailto:$value'));
-              } else if (type == 'website') {
-                icon = Icons.language;
-                onTap = () => launchUrl(Uri.parse(value));
               } else {
                 icon = Icons.contact_phone;
                 onTap = null;

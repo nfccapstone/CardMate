@@ -11,7 +11,6 @@ class EditContactScreen extends StatelessWidget {
     'mobile': '휴대전화',
     'phone': '유선전화',
     'email': '이메일',
-    'website': '홈페이지',
     'address': '주소',
     'fax': '팩스',
   };
@@ -20,7 +19,6 @@ class EditContactScreen extends StatelessWidget {
     'mobile': '010-0000-0000',
     'phone': '02-000-0000',
     'email': 'nameCard@example.com',
-    'website': 'https://your.site',
     'address': '서울특별시 종로구...',
     'fax': '02-000-0000',
   };
@@ -29,7 +27,6 @@ class EditContactScreen extends StatelessWidget {
     'mobile': TextInputType.phone,
     'phone': TextInputType.phone,
     'email': TextInputType.emailAddress,
-    'website': TextInputType.url,
     'address': TextInputType.text,
     'fax': TextInputType.phone,
   };
@@ -143,8 +140,6 @@ class EditContactScreen extends StatelessWidget {
       return '국가번호 설정을 위해 +, -, 숫자만 입력 가능해요.';
     } else if (type == 'email') {
       return '유효한 이메일 형식을 입력해주세요.';
-    } else if (type == 'website') {
-      return 'https:// 포함한 웹사이트 주소를 입력하세요.';
     }
     return null;
   }

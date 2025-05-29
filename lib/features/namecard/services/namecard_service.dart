@@ -166,7 +166,6 @@ class NameCardService implements INameCardService {
           'mobile',    // 휴대전화
           'phone',     // 유선전화
           'email',     // 이메일
-          'website',   // 홈페이지
           'address',   // 주소
           'fax',       // 팩스
         ];

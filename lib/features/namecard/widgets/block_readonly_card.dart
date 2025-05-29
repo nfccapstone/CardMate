@@ -44,7 +44,7 @@ class _BlockReadOnlyCardState extends State<BlockReadOnlyCard> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            '[${type.toUpperCase()}] $title',
+            '$title',
             style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.black),
           ),
           const SizedBox(height: 8),

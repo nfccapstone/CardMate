@@ -232,13 +232,13 @@ class _ManualCardDetailScreenState extends State<ManualCardDetailScreen> {
 
           if (type == '전화번호' || type == '유선전화') {
             icon = Icons.phone;
-            onTap = () => launchUrl(Uri.parse('tel:$value'));
+            onTap = () => _launchUrl('tel:$value');
           } else if (type == '이메일') {
             icon = Icons.email;
-            onTap = () => launchUrl(Uri.parse('mailto:$value'));
+            onTap = () => _launchUrl('mailto:$value');
           } else if (type == '홈페이지') {
             icon = Icons.language;
-            onTap = () => launchUrl(Uri.parse(value));
+            onTap = () => _launchUrl(value);
           } else if (type == '주소') {
             icon = Icons.location_on;
             onTap = null;

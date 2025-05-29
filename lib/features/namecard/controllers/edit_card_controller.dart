@@ -30,8 +30,6 @@ class EditCardController extends GetxController {
       final data = await _service.fetchBasicInfo();
       if (data != null) {
         basicInfo.assignAll(data);
-      } else {
-        Get.snackbar('오류', '명함 정보를 불러오지 못했습니다.');
       }
 
       // 블록 데이터 불러오기
@@ -43,7 +41,6 @@ class EditCardController extends GetxController {
       links.assignAll(linksData);
     } catch (e) {
       print('데이터 로딩 오류: $e');
-      Get.snackbar('오류', '데이터를 불러오는 중 오류가 발생했습니다.');
     } finally {
       isLoading.value = false;
     }
@@ -54,9 +51,6 @@ class EditCardController extends GetxController {
     final success = await _service.saveBasicInfo(newData);
     if (success) {
       basicInfo.assignAll(newData);
-      Get.snackbar('저장 완료', '명함 정보가 저장되었습니다.');
-    } else {
-      Get.snackbar('저장 실패', '명함 정보 저장에 실패했습니다.');
     }
     isLoading.value = false;
   }
@@ -67,7 +61,6 @@ class EditCardController extends GetxController {
       // Firebase에서 최신 블록 목록을 다시 가져옴
       final blocksData = await _service.fetchBlocks();
       blocks.assignAll(blocksData);
-      Get.snackbar('성공', '블록이 추가되었습니다.');
     } catch (e) {
       Get.snackbar('오류', '블록 추가에 실패했습니다.');
     }
@@ -80,8 +73,6 @@ class EditCardController extends GetxController {
       
       // Firebase에서 블록 삭제
       await _service.deleteBlock(blockId);
-      
-      Get.snackbar('성공', '블록이 삭제되었습니다.');
     } catch (e) {
       // 실패 시 다시 블록 목록을 가져와서 상태 복구
       final blocksData = await _service.fetchBlocks();
@@ -126,8 +117,6 @@ class EditCardController extends GetxController {
       
       // Firebase에 순서 업데이트
       await _service.updateBlockOrder(blocks);
-      
-      Get.snackbar('성공', '블록 순서가 변경되었습니다.');
     } catch (e) {
       // 실패 시 원래 순서로 복구
       final blocksData = await _service.fetchBlocks();
@@ -142,7 +131,6 @@ class EditCardController extends GetxController {
       // Firebase에서 최신 링크 목록을 다시 가져옴
       final linksData = await _service.fetchLinks();
       links.assignAll(linksData);
-      Get.snackbar('성공', '링크가 추가되었습니다.');
     } catch (e) {
       Get.snackbar('오류', '링크 추가에 실패했습니다.');
     }
@@ -155,8 +143,6 @@ class EditCardController extends GetxController {
       
       // Firebase에서 링크 삭제
       await _service.deleteLink(linkId);
-      
-      Get.snackbar('성공', '링크가 삭제되었습니다.');
     } catch (e) {
       // 실패 시 다시 링크 목록을 가져와서 상태 복구
       final linksData = await _service.fetchLinks();
@@ -171,7 +157,6 @@ class EditCardController extends GetxController {
       // Firebase에서 최신 블록 목록을 다시 가져옴
       final blocksData = await _service.fetchBlocks();
       blocks.assignAll(blocksData);
-      Get.snackbar('성공', '블록이 수정되었습니다.');
     } catch (e) {
       Get.snackbar('오류', '블록 수정에 실패했습니다.');
     }

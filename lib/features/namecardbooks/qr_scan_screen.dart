@@ -26,13 +26,6 @@ class _QRScanScreenState extends State<QRScanScreen> {
       await cardController.addCardById(cardId);
       await controller.stop();
 
-      Get.snackbar(
-        '성공',
-        '명함이 추가되었습니다.',
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.black87,
-        colorText: Colors.white,
-      );
       Get.until((route) => route.settings.name == '/home');
     } catch (e) {
       Get.snackbar(

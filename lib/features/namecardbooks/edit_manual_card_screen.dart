@@ -131,7 +131,6 @@ class _EditManualCardScreenState extends State<EditManualCardScreen> {
                     DropdownMenuItem(value: '전화번호', child: Text('전화번호')),
                     DropdownMenuItem(value: '유선전화', child: Text('유선전화')),
                     DropdownMenuItem(value: '이메일', child: Text('이메일')),
-                    DropdownMenuItem(value: '홈페이지', child: Text('홈페이지')),
                     DropdownMenuItem(value: '주소', child: Text('주소')),
                     DropdownMenuItem(value: '팩스', child: Text('팩스')),
                   ],
@@ -395,9 +394,8 @@ class _EditManualCardScreenState extends State<EditManualCardScreen> {
       '전화번호': 0,
       '유선전화': 1,
       '이메일': 2,
-      '홈페이지': 3,
-      '주소': 4,
-      '팩스': 5,
+      '주소': 3,
+      '팩스': 4,
     };
 
     // 연락처를 순서대로 정렬

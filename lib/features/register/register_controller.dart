@@ -50,11 +50,6 @@ class RegisterController extends GetxController {
       );
 
       if (user != null) {
-        Get.snackbar(
-          "회원가입 성공",
-          "CardId 입력 화면으로 이동합니다.",
-          snackPosition: SnackPosition.BOTTOM,
-        );
         Get.offAllNamed('/cardId', arguments: {'userId': user.uid});
       } else {
         Get.snackbar(

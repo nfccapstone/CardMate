@@ -69,13 +69,6 @@ class _AddCardByNFCScreenState extends State<AddCardByNFCScreen> with SingleTick
         final cardId = url.split('/').last;
         await cardController.addCardById(cardId);
 
-        Get.snackbar(
-          '성공',
-          '명함이 추가되었습니다.',
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.black87,
-          colorText: Colors.white,
-        );
         await NfcManager.instance.stopSession();
         setState(() {
           isScanning = false;

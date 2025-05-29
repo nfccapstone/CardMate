@@ -60,7 +60,6 @@ class _AddManualCardScreenState extends State<AddManualCardScreen> {
       Get.find<CardController>().fetchNameCards();
 
       Get.back();
-      Get.snackbar('성공', '명함이 추가되었습니다.');
     } catch (e) {
       Get.snackbar('오류', '명함 추가 중 오류가 발생했습니다.');
     } finally {

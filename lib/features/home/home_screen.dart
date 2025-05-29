@@ -13,6 +13,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cardmate/features/namecardbooks/widgets/card_update_alert_list.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:cardmate/main.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -23,6 +24,13 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> with RouteAware {
   late final PageController _pageController;
+
+  Future<void> _launchUrl(String url) async {
+    final uri = Uri.parse(url);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri);
+    }
+  }
 
   @override
   void initState() {
@@ -412,14 +420,6 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
                             size: 18, color: Colors.black38),
                         onPressed: () {
                           Clipboard.setData(ClipboardData(text: profileLink));
-                          Get.snackbar(
-                            '복사 완료',
-                            '링크가 클립보드에 복사되었습니다.',
-                            snackPosition: SnackPosition.BOTTOM,
-                            backgroundColor: Colors.black87,
-                            colorText: Colors.white,
-                            duration: const Duration(seconds: 2),
-                          );
                         },
                       ),
                       const SizedBox(width: 2),
@@ -492,16 +492,12 @@ $profileLink
                                 ),
                                 child: Row(
                                   children: [
-                                    _getContactIcon(entry.key),
-                                    const SizedBox(width: 12),
-                                    Text(
-                                      '${_getContactLabel(entry.key)}: ',
-                                      style: const TextStyle(
-                                        color: Colors.black87,
-                                        fontWeight: FontWeight.w500,
-                                        fontSize: 15,
-                                      ),
+                                    Icon(
+                                      _getContactIcon(entry.key),
+                                      size: 20,
+                                      color: Colors.black87,
                                     ),
+                                    const SizedBox(width: 8),
                                     Expanded(
                                       child: Text(
                                         entry.value,
@@ -550,33 +546,18 @@ $profileLink
     });
   }
 
-  Icon _getContactIcon(String type) {
+  IconData _getContactIcon(String type) {
     switch (type) {
       case 'mobile':
-        return const Icon(Icons.phone_android, color: Colors.black54, size: 20);
+        return Icons.phone_android;
       case 'email':
-        return const Icon(Icons.email, color: Colors.black54, size: 20);
+        return Icons.email;
       case 'tel':
-        return const Icon(Icons.phone, color: Colors.black54, size: 20);
+        return Icons.phone;
       case 'fax':
-        return const Icon(Icons.print, color: Colors.black54, size: 20);
+        return Icons.print;
       default:
-        return const Icon(Icons.info_outline, color: Colors.black54, size: 20);
-    }
-  }
-
-  String _getContactLabel(String type) {
-    switch (type) {
-      case 'mobile':
-        return '휴대전화';
-      case 'email':
-        return '이메일';
-      case 'tel':
-        return '전화번호';
-      case 'fax':
-        return '팩스';
-      default:
-        return type;
+        return Icons.info_outline;
     }
   }
 }

@@ -64,7 +64,6 @@ class HomeController extends GetxController {
       }
     } catch (e) {
       print('명함 정보 로딩 오류: $e');
-      Get.snackbar('오류', '명함 정보를 불러오는데 실패했습니다.');
     }
   }
 
@@ -81,7 +80,6 @@ class HomeController extends GetxController {
       registerCard();
     } catch (e) {
       print('명함 네비게이션 오류: $e');
-      Get.snackbar('오류', '명함 정보를 확인하는데 실패했습니다.');
     }
   }
 }

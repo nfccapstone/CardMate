@@ -45,7 +45,6 @@ class CardWebScreen extends StatelessWidget {
               'mobile',
               'phone',
               'email',
-              'website',
               'address',
               'fax',
             ];
@@ -181,7 +180,6 @@ class CardWebScreen extends StatelessWidget {
                           'mobile',
                           'phone',
                           'email',
-                          'website',
                           'address',
                           'fax',
                         ];
@@ -217,15 +215,6 @@ class CardWebScreen extends StatelessWidget {
                                 icon: const Icon(Icons.email,
                                     color: Colors.black87),
                                 onPressed: () => _launchUrl('mailto:$value'),
-                              ),
-                            ];
-                          } else if (type == 'website') {
-                            icon = Icons.language;
-                            actions = [
-                              IconButton(
-                                icon: const Icon(Icons.open_in_browser,
-                                    color: Colors.black87),
-                                onPressed: () => _launchUrl(value),
                               ),
                             ];
                           } else {
@@ -386,8 +375,6 @@ class CardWebScreen extends StatelessWidget {
         return '유선전화';
       case 'email':
         return '이메일';
-      case 'website':
-        return '홈페이지';
       case 'address':
         return '주소';
       case 'fax':
