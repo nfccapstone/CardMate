@@ -2,6 +2,7 @@
 
 **CardMate**는 종이 명함의 불편함을 해소하고, 명함 관리와 네트워킹을 혁신적으로 개선하는 **디지털 명함 앱**입니다.  
 간편하고 직관적인 UI를 통해 사용자에게 **효율적인 명함 교환 및 관리** 경험을 제공합니다.
+## 🎬 시연 영상
 
 ---
 
@@ -19,7 +20,7 @@
 ---
 
 ## 🏗️ 프로젝트 구조
-
+![Image](https://github.com/user-attachments/assets/67aae6f2-ec15-45c4-80e3-068ccf1c28b6)
 ## 🛠️ 개발 환경 및 기술 스택
 
 | 항목 | 내용 |
@@ -27,7 +28,7 @@
 | 👨‍💻 개발 환경 | Windows, Android |
 | 🧰 개발 도구 | VSCode |
 | 💻 개발 언어 | Dart |
-| 🔧 주요 기술 | Flutter, Firebase, NFC, QR 코드 |
+| 🔧 주요 기술 | Flutter, Firebase |
 
 ---
 
@@ -35,10 +36,10 @@
 
 | 이름 | 역할 |
 |------|------|
-| 황준선 (팀장) | Firebase 설계 |
-| 주환수 | UI/UX 디자인 |
+| 황준선 (팀장) | Firebase 설계 및 프로젝트 관리 |
+| 주환수 | UI/UX 디자인 및 User기능 |
 | 조민기 | 백엔드 로직 구현 |
-| 최은비 | 프론트엔드 개발 |
+| 최은비 | 프론트엔드 개발|
 
 ---
 
@@ -55,5 +56,22 @@
 
 ---
 
-## 📸 결과물 (스크린샷 추가 추천)
-> 실제 앱 화면을 여기에 이미지로 첨부하면 더 좋은 포트폴리오가 됩니다.
+## 📸 결과물
+<table align="center">
+  <tr>
+    <td><img src="https://github.com/user-attachments/assets/655f0a2a-55d9-4299-b65d-20e5881c3ed7" width="200"/></td>
+    <td><img src="https://github.com/user-attachments/assets/e731bccc-6eaa-4241-b5a3-9264c1b68fec" width="200"/></td>
+    <td><img src="https://github.com/user-attachments/assets/c1ecfce1-2ff8-4064-b484-e8dbdf772573" width="200"/></td>
+    <td><img src="https://github.com/user-attachments/assets/06a2d498-8078-43dc-8da2-e8ceabcc9d1d" width="200"/></td>
+    <td><img src="https://github.com/user-attachments/assets/3cb5e2a2-e8b0-46ca-87ec-f7b033c7b786" width="200"/></td>
+  </tr>
+  <tr>
+    <td><img src="https://github.com/user-attachments/assets/5b529b7a-cfc5-4056-813b-1e5cedbfbcd3" width="200"/></td>
+    <td><img src="https://github.com/user-attachments/assets/6d1e8da1-c6f7-4b78-b844-04b1d1de02b3" width="200"/></td>
+    <td><img src="https://github.com/user-attachments/assets/7fb1933b-3d59-4ee7-89d4-f5bcc65e5f71" width="200"/></td>
+    <td><img src="https://github.com/user-attachments/assets/4c776acf-a81f-4930-b166-ff0c19844fdc" width="200"/></td>
+    <td><img src="https://github.com/user-attachments/assets/9f0d8d1a-bfb2-426e-b18e-902c1ad82894" width="200"/></td>
+  </tr>
+</table>
+
+
