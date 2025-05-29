@@ -57,4 +57,18 @@
 ---
 
 ## 📸 결과물 (스크린샷 추가 추천)
-<img width="208" alt="Image" src="https://github.com/user-attachments/assets/e09651ca-6303-4a5e-bbfa-e7719542786c" />
+<h3>📸 결과물 (앱 시연 스크린샷)</h3>
+
+<p>아래는 CardMate27의 실제 앱 시연 장면입니다.</p>
+
+<div style="display: flex; flex-wrap: wrap; gap: 10px;">
+  <img src="https://github.com/user-attachments/assets/f3f22548-0f85-42f6-ae62-cc7d16de5a56" width="150">
+  <img src="https://github.com/user-attachments/assets/102a72cd-50ee-4223-9a48-0b3437a994fb" width="150">
+  <img src="https://github.com/user-attachments/assets/a720188e-382b-4a68-b529-d346dbbb1959" width="150">
+  <img src="https://github.com/user-attachments/assets/0581aa54-046c-410e-bd0e-45239349d36c" width="150">
+  <img src="https://github.com/user-attachments/assets/071e98b8-9aae-4189-aacb-decccffdcb5c" width="150">
+  <img src="https://github.com/user-attachments/assets/8df0e34b-f8d7-4dc4-8f12-d63bf4ed4346" width="150">
+  <img src="https://github.com/user-attachments/assets/323f9128-034f-4627-87cb-ce06a3cbfdbe" width="150">
+  <img src="https://github.com/user-attachments/assets/90221164-60d9-4415-9dfb-5652f5e8a36f" width="150">
+</div>
+
