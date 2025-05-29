@@ -56,7 +56,7 @@
 
 ---
 
-## 📸 결과물 (스크린샷 추가 추천)
+## 📸 결과물
 <table align="center">
   <tr>
     <td><img src="https://github.com/user-attachments/assets/655f0a2a-55d9-4299-b65d-20e5881c3ed7" width="200"/></td>
