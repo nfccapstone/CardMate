@@ -61,19 +61,50 @@
 ## 📸 결과물
 <table align="center">
   <tr>
-    <td><img src="https://github.com/user-attachments/assets/655f0a2a-55d9-4299-b65d-20e5881c3ed7" width="200"/></td>
-    <td><img src="https://github.com/user-attachments/assets/e731bccc-6eaa-4241-b5a3-9264c1b68fec" width="200"/></td>
-    <td><img src="https://github.com/user-attachments/assets/c1ecfce1-2ff8-4064-b484-e8dbdf772573" width="200"/></td>
-    <td><img src="https://github.com/user-attachments/assets/06a2d498-8078-43dc-8da2-e8ceabcc9d1d" width="200"/></td>
-    <td><img src="https://github.com/user-attachments/assets/3cb5e2a2-e8b0-46ca-87ec-f7b033c7b786" width="200"/></td>
+    <td align="center">
+      <img src="https://github.com/user-attachments/assets/655f0a2a-55d9-4299-b65d-20e5881c3ed7" width="200"/><br/>
+      <p>설명 1</p>
+    </td>
+    <td align="center">
+      <img src="https://github.com/user-attachments/assets/e731bccc-6eaa-4241-b5a3-9264c1b68fec" width="200"/><br/>
+      <p>설명 2</p>
+    </td>
+    <td align="center">
+      <img src="https://github.com/user-attachments/assets/c1ecfce1-2ff8-4064-b484-e8dbdf772573" width="200"/><br/>
+      <p>설명 3</p>
+    </td>
+    <td align="center">
+      <img src="https://github.com/user-attachments/assets/06a2d498-8078-43dc-8da2-e8ceabcc9d1d" width="200"/><br/>
+      <p>설명 4</p>
+    </td>
+    <td align="center">
+      <img src="https://github.com/user-attachments/assets/3cb5e2a2-e8b0-46ca-87ec-f7b033c7b786" width="200"/><br/>
+      <p>설명 5</p>
+    </td>
   </tr>
   <tr>
-    <td><img src="https://github.com/user-attachments/assets/5b529b7a-cfc5-4056-813b-1e5cedbfbcd3" width="200"/></td>
-    <td><img src="https://github.com/user-attachments/assets/6d1e8da1-c6f7-4b78-b844-04b1d1de02b3" width="200"/></td>
-    <td><img src="https://github.com/user-attachments/assets/7fb1933b-3d59-4ee7-89d4-f5bcc65e5f71" width="200"/></td>
-    <td><img src="https://github.com/user-attachments/assets/4c776acf-a81f-4930-b166-ff0c19844fdc" width="200"/></td>
-    <td><img src="https://github.com/user-attachments/assets/9f0d8d1a-bfb2-426e-b18e-902c1ad82894" width="200"/></td>
+    <td align="center">
+      <img src="https://github.com/user-attachments/assets/5b529b7a-cfc5-4056-813b-1e5cedbfbcd3" width="200"/><br/>
+      <p>설명 6</p>
+    </td>
+    <td align="center">
+      <img src="https://github.com/user-attachments/assets/6d1e8da1-c6f7-4b78-b844-04b1d1de02b3" width="200"/><br/>
+      <p>설명 7</p>
+    </td>
+    <td align="center">
+      <img src="https://github.com/user-attachments/assets/7fb1933b-3d59-4ee7-89d4-f5bcc65e5f71" width="200"/><br/>
+      <p>설명 8</p>
+    </td>
+    <td align="center">
+      <img src="https://github.com/user-attachments/assets/4c776acf-a81f-4930-b166-ff0c19844fdc" width="200"/><br/>
+      <p>설명 9</p>
+    </td>
+    <td align="center">
+      <img src="https://github.com/user-attachments/assets/9f0d8d1a-bfb2-426e-b18e-902c1ad82894" width="200"/><br/>
+      <p>설명 10</p>
+    </td>
   </tr>
 </table>
+
 
 
