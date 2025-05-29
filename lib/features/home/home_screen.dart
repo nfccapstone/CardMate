@@ -56,6 +56,12 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
   @override
   Widget build(BuildContext context) {
     final HomeController controller = Get.find<HomeController>();
+    
+    // refresh 인자 처리
+    final args = Get.arguments;
+    if (args != null && args['refresh'] == true) {
+      controller.fetchCardInfo();
+    }
 
     final screens = [
       const NamecardbooksScreen(),

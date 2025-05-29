@@ -9,6 +9,7 @@ import 'package:cardmate/features/namecard/services/i_contact_service.dart';
 import 'package:cardmate/features/namecard/widgets/block_preview_card.dart';
 import 'package:cardmate/features/namecard/widgets/link_section.dart';
 import 'package:cardmate/features/namecard/utils/platform_icon_utils.dart';
+import 'package:cardmate/features/namecard/screens/block_create_screen.dart';
 
 enum LinkPlatform { direct, instagram, github }
 
@@ -189,7 +190,7 @@ class EditCardScreen extends StatelessWidget {
   Widget _buildBlockAddButton(
       BuildContext context, EditCardController controller) {
     return GestureDetector(
-      onTap: () => _showBlockTypeBottomSheet(controller),
+      onTap: () => _showBlockTypeBottomSheet(context, controller),
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 16),
         alignment: Alignment.center,
@@ -209,8 +210,16 @@ class EditCardScreen extends StatelessWidget {
     );
   }
 
-  void _showBlockTypeBottomSheet(EditCardController controller) {
-    Get.toNamed('/blockCreate');
+  void _showBlockTypeBottomSheet(BuildContext context, EditCardController controller) async {
+    final result = await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => const BlockCreateScreen(),
+      ),
+    );
+    if (result == true) {
+      // BlockCreateScreen에서 블록이 추가되었다면 데이터 새로고침
+      controller.loadNameCardData();
+    }
   }
 
   void _navigateToBlockCreateScreen(

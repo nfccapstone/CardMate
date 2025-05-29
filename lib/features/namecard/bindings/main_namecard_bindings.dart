@@ -26,8 +26,8 @@ class MainNameCardBindings extends Bindings {
         profileImageService: Get.find<IProfileImageService>(),
       ),
     );
-    Get.lazyPut<EditCardController>(
-      () => EditCardController(editCardService: Get.find<IEditCardService>()),
+    Get.put<EditCardController>(
+      EditCardController(editCardService: Get.find<IEditCardService>()),
     );
   }
 } 

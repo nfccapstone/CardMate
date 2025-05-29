@@ -198,8 +198,8 @@ class _BlockCreateScreenState extends State<BlockCreateScreen> {
       }
     }
 
-    Get.offAllNamed('/home');
-    Get.toNamed('/editCard', arguments: {'cardId': _editController.basicInfo['cardId']});
+    // 화면 전환 로직 수정
+    Navigator.of(context).pop(true); // Get.back() 대신 Navigator.pop() 사용
   }
 
   @override

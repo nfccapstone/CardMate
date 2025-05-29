@@ -108,6 +108,7 @@ class MyApp extends StatelessWidget {
         GetPage(
           name: '/blockCreate',
           page: () => const BlockCreateScreen(),
+          binding: MainNameCardBindings(),
         ),
         GetPage(
           name: '/card/myNameCard/:cardId',

@@ -26,22 +26,27 @@ class EditCardController extends GetxController {
 
   Future<void> loadNameCardData() async {
     isLoading.value = true;
-    final data = await _service.fetchBasicInfo();
-    if (data != null) {
-      basicInfo.assignAll(data);
-    } else {
-      Get.snackbar('오류', '명함 정보를 불러오지 못했습니다.');
+    try {
+      final data = await _service.fetchBasicInfo();
+      if (data != null) {
+        basicInfo.assignAll(data);
+      } else {
+        Get.snackbar('오류', '명함 정보를 불러오지 못했습니다.');
+      }
+
+      // 블록 데이터 불러오기
+      final blocksData = await _service.fetchBlocks();
+      blocks.assignAll(blocksData);
+
+      // 링크 데이터 불러오기
+      final linksData = await _service.fetchLinks();
+      links.assignAll(linksData);
+    } catch (e) {
+      print('데이터 로딩 오류: $e');
+      Get.snackbar('오류', '데이터를 불러오는 중 오류가 발생했습니다.');
+    } finally {
+      isLoading.value = false;
     }
-
-    // 블록 데이터 불러오기
-    final blocksData = await _service.fetchBlocks();
-    blocks.assignAll(blocksData);
-
-    // 링크 데이터 불러오기
-    final linksData = await _service.fetchLinks();
-    links.assignAll(linksData);
-
-    isLoading.value = false;
   }
 
   Future<void> saveBasicInfo(Map<String, dynamic> newData) async {
