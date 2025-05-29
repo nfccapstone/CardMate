@@ -49,6 +49,11 @@ class LoginService implements ILoginService {
       final UserCredential userCredential =
           await _auth.signInWithCredential(credential);
 
+      // 구글 로그인 성공 후 CardId 화면으로 이동
+      if (userCredential.user != null) {
+        Get.offAllNamed('/cardId', arguments: {'userId': userCredential.user!.uid});
+      }
+
       return userCredential.user;
     } catch (e) {
       print("구글 로그인 오류: $e");
