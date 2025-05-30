@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'more_controller.dart';
 import 'package:cardmate/features/home/home_controller.dart';
 import 'package:nfc_manager/nfc_manager.dart';
+import 'package:flutter/services.dart';
 
 class MoreScreen extends StatefulWidget {
   const MoreScreen({Key? key}) : super(key: key);
@@ -56,6 +57,98 @@ class _MoreScreenState extends State<MoreScreen> with SingleTickerProviderStateM
             ),
           ),
           const SizedBox(height: 24),
+          _buildMenuCard(
+            icon: Icons.badge,
+            title: '내 CardID 확인',
+            onTap: () {
+              final homeController = Get.find<HomeController>();
+              final cardId = homeController.cardData['cardId'] ?? '';
+              
+              Get.dialog(
+                Dialog(
+                  backgroundColor: Colors.transparent,
+                  child: Container(
+                    padding: const EdgeInsets.all(24),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.25),
+                          blurRadius: 18,
+                          offset: const Offset(0, 8),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Text(
+                          '내 CardID',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black87,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        Container(
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: Colors.grey[100],
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(color: Colors.grey[300]!),
+                          ),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  cardId,
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    color: Colors.black87,
+                                  ),
+                                ),
+                              ),
+                              IconButton(
+                                icon: const Icon(Icons.copy, size: 20),
+                                onPressed: () {
+                                  Clipboard.setData(ClipboardData(text: cardId));
+                                  Get.snackbar(
+                                    '복사 완료',
+                                    'CardID가 클립보드에 복사되었습니다.',
+                                    snackPosition: SnackPosition.BOTTOM,
+                                    backgroundColor: Colors.black87,
+                                    colorText: Colors.white,
+                                    duration: const Duration(seconds: 2),
+                                  );
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 24),
+                        ElevatedButton(
+                          onPressed: () => Get.back(),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.black,
+                            foregroundColor: Colors.white,
+                            minimumSize: const Size(double.infinity, 48),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            elevation: 0,
+                          ),
+                          child: const Text('닫기'),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+          const SizedBox(height: 12),
           _buildMenuCard(
             icon: Icons.logout,
             title: '로그아웃',
